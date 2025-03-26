@@ -1,22 +1,9 @@
+import Navbar from "../components/Navbar";
+
 const Homepage = () => {
   return (
     <div className="bg-[#111827] text-gray-200 min-h-screen flex flex-col">
-      <nav className="bg-[#111827] p-4 flex justify-between items-center">
-        <div className="flex space-x-20 flex-grow justify-center">
-          <a href="#" className="hover:text-white">
-            HOME
-          </a>
-          <a href="#" className="hover:text-white">
-            ASSESSMENT
-          </a>
-          <a href="#" className="hover:text-white">
-            DASHBOARD
-          </a>
-        </div>
-        <div className="rounded-full bg-gray-700 w-10 h-10 flex items-center justify-center">
-          <img src="" alt="Profile" className="rounded-full" />
-        </div>
-      </nav>
+      <Navbar /> {/* Add the Navbar here */}
 
       <div className="flex-grow text-center p-25">
         <h1 className="text-4xl font-bold mb-4">

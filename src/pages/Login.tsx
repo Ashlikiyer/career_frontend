@@ -1,17 +1,19 @@
 const Login = () => {
   return (
     <div>
-      <section className="bg-[#121212] min-h-screen flex items-center justify-center">
+      <section className="bg-[#111827] min-h-screen flex items-center justify-center">
         <div className="container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="flex w-full max-w-5xl">
             {/* Left Side (Logo and Description) */}
             <div className="w-1/2 p-8 text-white flex flex-col items-start justify-center">
-              <div className="text-6xl font-bold mb-4">
-                <span className="text-white">C</span>
-                <span className="text-white">M</span>
+              <div className="-mb-8 -mt-15 ml-10" style={{ height: '250px', overflow: 'hidden' }}>
+                <img
+                  src="src/assets/logo.svg"
+                  className="w-full h-full object-contain"
+                  alt="CareerML Logo"
+                />
               </div>
-              <div className="text-3xl font-semibold mb-6">CAREERML</div>
-              <p className="text-lg mb-8">
+              <p className="text-lg text-center -ml-25">
                 Discover your ideal career with ML-powered recommendations. Take
                 the assessment and start your journey today!
               </p>
@@ -71,12 +73,6 @@ const Login = () => {
                       Sign up
                     </a>
                   </p>
-                  <a
-                    href="#"
-                    className="text-sm font-medium text-blue-600 hover:underline"
-                  >
-                    Forgot password?
-                  </a>
                 </div>
               </form>
             </div>
