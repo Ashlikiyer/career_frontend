@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
+import Results from './Results';
 
 const Assessment = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -101,23 +102,9 @@ const Assessment = () => {
     }
   };
 
-  const calculateResults = () => {
-    const counts = {
-      developer: 0,
-      designer: 0,
-      analyst: 0,
-      engineer: 0
-    };
-
-    answers.forEach((answer) => {
-      if (answer === 0) counts.developer++;
-      if (answer === 1) counts.designer++;
-      if (answer === 2) counts.engineer++;
-      if (answer === 3) counts.analyst++;
-    });
-
-    return counts;
-  };
+  if (completed && showResults) {
+    return <Results />;
+  }
 
   if (completed && !showResults) {
     return (
@@ -141,73 +128,10 @@ const Assessment = () => {
     );
   }
 
-  if (completed && showResults) {
-    const results = calculateResults();
-    return (
-      <div className="min-h-screen bg-[#111827] text-gray-200 flex flex-col">
-        <Navbar />
-        <div className="flex-grow  p-8">
-          <div className="max-w-2xl mx-auto bg-[#1F2937] rounded-lg p-6 shadow-lg">
-            <h1 className="text-3xl font-bold mb-6 text-center">Assessment Results</h1>
-            <div className="space-y-4">
-              <div className="bg-[#374151] p-4 rounded-lg">
-                <h2 className="text-xl font-semibold">Developer Potential: {results.developer * 10}%</h2>
-                <div className="w-full bg-gray-700 rounded-full h-2.5 mt-2">
-                  <div 
-                    className="bg-blue-600 h-2.5 rounded-full" 
-                    style={{ width: `${results.developer * 10}%` }}
-                  ></div>
-                </div>
-              </div>
-              <div className="bg-[#374151] p-4 rounded-lg">
-                <h2 className="text-xl font-semibold">Designer Potential: {results.designer * 10}%</h2>
-                <div className="w-full bg-gray-700 rounded-full h-2.5 mt-2">
-                  <div 
-                    className="bg-purple-600 h-2.5 rounded-full" 
-                    style={{ width: `${results.designer * 10}%` }}
-                  ></div>
-                </div>
-              </div>
-              <div className="bg-[#374151] p-4 rounded-lg">
-                <h2 className="text-xl font-semibold">Engineer Potential: {results.engineer * 10}%</h2>
-                <div className="w-full bg-gray-700 rounded-full h-2.5 mt-2">
-                  <div 
-                    className="bg-green-600 h-2.5 rounded-full" 
-                    style={{ width: `${results.engineer * 10}%` }}
-                  ></div>
-                </div>
-              </div>
-              <div className="bg-[#374151] p-4 rounded-lg">
-                <h2 className="text-xl font-semibold">Analyst Potential: {results.analyst * 10}%</h2>
-                <div className="w-full bg-gray-700 rounded-full h-2.5 mt-2">
-                  <div 
-                    className="bg-yellow-600 h-2.5 rounded-full" 
-                    style={{ width: `${results.analyst * 10}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-            <button 
-              onClick={() => {
-                setCurrentQuestion(0);
-                setAnswers(Array(10).fill(null));
-                setCompleted(false);
-                setShowResults(false);
-              }}
-              className="mt-8 bg-[#4C4C86] hover:bg-[#4C4C86] text-white font-bold py-2 px-6 rounded transition delay-10 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110"
-            >
-              Retake Assessment
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-[#111827] text-gray-200 flex flex-col">
       <Navbar />
-      <div className="flex-grow  p-8">
+      <div className="flex-grow p-8">
         <div className="max-w-2xl mx-auto bg-[#1F2937] rounded-lg p-6 shadow-lg">
           <div className="mb-4">
             <span className="text-sm text-gray-400">
