@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/dataService";
@@ -10,12 +11,11 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage(""); // Clear previous message
+    setMessage("");
     try {
       const response = await loginUser({ email, password });
       setMessage(response.message || "Login successful!");
-      // Redirect to dashboard or home (adjust route as needed)
-      navigate("/dashboard"); // Example route
+      navigate("/"); // Changed to redirect to homepage
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Login failed. Please try again.";
       setMessage(errorMessage);
@@ -27,7 +27,6 @@ const Login = () => {
       <section className="bg-[#111827] min-h-screen flex items-center justify-center">
         <div className="container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="flex w-full max-w-5xl">
-            {/* Left Side (Logo and Description) */}
             <div className="w-1/2 p-8 text-white flex flex-col items-start justify-center">
               <div className="-mb-8 -mt-15 ml-10" style={{ height: "250px", overflow: "hidden" }}>
                 <img
@@ -42,7 +41,6 @@ const Login = () => {
               </p>
             </div>
 
-            {/* Right Side (Login Form) */}
             <div className="w-1/2 p-8 bg-white rounded-lg shadow-lg">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 mb-6">
                 Sign in to your account

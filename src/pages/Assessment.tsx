@@ -1,109 +1,148 @@
-import { useState } from 'react';
-import Navbar from '../components/Navbar';
-import Results from './Results';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Cookies } from "react-cookie";
+import Navbar from "../components/Navbar";
+import Results from "./Results";
+import {
+  fetchDefaultQuestion,
+  fetchNextQuestion,
+  submitAnswer,
+  restartQuiz,
+} from "../../services/dataService";
+
+interface Question {
+  question_id: number;
+  question_text: string;
+  options_answer: string;
+  career_category?: string;
+  career_mapping?: { [key: string]: string };
+  options?: string[];
+}
+
+interface Feedback {
+  message?: string;
+  career?: string;
+  confidence?: number;
+  career_suggestion?: string;
+  score?: number;
+  feedbackMessage?: string;
+  nextQuestionId?: number;
+  saveOption?: boolean;
+  restartOption?: boolean;
+}
+
+interface CareerRecommendation {
+  career_name: string;
+  saved_career_id: number;
+  score: number;
+}
+
+interface Recommendations {
+  careers: CareerRecommendation[];
+}
 
 const Assessment = () => {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState(Array(10).fill(null));
+  const navigate = useNavigate();
+  const cookies = new Cookies();
+  const authToken = cookies.get("authToken");
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [answers, setAnswers] = useState<{ [key: number]: string }>({});
   const [completed, setCompleted] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [recommendations, setRecommendations] = useState<Recommendations>({ careers: [] });
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [assessmentId] = useState(String(Math.floor(Math.random() * 1000))); // Persist ID
 
-  const questions = [
-    "What type of tasks do you enjoy the most?",
-    "Which work environment do you prefer?",
-    "How do you approach problem-solving?",
-    "What's your preferred way of learning new things?",
-    "Which of these activities energizes you the most?",
-    "How comfortable are you with mathematics and logic?",
-    "Which software development role appeals to you most?",
-    "How do you feel about working with data?",
-    "What's your attitude toward working in teams?",
-    "Which emerging technology interests you most?"
-  ];
+  useEffect(() => {
+    if (!authToken) {
+      navigate("/login");
+      return;
+    }
 
-  const options = [
-    [
-      "Writing code & developing software",
-      "Designing graphics, animations, or UI",
-      "Managing networks and cybersecurity",
-      "Analyzing data and creating reports"
-    ],
-    [
-      "Quiet, independent workspace",
-      "Collaborative, team-based environment",
-      "Fast-paced, dynamic setting",
-      "Structured, predictable office"
-    ],
-    [
-      "Break it down logically step by step",
-      "Visualize the components and connections",
-      "Try different approaches experimentally",
-      "Research how others have solved it"
-    ],
-    [
-      "Hands-on practice and building projects",
-      "Watching video tutorials and examples",
-      "Reading documentation and books",
-      "Taking structured courses with exercises"
-    ],
-    [
-      "Debugging complex code issues",
-      "Creating beautiful user interfaces",
-      "Optimizing system performance",
-      "Discovering patterns in large datasets"
-    ],
-    [
-      "Very comfortable - I enjoy complex problems",
-      "Somewhat comfortable - I can handle basics",
-      "Not very - I prefer creative/visual tasks",
-      "It depends on the application"
-    ],
-    [
-      "Front-end developer",
-      "Back-end engineer",
-      "Full-stack developer",
-      "DevOps specialist"
-    ],
-    [
-      "I love working with data and statistics",
-      "I'm comfortable with basic data analysis",
-      "I prefer working with visual representations",
-      "I avoid data-heavy tasks when possible"
-    ],
-    [
-      "I thrive in team collaborations",
-      "I prefer working alone but can team up",
-      "I like pairing with one other person",
-      "I work best independently"
-    ],
-    [
-      "Artificial Intelligence/Machine Learning",
-      "Blockchain and Web3 technologies",
-      "Augmented/Virtual Reality",
-      "Internet of Things (IoT)"
-    ]
-  ];
+    const fetchInitialQuestion = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchDefaultQuestion();
+        console.log("Default Question Data:", JSON.stringify(data, null, 2));
+        if (typeof data.options_answer === "string") {
+          data.options = data.options_answer.split(",").map((option: string) => option.trim());
+        }
+        setCurrentQuestion(data);
+      } catch (err: unknown) {
+        setError((err as Error).message || "Failed to load question. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInitialQuestion();
+  }, [authToken, navigate]);
 
-  const handleAnswerSelect = (optionIndex: number) => {
-    const newAnswers = [...answers];
-    newAnswers[currentQuestion] = optionIndex;
+  const handleAnswerSelect = async (optionIndex: number) => {
+    if (!currentQuestion) return;
+
+    console.log("Current Question Options:", currentQuestion.options);
+    const selectedOption = currentQuestion.options ? currentQuestion.options[optionIndex] : "";
+    console.log("Selected Option:", selectedOption);
+    const newAnswers = { ...answers, [currentQuestion.question_id]: selectedOption };
     setAnswers(newAnswers);
 
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-      setCompleted(true);
+    console.log("Submitting:", { assessmentId, question_id: currentQuestion.question_id, selectedOption, authToken });
+
+    try {
+      setLoading(true);
+      const data: Feedback = await submitAnswer(assessmentId, currentQuestion.question_id, selectedOption);
+      setError(null);
+      setFeedbackMessage(data.feedbackMessage || null);
+
+      if (data.message === "Assessment completed") {
+        setCompleted(true);
+        setRecommendations({
+          careers: [
+            {
+              career_name: data.career_suggestion || "Undecided",
+              saved_career_id: 0,
+              score: data.score || 0,
+            },
+          ],
+        });
+        setShowResults(true);
+      } else if (data.nextQuestionId) {
+        const nextQuestion = await fetchNextQuestion(currentQuestion.question_id);
+        if (typeof nextQuestion.options_answer === "string") {
+          nextQuestion.options = nextQuestion.options_answer.split(",").map((option: string) => option.trim());
+        }
+        console.log("Next Question:", JSON.stringify(nextQuestion, null, 2));
+        setCurrentQuestion(nextQuestion);
+      }
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to submit answer.");
+      console.error("Submission error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handlePrevious = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
+  const handleRestart = async () => {
+    try {
+      await restartQuiz();
+      setCompleted(false);
+      setShowResults(false);
+      setAnswers({});
+      setFeedbackMessage(null);
+      const data = await fetchDefaultQuestion();
+      if (typeof data.options_answer === "string") {
+        data.options = data.options_answer.split(",").map((option: string) => option.trim());
+      }
+      setCurrentQuestion(data);
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to restart quiz. Please try again.");
     }
   };
 
   if (completed && showResults) {
-    return <Results />;
+    return <Results initialRecommendations={recommendations} assessmentId={assessmentId} onRestart={handleRestart} />;
   }
 
   if (completed && !showResults) {
@@ -112,17 +151,45 @@ const Assessment = () => {
         <Navbar />
         <div className="flex-grow p-8 -mt-7 flex items-center justify-center">
           <div className="max-w-2xl mx-auto bg-[#1F2937] rounded-lg p-8 shadow-lg text-center">
-            <h1 className="text-3xl font-bold mb-6">Assessment Completed</h1>
-            <p className="text-xl mb-8">
-              Your career recommendations are ready. Click below to view them.
-            </p>
-            <button
-              onClick={() => setShowResults(true)}
-              className="bg-[#4C4C86] hover:bg-[#4C4C86] text-white font-bold py-3 px-8 rounded-lg transition delay-10 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110"
-            >
-              View Recommendations
-            </button>
+            <h2 className="text-3xl font-bold mb-6">Assessment Completed</h2>
+            <p className="text-xl mb-8">{feedbackMessage || "Your career recommendations are ready."}</p>
+            <div className="space-x-4">
+              <button
+                onClick={() => setShowResults(true)}
+                className="bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-3 px-8 rounded-lg transition duration-300"
+              >
+                View Recommendations
+              </button>
+              <button
+                onClick={handleRestart}
+                className="bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-3 px-8 rounded-lg transition duration-300"
+              >
+                Retake Assessment
+              </button>
+            </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#111827] text-gray-200 flex flex-col">
+        <Navbar />
+        <div className="flex-grow p-8 flex items-center justify-center">
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#111827] text-gray-200 flex flex-col">
+        <Navbar />
+        <div className="flex-grow p-8 flex items-center justify-center">
+          <p className="text-red-400">{error}</p>
         </div>
       </div>
     );
@@ -131,44 +198,49 @@ const Assessment = () => {
   return (
     <div className="min-h-screen bg-[#111827] text-gray-200 flex flex-col">
       <Navbar />
-      <div className="flex-grow p-8">
-        <div className="max-w-2xl mx-auto bg-[#1F2937] rounded-lg p-6 shadow-lg">
+      <div className="flex-grow p-6">
+        <div className="max-w-3xl mx-auto bg-[#1F2937] rounded-lg p-4">
           <div className="mb-4">
             <span className="text-sm text-gray-400">
-              Question {currentQuestion + 1} of {questions.length}
+              Question {currentQuestion?.question_id} of 10
             </span>
-            <div className="w-full bg-gray-700 rounded-full h-2.5 mt-2">
-              <div 
-                className="bg-blue-600 h-2.5 rounded-full" 
-                style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
+            <div className="w-full bg-gray-400 rounded-full h-4 mt-2">
+              <div
+                className="bg-blue-400 h-4 rounded-lg"
+                style={{ width: `${(currentQuestion?.question_id || 0) * 10}%` }}
               ></div>
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold mb-6">{questions[currentQuestion]}</h1>
+          <h2 className="text-lg font-semibold mb-4">{currentQuestion?.question_text}</h2>
+
+          {feedbackMessage && (
+            <div className="mt-4 p-4 bg-gray-800 rounded-lg">
+              <h3 className="text-base font-medium mb-2">Feedback:</h3>
+              <p className="text-gray-400">{feedbackMessage}</p>
+            </div>
+          )}
 
           <div className="space-y-3">
-            {options[currentQuestion].map((option, index) => (
+            {currentQuestion?.options?.map((option: any, index: any) => (
               <button
                 key={index}
                 onClick={() => handleAnswerSelect(index)}
-                className={`w-full text-left p-4 rounded-lg border ${answers[currentQuestion] === index ? 'border-blue-500 bg-blue-900/20' : 'border-gray-600 hover:bg-gray-700'}`}
+                className={`w-full text-left p-3 rounded-lg border ${
+                  answers[currentQuestion?.question_id] === option
+                    ? "border-blue-400 bg-blue-900/20"
+                    : "border-gray-600 hover:bg-gray-700"
+                }`}
               >
                 {option}
               </button>
             ))}
           </div>
 
-          <div className="flex justify-between mt-8">
-            <button
-              onClick={handlePrevious}
-              disabled={currentQuestion === 0}
-              className={`py-2 px-4 rounded ${currentQuestion === 0 ? 'bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-gray-600 hover:bg-gray-500'}`}
-            >
-              Previous
-            </button>
+          <div className="flex justify-between mt-6">
+           
             <span className="text-sm text-gray-400 self-center">
-              {answers.filter(a => a !== null).length} / {questions.length} answered
+              {Object.keys(answers).length} / 10 answered
             </span>
           </div>
         </div>
