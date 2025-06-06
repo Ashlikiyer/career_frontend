@@ -5,6 +5,20 @@ import Navbar from "../components/Navbar";
 import { fetchSavedCareers, deleteCareer } from "../../services/dataService";
 import RoadmapModal from "@/components/modal/RoadmapModal";
 import RoadmapPage from "../pages/Roadmap";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CheckCircle2Icon } from "lucide-react";
 
 interface SavedCareer {
   saved_career_id: number;
@@ -30,14 +44,13 @@ const Dashboard = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
   const [isRoadmapModalOpen, setIsRoadmapModalOpen] = useState(false);
-  // Initialize generatedRoadmaps from localStorage
   const [generatedRoadmaps, setGeneratedRoadmaps] = useState<{ savedCareerId: number; careerName: string }[]>(() => {
     const saved = localStorage.getItem("generatedRoadmaps");
     return saved ? JSON.parse(saved) : [];
   });
   const [selectedCareer, setSelectedCareer] = useState<{ savedCareerId: number; careerName: string } | null>(null);
+  const [careerToDelete, setCareerToDelete] = useState<{ savedCareerId: number; careerName: string } | null>(null);
 
-  // Save generatedRoadmaps to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("generatedRoadmaps", JSON.stringify(generatedRoadmaps));
   }, [generatedRoadmaps]);
@@ -51,9 +64,18 @@ const Dashboard = () => {
     const fetchCareers = async () => {
       try {
         setLoading(true);
+        const startTime = Date.now();
         const data = await fetchSavedCareers();
         console.log("Saved Careers Data:", JSON.stringify(data, null, 2));
         setSavedCareers(Array.isArray(data) ? data : [data].filter(Boolean));
+
+        const elapsedTime = Date.now() - startTime;
+        const minimumLoadingTime = 2000; // 2 seconds in milliseconds
+        const remainingTime = minimumLoadingTime - elapsedTime;
+
+        if (remainingTime > 0) {
+          await new Promise((resolve) => setTimeout(resolve, remainingTime));
+        }
       } catch (err: unknown) {
         setError((err as Error).message || "Failed to load saved careers.");
         console.error("Fetch Careers Error:", err);
@@ -64,10 +86,10 @@ const Dashboard = () => {
     fetchCareers();
   }, [authToken, navigate]);
 
-  const handleDeleteCareer = async (savedCareerId: number, careerName: string) => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete the career "${careerName}"?`);
-    if (!confirmDelete) return;
+  const handleDeleteCareer = async () => {
+    if (!careerToDelete) return;
 
+    const { savedCareerId, careerName } = careerToDelete;
     try {
       setError(null);
       setSuccess(null);
@@ -76,6 +98,7 @@ const Dashboard = () => {
       setGeneratedRoadmaps(generatedRoadmaps.filter((item) => item.savedCareerId !== savedCareerId));
       setSuccess(`Career "${careerName}" deleted successfully!`);
       setMenuOpenId(null);
+      setCareerToDelete(null);
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: unknown) {
       const errorMessage = (err as Error).message || "Failed to delete career.";
@@ -114,8 +137,32 @@ const Dashboard = () => {
     return (
       <div className="min-h-screen bg-[#111827] text-gray-200 flex flex-col">
         <Navbar />
-        <div className="flex-grow p-8 flex items-center justify-center">
-          <p>Loading...</p>
+        <div className="flex-grow p-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">Your Career Dashboard</h2>
+              <p className="text-lg text-gray-400">
+                View your saved career paths or generate a roadmap to plan your journey.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="relative p-6 bg-gradient-to-br from-[#1F2937] to-[#2D3748] rounded-lg border border-gray-700"
+                >
+                  <div className="flex flex-col space-y-3">
+                    <Skeleton className="h-6 w-3/4 rounded-md" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-full rounded-md" />
+                      <Skeleton className="h-4 w-1/2 rounded-md" />
+                    </div>
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -144,13 +191,32 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#111827] text-gray-200 flex flex-col">
+      <style>
+        {`
+          @keyframes slideInFromRight {
+            0% {
+              transform: translateX(100%);
+              opacity: 0;
+            }
+            100% {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+          .animate-slide-in {
+            animation: slideInFromRight 0.3s ease-out forwards;
+          }
+        `}
+      </style>
       <Navbar />
       <div className="flex-grow p-8">
         <div className="max-w-4xl mx-auto">
           {success && (
-            <div className="mb-6 p-4 bg-gray-700 text-green-400 rounded-lg text-center">
-              {success}
-            </div>
+            <Alert className="fixed top-4 right-4 z-50 max-w-sm bg-white border border-gray-300 text-black shadow-lg rounded-lg animate-slide-in">
+              <CheckCircle2Icon className="h-4 w-4" />
+              <AlertTitle>Success!</AlertTitle>
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
           )}
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Your Career Dashboard</h2>
@@ -205,12 +271,41 @@ const Dashboard = () => {
                         </button>
                         {menuOpenId === career.saved_career_id && (
                           <div className="absolute right-0 mt-2 w-48 bg-[#1F2937] border border-gray-700 rounded-lg shadow-lg z-10">
-                            <button
-                              onClick={() => handleDeleteCareer(career.saved_career_id, career.career_name)}
-                              className="w-full text-left px-4 py-2 text-red-400 hover:bg-gray-700 rounded-t-lg"
-                            >
-                              Delete
-                            </button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <button
+                                  onClick={() =>
+                                    setCareerToDelete({
+                                      savedCareerId: career.saved_career_id,
+                                      careerName: career.career_name,
+                                    })
+                                  }
+                                  className="w-full text-left px-4 py-2 text-red-400 hover:bg-gray-700 rounded-t-lg"
+                                >
+                                  Delete
+                                </button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="bg-[#1F2937] border-gray-700 text-gray-200">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                  <AlertDialogDescription className="text-gray-400">
+                                    This action cannot be undone. This will permanently delete the career "
+                                    {careerToDelete?.careerName}" from your saved careers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel className="bg-gray-600 text-gray-200 hover:bg-gray-500">
+                                    Cancel
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={handleDeleteCareer}
+                                    className="bg-red-600 hover:bg-red-500 text-white"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                             <button
                               onClick={() => {
                                 setIsRoadmapModalOpen(true);

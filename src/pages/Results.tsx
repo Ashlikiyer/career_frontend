@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { saveCareer } from "../../services/dataService";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CheckCircle2Icon } from "lucide-react";
 
 interface CareerRecommendation {
   career_name: string;
@@ -19,7 +21,7 @@ interface ResultsProps {
   onRestart: () => void;
 }
 
-const Results = ({ initialRecommendations,onRestart }: ResultsProps) => {
+const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
   const navigate = useNavigate();
   const [recommendations, setRecommendations] = useState<Recommendations>(initialRecommendations);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +64,23 @@ const Results = ({ initialRecommendations,onRestart }: ResultsProps) => {
 
   return (
     <div className="min-h-screen bg-[#111827] text-gray-200">
+      <style>
+        {`
+          @keyframes slideInFromRight {
+            0% {
+              transform: translateX(100%);
+              opacity: 0;
+            }
+            100% {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+          .animate-slide-in {
+            animation: slideInFromRight 0.3s ease-out forwards;
+          }
+        `}
+      </style>
       <Navbar />
       <div className="pt-4 p-6 max-w-3xl mx-auto">
         {error && (
@@ -70,9 +89,11 @@ const Results = ({ initialRecommendations,onRestart }: ResultsProps) => {
           </div>
         )}
         {success && (
-          <div className="mb-6 p-4 bg-gray-700 text-green-400 rounded-lg">
-            {success}
-          </div>
+          <Alert className="fixed top-4 right-4 z-50 max-w-sm bg-white border border-gray-300 text-black shadow-lg rounded-lg animate-slide-in">
+            <CheckCircle2Icon className="h-4 w-4" />
+            <AlertTitle>Success!</AlertTitle>
+            <AlertDescription>{success}</AlertDescription>
+          </Alert>
         )}
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold mb-4">Your Career Path</h2>

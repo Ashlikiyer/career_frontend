@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, ResponseType } from "axios";
 import { Cookies } from "react-cookie";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api/",
+  baseURL: "https://career.careerapp.xyz/api/",
   withCredentials: true,
 });
 

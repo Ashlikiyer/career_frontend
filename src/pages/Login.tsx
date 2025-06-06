@@ -36,7 +36,7 @@ const Login = () => {
                 />
               </div>
               <p className="text-lg text-center -ml-25">
-                Discover your ideal career with ML-powered recommendations. Take
+                Discover your ideal career with AI-powered recommendations. Take
                 the assessment and start your journey today!
               </p>
             </div>

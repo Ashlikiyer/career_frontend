@@ -53,7 +53,7 @@ const Assessment = () => {
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState<Recommendations>({ careers: [] });
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
-  const [assessmentId] = useState(String(Math.floor(Math.random() * 1000))); // Persist ID
+  const [assessmentId] = useState<string>(String(Math.floor(Math.random() * 1000))); // Fixed for session
 
   useEffect(() => {
     if (!authToken) {
@@ -70,6 +70,7 @@ const Assessment = () => {
           data.options = data.options_answer.split(",").map((option: string) => option.trim());
         }
         setCurrentQuestion(data);
+        console.log("Using assessmentId:", assessmentId);
       } catch (err: unknown) {
         setError((err as Error).message || "Failed to load question. Please try again.");
       } finally {
@@ -117,7 +118,7 @@ const Assessment = () => {
         setCurrentQuestion(nextQuestion);
       }
     } catch (err: unknown) {
-      setError((err as Error).message || "Failed to submit answer.");
+      setError((err as Error).message || "Failed to submit answer. Please retry or restart if the issue persists.");
       console.error("Submission error:", err);
     } finally {
       setLoading(false);
@@ -136,6 +137,7 @@ const Assessment = () => {
         data.options = data.options_answer.split(",").map((option: string) => option.trim());
       }
       setCurrentQuestion(data);
+      console.log("Restarted with assessmentId:", assessmentId);
     } catch (err: unknown) {
       setError((err as Error).message || "Failed to restart quiz. Please try again.");
     }
@@ -190,6 +192,18 @@ const Assessment = () => {
         <Navbar />
         <div className="flex-grow p-8 flex items-center justify-center">
           <p className="text-red-400">{error}</p>
+          <button
+            onClick={() => handleAnswerSelect(0)} // Retry with same assessmentId
+            className="ml-4 bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+          >
+            Retry
+          </button>
+          <button
+            onClick={handleRestart} // Option to restart if retry fails
+            className="ml-4 bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+          >
+            Restart Quiz
+          </button>
         </div>
       </div>
     );
@@ -238,7 +252,6 @@ const Assessment = () => {
           </div>
 
           <div className="flex justify-between mt-6">
-           
             <span className="text-sm text-gray-400 self-center">
               {Object.keys(answers).length} / 10 answered
             </span>
