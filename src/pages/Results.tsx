@@ -17,7 +17,6 @@ interface Recommendations {
 
 interface ResultsProps {
   initialRecommendations: Recommendations;
-  assessmentId: string;
   onRestart: () => void;
 }
 
@@ -38,8 +37,7 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
       setError(null);
       setSuccess(null);
       const careerName = recommendations.careers[0].career_name;
-      const response = await saveCareer(careerName);
-      console.log("Save Career Response:", response);
+      await saveCareer(careerName);
       setSuccess(`Career "${careerName}" saved successfully!`);
       setTimeout(() => {
         navigate("/dashboard");

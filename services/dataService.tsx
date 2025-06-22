@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, ResponseType } from "axios";
 import { Cookies } from "react-cookie";
 
 const api = axios.create({
-  baseURL: "https://career.careerapp.xyz/api/",
+  baseURL: "https://ai.careerapp.xyz/api/",
   withCredentials: true,
 });
 
@@ -12,7 +12,11 @@ let authToken: string | null = cookies.get("authToken") || null;
 const setAuth = (token: string | null) => {
   authToken = token;
   if (token) {
-    cookies.set("authToken", token, { path: "/", secure: false, sameSite: "lax" });
+    cookies.set("authToken", token, {
+      path: "/",
+      secure: false,
+      sameSite: "lax",
+    });
   } else {
     cookies.remove("authToken", { path: "/" });
   }
@@ -59,7 +63,10 @@ export async function dataFetch(
         data: JSON.stringify(error.response?.data, null, 2),
         config: JSON.stringify(error.config, null, 2),
       });
-      const errorMessage = error.response?.data?.details || error.response?.data?.error || error.message;
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message;
       throw new Error(errorMessage);
     } else if (error instanceof Error) {
       throw new Error(error.message);
@@ -69,11 +76,18 @@ export async function dataFetch(
   }
 }
 
-export async function registerUser(userData: { username: string; email: string; password: string }) {
+export async function registerUser(userData: {
+  username: string;
+  email: string;
+  password: string;
+}) {
   return dataFetch("users/register", "POST", userData);
 }
 
-export async function loginUser(credentials: { email: string; password: string }) {
+export async function loginUser(credentials: {
+  email: string;
+  password: string;
+}) {
   const response = await dataFetch("users/login", "POST", credentials);
   if (response.token) {
     setAuth(response.token);
@@ -88,55 +102,50 @@ export async function logoutUser() {
   setAuth(null);
 }
 
-export async function fetchDefaultQuestion() {
-  return dataFetch("questions/default", "GET");
+export async function startAssessment() {
+  return dataFetch("assessment/start", "GET");
 }
 
-export async function fetchNextQuestion(currentQuestionId: number) {
-  return dataFetch(`questions/next?currentQuestionId=${currentQuestionId}`, "GET");
+export async function fetchNextQuestion(currentQuestionId: number, assessmentId: number) {
+  return dataFetch(`assessment/next?currentQuestionId=${currentQuestionId}&assessment_id=${assessmentId}`, "GET");
 }
 
-export async function submitAnswer(assessmentId: string, questionId: number, selectedOption: string) {
+export async function submitAnswer(
+  assessmentId: number,
+  questionId: number,
+  selectedOption: string
+) {
   const data = {
     assessment_id: assessmentId,
     question_id: questionId,
-    selected_option: selectedOption.trim(), // Normalize option
+    selected_option: selectedOption.trim(),
   };
   console.log("Submitting Answer Payload:", JSON.stringify(data, null, 2));
-  return dataFetch("results/submit-answer", "POST", data);
+  return dataFetch("assessment/answer", "POST", data);
 }
 
-export async function restartQuiz() {
-  return dataFetch("questions/restart", "POST");
+export async function restartAssessment() {
+  return dataFetch("assessment/restart", "POST");
 }
 
-export async function fetchResults(assessmentId: string) {
-  return dataFetch(`results/${assessmentId}`, "GET");
-}
-
-// Replace saveCareer and add fetchSavedCareers if not already present
 export async function saveCareer(careerName: string) {
-  const data = {
-    career_name: careerName,
-  };
+  const data = { career_name: careerName };
   console.log("Saving Career Payload:", JSON.stringify(data, null, 2));
   return dataFetch("saved-careers", "POST", data);
-}
-
-export async function deleteCareer(savedCareerId: number) {
-  return dataFetch(`saved-careers/${savedCareerId}`, "DELETE");
 }
 
 export async function fetchSavedCareers() {
   return dataFetch("saved-careers", "GET");
 }
 
-// Keep generateRoadmap as-is (no network request)
+export async function deleteCareer(savedCareerId: number) {
+  return dataFetch(`saved-careers/${savedCareerId}`, "DELETE");
+}
+
 export async function generateRoadmap(savedCareerId: number) {
   return { success: true, saved_career_id: savedCareerId };
 }
 
-// Update fetchRoadmap to use savedCareerId
 export async function fetchRoadmap(savedCareerId: number) {
   try {
     const data = await dataFetch(`roadmaps/${savedCareerId}`, "GET");

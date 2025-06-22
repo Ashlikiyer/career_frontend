@@ -4,10 +4,10 @@ import { Cookies } from "react-cookie";
 import Navbar from "../components/Navbar";
 import Results from "./Results";
 import {
-  fetchDefaultQuestion,
+  startAssessment,
   fetchNextQuestion,
   submitAnswer,
-  restartQuiz,
+  restartAssessment,
 } from "../../services/dataService";
 
 interface Question {
@@ -15,8 +15,8 @@ interface Question {
   question_text: string;
   options_answer: string;
   career_category?: string;
-  career_mapping?: { [key: string]: string };
   options?: string[];
+  assessment_id?: number;
 }
 
 interface Feedback {
@@ -29,6 +29,7 @@ interface Feedback {
   nextQuestionId?: number;
   saveOption?: boolean;
   restartOption?: boolean;
+  assessment_id?: number;
 }
 
 interface CareerRecommendation {
@@ -53,7 +54,7 @@ const Assessment = () => {
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState<Recommendations>({ careers: [] });
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
-  const [assessmentId] = useState<string>(String(Math.floor(Math.random() * 1000))); // Fixed for session
+  const [assessmentId, setAssessmentId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!authToken) {
@@ -64,15 +65,15 @@ const Assessment = () => {
     const fetchInitialQuestion = async () => {
       try {
         setLoading(true);
-        const data = await fetchDefaultQuestion();
-        console.log("Default Question Data:", JSON.stringify(data, null, 2));
+        const data: Question = await startAssessment();
+        console.log("Start Assessment Data:", JSON.stringify(data, null, 2));
         if (typeof data.options_answer === "string") {
           data.options = data.options_answer.split(",").map((option: string) => option.trim());
         }
         setCurrentQuestion(data);
-        console.log("Using assessmentId:", assessmentId);
+        setAssessmentId(data.assessment_id || null);
       } catch (err: unknown) {
-        setError((err as Error).message || "Failed to load question. Please try again.");
+        setError((err as Error).message || "Failed to start assessment. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -81,15 +82,14 @@ const Assessment = () => {
   }, [authToken, navigate]);
 
   const handleAnswerSelect = async (optionIndex: number) => {
-    if (!currentQuestion) return;
+    if (!currentQuestion || !assessmentId) {
+      setError("Assessment ID is missing. Please restart the assessment.");
+      return;
+    }
 
-    console.log("Current Question Options:", currentQuestion.options);
     const selectedOption = currentQuestion.options ? currentQuestion.options[optionIndex] : "";
-    console.log("Selected Option:", selectedOption);
     const newAnswers = { ...answers, [currentQuestion.question_id]: selectedOption };
     setAnswers(newAnswers);
-
-    console.log("Submitting:", { assessmentId, question_id: currentQuestion.question_id, selectedOption, authToken });
 
     try {
       setLoading(true);
@@ -110,15 +110,24 @@ const Assessment = () => {
         });
         setShowResults(true);
       } else if (data.nextQuestionId) {
-        const nextQuestion = await fetchNextQuestion(currentQuestion.question_id);
-        if (typeof nextQuestion.options_answer === "string") {
-          nextQuestion.options = nextQuestion.options_answer.split(",").map((option: string) => option.trim());
+        try {
+          const nextQuestion: Question = await fetchNextQuestion(currentQuestion.question_id, assessmentId);
+          if (typeof nextQuestion.options_answer === "string") {
+            nextQuestion.options = nextQuestion.options_answer.split(",").map((option: string) => option.trim());
+          }
+          console.log("Next Question:", JSON.stringify(nextQuestion, null, 2));
+          setCurrentQuestion(nextQuestion);
+        } catch (err) {
+          if ((err as Error).message.includes("No more questions available")) {
+            setCompleted(true);
+            setShowResults(true);
+          } else {
+            throw err;
+          }
         }
-        console.log("Next Question:", JSON.stringify(nextQuestion, null, 2));
-        setCurrentQuestion(nextQuestion);
       }
     } catch (err: unknown) {
-      setError((err as Error).message || "Failed to submit answer. Please retry or restart if the issue persists.");
+      setError((err as Error).message || "Failed to submit answer. Please retry or restart.");
       console.error("Submission error:", err);
     } finally {
       setLoading(false);
@@ -127,24 +136,27 @@ const Assessment = () => {
 
   const handleRestart = async () => {
     try {
-      await restartQuiz();
+      setLoading(true);
+      const restartData = await restartAssessment();
       setCompleted(false);
       setShowResults(false);
       setAnswers({});
       setFeedbackMessage(null);
-      const data = await fetchDefaultQuestion();
-      if (typeof data.options_answer === "string") {
-        data.options = data.options_answer.split(",").map((option: string) => option.trim());
+      setAssessmentId(restartData.assessment_id || null);
+      const questionData: Question = await startAssessment();
+      if (typeof questionData.options_answer === "string") {
+        questionData.options = questionData.options_answer.split(",").map((option: string) => option.trim());
       }
-      setCurrentQuestion(data);
-      console.log("Restarted with assessmentId:", assessmentId);
+      setCurrentQuestion(questionData);
     } catch (err: unknown) {
-      setError((err as Error).message || "Failed to restart quiz. Please try again.");
+      setError((err as Error).message || "Failed to restart assessment. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   if (completed && showResults) {
-    return <Results initialRecommendations={recommendations} assessmentId={assessmentId} onRestart={handleRestart} />;
+    return <Results initialRecommendations={recommendations} onRestart={handleRestart} />;
   }
 
   if (completed && !showResults) {
@@ -193,16 +205,16 @@ const Assessment = () => {
         <div className="flex-grow p-8 flex items-center justify-center">
           <p className="text-red-400">{error}</p>
           <button
-            onClick={() => handleAnswerSelect(0)} // Retry with same assessmentId
+            onClick={() => handleAnswerSelect(0)}
             className="ml-4 bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-2 px-4 rounded-lg transition duration-300"
           >
             Retry
           </button>
           <button
-            onClick={handleRestart} // Option to restart if retry fails
+            onClick={handleRestart}
             className="ml-4 bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-2 px-4 rounded-lg transition duration-300"
           >
-            Restart Quiz
+            Restart Assessment
           </button>
         </div>
       </div>
@@ -236,7 +248,7 @@ const Assessment = () => {
           )}
 
           <div className="space-y-3">
-            {currentQuestion?.options?.map((option: any, index: any) => (
+            {currentQuestion?.options?.map((option: string, index: number) => (
               <button
                 key={index}
                 onClick={() => handleAnswerSelect(index)}

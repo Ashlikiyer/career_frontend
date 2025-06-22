@@ -1,7 +1,7 @@
-import Navbar from "../components/Navbar";
 import { useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
+import Navbar from "../components/Navbar";
 
 const Homepage = () => {
   const navigate = useNavigate();
@@ -14,6 +14,10 @@ const Homepage = () => {
     }
   }, [navigate, cookies]);
 
+  const handleStartAssessment = () => {
+    navigate("/assessment");
+  };
+
   return (
     <div className="bg-[#111827] text-gray-200 min-h-screen flex flex-col">
       <Navbar />
@@ -21,16 +25,14 @@ const Homepage = () => {
       <div className="flex-grow text-center p-25">
         <h1 className="text-4xl font-bold mb-4">Discover Your Future in Tech 🚀</h1>
         <p className="text-lg mb-8">
-          Find the best career path for you using our AI-powered
-          career assessment. Answer a few questions and get personalized
-          career recommendations based on your skills and interests.
+          Find the best career path for you using our AI-powered career assessment. Answer a few questions and get personalized career recommendations based on your skills and interests.
         </p>
-        <Link
-          to="/assessment"
-          className="bg-[#4C4C86] hover:bg-[#4C4C86] text-white font-bold py-3 px-6 rounded transition delay-10 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 inline-block"
+        <button
+          onClick={handleStartAssessment}
+          className="bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-3 px-6 rounded transition delay-100 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 inline-block"
         >
           Start Assessment
-        </Link>
+        </button>
       </div>
 
       <div className="bg-[#D9D9D9] p-22">
@@ -46,8 +48,7 @@ const Homepage = () => {
               Step 1: Take the Assessment
             </h3>
             <p className="text-sm text-black">
-              Answer a series of career-related questions to help us understand
-              your interests and skills.
+              Answer a series of career-related questions to help us understand your interests and skills.
             </p>
           </div>
           <div className="block max-w-sm p-6 bg-[#FFFFFF] border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition duration-150 ease-in-out text-center">
@@ -58,8 +59,7 @@ const Homepage = () => {
               Step 2: Get AI-Powered Recommendations
             </h3>
             <p className="text-sm text-black">
-              Our advanced AI model analyzes your responses to suggest
-              personalized career options, which you can save or retake.
+              Our advanced AI model analyzes your responses to suggest personalized career options, which you can save or retake.
             </p>
           </div>
           <div className="block max-w-sm p-6 bg-[#FFFFFF] border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition duration-150 ease-in-out text-center">
@@ -70,8 +70,7 @@ const Homepage = () => {
               Step 3: Generate Your Career Path
             </h3>
             <p className="text-sm text-black">
-              Save your career choice and generate a detailed career path on your
-              dashboard to guide your next steps.
+              Save your career choice and generate a detailed career path on your dashboard to guide your next steps.
             </p>
           </div>
         </div>
@@ -102,7 +101,7 @@ const Homepage = () => {
       </div>
 
       <footer className="bg-[#111827] p-4 text-center">
-        <p>© 2024 Career Path Recommendation System | Gordon College</p>
+        <p>© 2025 Career Path Recommendation System | Gordon College</p>
       </footer>
     </div>
   );

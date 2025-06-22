@@ -44,15 +44,16 @@ const Dashboard = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
   const [isRoadmapModalOpen, setIsRoadmapModalOpen] = useState(false);
-  const [generatedRoadmaps, setGeneratedRoadmaps] = useState<{ savedCareerId: number; careerName: string }[]>(() => {
-    const saved = localStorage.getItem("generatedRoadmaps");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [generatedRoadmaps, setGeneratedRoadmaps] = useState<{ savedCareerId: number; careerName: string }[]>(
+    () => JSON.parse(localStorage.getItem("generatedRoadmaps") || "[]")
+  );
   const [selectedCareer, setSelectedCareer] = useState<{ savedCareerId: number; careerName: string } | null>(null);
   const [careerToDelete, setCareerToDelete] = useState<{ savedCareerId: number; careerName: string } | null>(null);
+  const [roadmapToDelete, setRoadmapToDelete] = useState<{ savedCareerId: number; careerName: string } | null>(null);
 
   useEffect(() => {
     localStorage.setItem("generatedRoadmaps", JSON.stringify(generatedRoadmaps));
+    console.log("Saved to localStorage:", JSON.stringify(generatedRoadmaps, null, 2));
   }, [generatedRoadmaps]);
 
   useEffect(() => {
@@ -67,10 +68,20 @@ const Dashboard = () => {
         const startTime = Date.now();
         const data = await fetchSavedCareers();
         console.log("Saved Careers Data:", JSON.stringify(data, null, 2));
-        setSavedCareers(Array.isArray(data) ? data : [data].filter(Boolean));
+        const fetchedCareers = Array.isArray(data) ? data : [data].filter(Boolean);
+        setSavedCareers(fetchedCareers);
+
+        // Sync generatedRoadmaps with savedCareers after fetch
+        const validRoadmaps = generatedRoadmaps.filter((item) =>
+          fetchedCareers.some((career) => career.saved_career_id === item.savedCareerId)
+        );
+        if (JSON.stringify(validRoadmaps) !== JSON.stringify(generatedRoadmaps)) {
+          setGeneratedRoadmaps(validRoadmaps);
+          console.log("Synced generatedRoadmaps:", JSON.stringify(validRoadmaps, null, 2));
+        }
 
         const elapsedTime = Date.now() - startTime;
-        const minimumLoadingTime = 2000; // 2 seconds in milliseconds
+        const minimumLoadingTime = 2000;
         const remainingTime = minimumLoadingTime - elapsedTime;
 
         if (remainingTime > 0) {
@@ -108,6 +119,16 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeleteRoadmap = () => {
+    if (!roadmapToDelete) return;
+
+    const { savedCareerId, careerName } = roadmapToDelete;
+    setGeneratedRoadmaps(generatedRoadmaps.filter((item) => item.savedCareerId !== savedCareerId));
+    setSuccess(`Roadmap for "${careerName}" deleted successfully!`);
+    setRoadmapToDelete(null);
+    setTimeout(() => setSuccess(null), 3000);
+  };
+
   const toggleMenu = (savedCareerId: number) => {
     setMenuOpenId(menuOpenId === savedCareerId ? null : savedCareerId);
   };
@@ -123,14 +144,18 @@ const Dashboard = () => {
 
   const handleGenerateRoadmap = (savedCareerId: number) => {
     const career = savedCareers.find((c) => c.saved_career_id === savedCareerId);
-    if (career) {
-      setGeneratedRoadmaps((prev) => [
-        ...prev.filter((item) => item.savedCareerId !== savedCareerId),
-        { savedCareerId, careerName: career.career_name },
-      ]);
+    if (career && !generatedRoadmaps.some((item) => item.savedCareerId === savedCareerId)) {
+      setGeneratedRoadmaps((prev) => [...prev, { savedCareerId, careerName: career.career_name }]);
       setSuccess(`Roadmap generated for ${career.career_name}!`);
       setTimeout(() => setSuccess(null), 3000);
+    } else if (career) {
+      setError("Roadmap for this career already generated.");
+      setTimeout(() => setError(null), 3000);
     }
+  };
+
+  const handleStartAssessment = () => {
+    navigate("/assessment");
   };
 
   if (loading) {
@@ -229,10 +254,10 @@ const Dashboard = () => {
             <div className="text-center p-6 bg-[#1F2937] rounded-lg">
               <p className="text-gray-400">No saved careers yet. Take the assessment to discover your path!</p>
               <button
-                onClick={() => navigate("/assessment")}
+                onClick={handleStartAssessment}
                 className="mt-4 bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-2 px-6 rounded-lg transition duration-300"
               >
-                Take Assessment
+                Start Assessment
               </button>
             </div>
           ) : (
@@ -325,6 +350,12 @@ const Dashboard = () => {
                     >
                       View Roadmap
                     </button>
+                    <button
+                      onClick={() => handleGenerateRoadmap(career.saved_career_id)}
+                      className="mt-2 w-full bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+                    >
+                      Generate Roadmap
+                    </button>
                   </div>
                 ))}
               </div>
@@ -337,15 +368,61 @@ const Dashboard = () => {
                     {generatedRoadmaps.map((roadmap) => (
                       <li key={roadmap.savedCareerId} className="flex items-center justify-between">
                         <span className="text-gray-200">{roadmap.careerName}</span>
-                        <button
-                          onClick={() => handleViewRoadmap(roadmap.savedCareerId, roadmap.careerName)}
-                          className="text-blue-400 hover:underline text-sm"
-                        >
-                          View Roadmap
-                        </button>
+                        <div>
+                          <button
+                            onClick={() => handleViewRoadmap(roadmap.savedCareerId, roadmap.careerName)}
+                            className="text-blue-400 hover:underline text-sm mr-4"
+                          >
+                            View Roadmap
+                          </button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button
+                                onClick={() =>
+                                  setRoadmapToDelete({
+                                    savedCareerId: roadmap.savedCareerId,
+                                    careerName: roadmap.careerName,
+                                  })
+                                }
+                                className="text-red-400 hover:underline text-sm"
+                              >
+                                Delete
+                              </button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="bg-[#1F2937] border-gray-700 text-gray-200">
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription className="text-gray-400">
+                                  This will permanently delete the roadmap for "{roadmapToDelete?.careerName}". This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel className="bg-gray-600 text-gray-200 hover:bg-gray-500">
+                                  Cancel
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={handleDeleteRoadmap}
+                                  className="bg-red-600 hover:bg-red-500 text-white"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                       </li>
                     ))}
                   </ul>
+                </div>
+              )}
+              {savedCareers.length > 0 && (
+                <div className="text-center mb-12">
+                  <button
+                    onClick={handleStartAssessment}
+                    className="bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-2 px-6 rounded-lg transition duration-300"
+                  >
+                    Start Assessment
+                  </button>
                 </div>
               )}
             </>
@@ -360,21 +437,10 @@ const Dashboard = () => {
             />
           )}
 
-          {savedCareers.length > 0 && (
-            <div className="text-center mb-12">
-              <button
-                onClick={() => setIsRoadmapModalOpen(true)}
-                className="bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-2 px-6 rounded-lg transition duration-300"
-              >
-                Generate Roadmap
-              </button>
-            </div>
-          )}
-
           <div className="bg-[#1F2937] rounded-lg p-8 border border-gray-700">
             <h3 className="text-xl font-semibold mb-4">Where to Learn?</h3>
             <p className="text-gray-400 mb-4">Enhance your skills with these recommended platforms:</p>
-            <ul className="space-y-4 text-left">
+            <ul className="space-y-4">
               <li className="text-base">
                 <span className="font-medium">Coursera</span> - Courses in programming, data science, and design.{" "}
                 <a
