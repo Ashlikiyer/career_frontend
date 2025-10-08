@@ -22,7 +22,9 @@ interface ResultsProps {
 
 const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
   const navigate = useNavigate();
-  const [recommendations, setRecommendations] = useState<Recommendations>(initialRecommendations);
+  const [recommendations, setRecommendations] = useState<Recommendations>(
+    initialRecommendations
+  );
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -36,14 +38,17 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
     try {
       setError(null);
       setSuccess(null);
-      const careerName = recommendations.careers[0].career_name;
-      await saveCareer(careerName);
+      const career = recommendations.careers[0];
+      const careerName = career.career_name;
+      const assessmentScore = career.score;
+      await saveCareer(careerName, assessmentScore);
       setSuccess(`Career "${careerName}" saved successfully!`);
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
     } catch (err: unknown) {
-      const errorMessage = (err as Error).message || "Failed to save career. Please try again.";
+      const errorMessage =
+        (err as Error).message || "Failed to save career. Please try again.";
       setError(errorMessage);
       console.error("Save Career Error:", err);
     }
@@ -96,7 +101,8 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold mb-4">Your Career Path</h2>
           <p className="text-lg text-gray-400">
-            Based on your assessment, here’s the career path that matches your skills and interests.
+            Based on your assessment, here’s the career path that matches your
+            skills and interests.
           </p>
         </div>
 
@@ -106,7 +112,9 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
               key={index}
               className="bg-[#1F2937] rounded-lg p-6 border border-gray-700 hover:border-blue-400 transition-colors"
             >
-              <h3 className="text-xl font-semibold mb-2">{career.career_name}</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                {career.career_name}
+              </h3>
               <p className="text-gray-400">
                 {career.career_name === "Software Engineer" &&
                   "Build applications and systems with cutting-edge technologies."}
@@ -117,7 +125,9 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
                 {career.career_name === "Software Tester/Quality Assurance" &&
                   "Ensure software quality through rigorous testing."}
               </p>
-              <p className="text-sm text-gray-500 mt-2">Confidence Score: {career.score}%</p>
+              <p className="text-sm text-gray-500 mt-2">
+                Confidence Score: {career.score}%
+              </p>
             </div>
           ))}
         </div>
@@ -144,13 +154,16 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
           </p>
           <ul className="space-y-2">
             <li className="text-base">
-              • <span className="font-medium">Coursera</span> - Courses in programming, data science, and design.
+              • <span className="font-medium">Coursera</span> - Courses in
+              programming, data science, and design.
             </li>
             <li className="text-base">
-              • <span className="font-medium">Codecademy</span> - Interactive coding lessons for all levels.
+              • <span className="font-medium">Codecademy</span> - Interactive
+              coding lessons for all levels.
             </li>
             <li className="text-base">
-              • <span className="font-medium">AWS Skill Builder</span> - Cloud computing and technical training.
+              • <span className="font-medium">AWS Skill Builder</span> - Cloud
+              computing and technical training.
             </li>
           </ul>
         </div>

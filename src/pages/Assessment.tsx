@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
 import Navbar from "../components/Navbar";
@@ -8,6 +8,7 @@ import {
   fetchNextQuestion,
   submitAnswer,
   restartAssessment,
+  getCurrentOrStartAssessment,
 } from "../../services/dataService";
 
 interface Question {
@@ -30,6 +31,7 @@ interface Feedback {
   saveOption?: boolean;
   restartOption?: boolean;
   assessment_id?: number;
+  completed?: boolean;
 }
 
 interface CareerRecommendation {
@@ -52,9 +54,12 @@ const Assessment = () => {
   const [showResults, setShowResults] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [recommendations, setRecommendations] = useState<Recommendations>({ careers: [] });
+  const [recommendations, setRecommendations] = useState<Recommendations>({
+    careers: [],
+  });
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [assessmentId, setAssessmentId] = useState<number | null>(null);
+  const isLoadingRef = useRef(false);
 
   useEffect(() => {
     if (!authToken) {
@@ -62,23 +67,58 @@ const Assessment = () => {
       return;
     }
 
-    const fetchInitialQuestion = async () => {
+    const checkExistingAssessment = async () => {
+      // Prevent duplicate calls
+      if (isLoadingRef.current) {
+        console.log("Assessment already loading, skipping duplicate call");
+        return;
+      }
+
       try {
+        isLoadingRef.current = true;
         setLoading(true);
-        const data: Question = await startAssessment();
-        console.log("Start Assessment Data:", JSON.stringify(data, null, 2));
+
+        // Use single combined endpoint to get existing OR create new assessment
+        const data: Question = await getCurrentOrStartAssessment();
+        console.log("Assessment Data:", JSON.stringify(data, null, 2));
         if (typeof data.options_answer === "string") {
-          data.options = data.options_answer.split(",").map((option: string) => option.trim());
+          data.options = data.options_answer
+            .split(",")
+            .map((option: string) => option.trim());
         }
         setCurrentQuestion(data);
         setAssessmentId(data.assessment_id || null);
       } catch (err: unknown) {
-        setError((err as Error).message || "Failed to start assessment. Please try again.");
+        const errorMessage =
+          (err as Error).message ||
+          "Failed to start assessment. Please try again.";
+        if (errorMessage.includes("session expired")) {
+          setError(
+            "Your assessment session has expired. Starting a new assessment."
+          );
+          // Try to start a fresh assessment
+          try {
+            const data: Question = await startAssessment();
+            if (typeof data.options_answer === "string") {
+              data.options = data.options_answer
+                .split(",")
+                .map((option: string) => option.trim());
+            }
+            setCurrentQuestion(data);
+            setAssessmentId(data.assessment_id || null);
+            setError(null);
+          } catch (retryErr) {
+            setError("Failed to start assessment. Please try again.");
+          }
+        } else {
+          setError(errorMessage);
+        }
       } finally {
         setLoading(false);
+        isLoadingRef.current = false;
       }
     };
-    fetchInitialQuestion();
+    checkExistingAssessment();
   }, [authToken, navigate]);
 
   const handleAnswerSelect = async (optionIndex: number) => {
@@ -87,17 +127,26 @@ const Assessment = () => {
       return;
     }
 
-    const selectedOption = currentQuestion.options ? currentQuestion.options[optionIndex] : "";
-    const newAnswers = { ...answers, [currentQuestion.question_id]: selectedOption };
+    const selectedOption = currentQuestion.options
+      ? currentQuestion.options[optionIndex]
+      : "";
+    const newAnswers = {
+      ...answers,
+      [currentQuestion.question_id]: selectedOption,
+    };
     setAnswers(newAnswers);
 
     try {
       setLoading(true);
-      const data: Feedback = await submitAnswer(assessmentId, currentQuestion.question_id, selectedOption);
+      const data: Feedback = await submitAnswer(
+        assessmentId,
+        currentQuestion.question_id,
+        selectedOption
+      );
       setError(null);
       setFeedbackMessage(data.feedbackMessage || null);
 
-      if (data.message === "Assessment completed") {
+      if (data.completed || data.message === "Assessment completed") {
         setCompleted(true);
         setRecommendations({
           careers: [
@@ -111,12 +160,28 @@ const Assessment = () => {
         setShowResults(true);
       } else if (data.nextQuestionId) {
         try {
-          const nextQuestion: Question = await fetchNextQuestion(currentQuestion.question_id, assessmentId);
-          if (typeof nextQuestion.options_answer === "string") {
-            nextQuestion.options = nextQuestion.options_answer.split(",").map((option: string) => option.trim());
+          const nextQuestionData = await fetchNextQuestion(
+            currentQuestion.question_id,
+            assessmentId
+          );
+          if (nextQuestionData) {
+            const nextQuestion: Question = {
+              question_id: nextQuestionData.question_id,
+              question_text: nextQuestionData.question_text,
+              options_answer: nextQuestionData.options.join(","),
+              options: nextQuestionData.options,
+              assessment_id: nextQuestionData.assessment_id,
+            };
+            console.log(
+              "Next Question:",
+              JSON.stringify(nextQuestion, null, 2)
+            );
+            setCurrentQuestion(nextQuestion);
+          } else {
+            // No more questions available
+            setCompleted(true);
+            setShowResults(true);
           }
-          console.log("Next Question:", JSON.stringify(nextQuestion, null, 2));
-          setCurrentQuestion(nextQuestion);
         } catch (err) {
           if ((err as Error).message.includes("No more questions available")) {
             setCompleted(true);
@@ -127,7 +192,23 @@ const Assessment = () => {
         }
       }
     } catch (err: unknown) {
-      setError((err as Error).message || "Failed to submit answer. Please retry or restart.");
+      const errorMessage =
+        (err as Error).message ||
+        "Failed to submit answer. Please retry or restart.";
+      if (errorMessage.includes("session expired")) {
+        // Handle session expiry
+        setCompleted(false);
+        setShowResults(false);
+        setAnswers({});
+        setFeedbackMessage(null);
+        setAssessmentId(null);
+        setCurrentQuestion(null);
+        setError(
+          "Your assessment session has expired. Please start a new assessment."
+        );
+      } else {
+        setError(errorMessage);
+      }
       console.error("Submission error:", err);
     } finally {
       setLoading(false);
@@ -145,18 +226,28 @@ const Assessment = () => {
       setAssessmentId(restartData.assessment_id || null);
       const questionData: Question = await startAssessment();
       if (typeof questionData.options_answer === "string") {
-        questionData.options = questionData.options_answer.split(",").map((option: string) => option.trim());
+        questionData.options = questionData.options_answer
+          .split(",")
+          .map((option: string) => option.trim());
       }
       setCurrentQuestion(questionData);
     } catch (err: unknown) {
-      setError((err as Error).message || "Failed to restart assessment. Please try again.");
+      setError(
+        (err as Error).message ||
+          "Failed to restart assessment. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   if (completed && showResults) {
-    return <Results initialRecommendations={recommendations} onRestart={handleRestart} />;
+    return (
+      <Results
+        initialRecommendations={recommendations}
+        onRestart={handleRestart}
+      />
+    );
   }
 
   if (completed && !showResults) {
@@ -166,7 +257,9 @@ const Assessment = () => {
         <div className="flex-grow p-8 -mt-7 flex items-center justify-center">
           <div className="max-w-2xl mx-auto bg-[#1F2937] rounded-lg p-8 shadow-lg text-center">
             <h2 className="text-3xl font-bold mb-6">Assessment Completed</h2>
-            <p className="text-xl mb-8">{feedbackMessage || "Your career recommendations are ready."}</p>
+            <p className="text-xl mb-8">
+              {feedbackMessage || "Your career recommendations are ready."}
+            </p>
             <div className="space-x-4">
               <button
                 onClick={() => setShowResults(true)}
@@ -233,12 +326,16 @@ const Assessment = () => {
             <div className="w-full bg-gray-400 rounded-full h-4 mt-2">
               <div
                 className="bg-blue-400 h-4 rounded-lg"
-                style={{ width: `${(currentQuestion?.question_id || 0) * 10}%` }}
+                style={{
+                  width: `${(currentQuestion?.question_id || 0) * 10}%`,
+                }}
               ></div>
             </div>
           </div>
 
-          <h2 className="text-lg font-semibold mb-4">{currentQuestion?.question_text}</h2>
+          <h2 className="text-lg font-semibold mb-4">
+            {currentQuestion?.question_text}
+          </h2>
 
           {feedbackMessage && (
             <div className="mt-4 p-4 bg-gray-800 rounded-lg">
