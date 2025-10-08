@@ -265,13 +265,20 @@ export async function submitAnswer(
 
     // Handle different response types
     if (response.saveOption) {
-      // Assessment completed
+      // Assessment completed - return enhanced format with backward compatibility
       return {
         completed: true,
-        career_suggestion: response.career_suggestion,
-        score: response.score,
+        // New enhanced fields
+        career_suggestions: response.career_suggestions,
+        primary_career: response.primary_career,
+        primary_score: response.primary_score,
+        // Legacy fields for backward compatibility
+        career_suggestion: response.career_suggestion || response.primary_career,
+        score: response.score || response.primary_score,
         feedbackMessage: response.feedbackMessage,
-        message: "Assessment completed",
+        message: response.message || "Assessment completed",
+        saveOption: response.saveOption,
+        restartOption: response.restartOption,
       };
     } else {
       // Continue assessment
@@ -414,14 +421,58 @@ export async function testSessionConnectivity() {
     // Test basic connectivity
     const health = await ensureValidSession();
     console.log("Health check:", health);
-
+    
     // Test session debug info
     const sessionInfo = await debugSession();
     console.log("Session info:", sessionInfo);
-
+    
     return { health, sessionInfo };
   } catch (error) {
     console.error("Session connectivity test failed:", error);
+    throw error;
+  }
+}
+
+// New Career Suggestions API Functions
+export async function getCareerSuggestions(assessmentId: number) {
+  try {
+    const response = await dataFetch(`career-suggestions/${assessmentId}`, "GET");
+    return response;
+    /*
+    Response format:
+    {
+      "assessment_id": 1,
+      "career_suggestions": [...],
+      "primary_career": "Web Developer",
+      "primary_score": 94,
+      "answers_count": 8,
+      "completion_date": "2025-10-08T10:30:00.000Z"
+    }
+    */
+  } catch (error) {
+    console.error('Error getting career suggestions:', error);
+    throw error;
+  }
+}
+
+export async function getCareerDetails(assessmentId: number, careerName: string) {
+  try {
+    const response = await dataFetch(`career-suggestions/${assessmentId}/career/${careerName}`, "GET");
+    return response;
+    /*
+    Response format:
+    {
+      "career": {
+        "career": "Web Developer",
+        "compatibility": 94,
+        "reason": "Strong web development interest..."
+      },
+      "rank": 1,
+      "total_suggestions": 5
+    }
+    */
+  } catch (error) {
+    console.error('Error getting career details:', error);
     throw error;
   }
 }

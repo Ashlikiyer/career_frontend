@@ -4,15 +4,28 @@ import Navbar from "../components/Navbar";
 import { saveCareer } from "../../services/dataService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
+import "../components/CareerResults.css";
+
+interface CareerSuggestion {
+  career: string;
+  compatibility: number;
+  reason: string;
+}
 
 interface CareerRecommendation {
   career_name: string;
   saved_career_id: number;
   score: number;
+  reason?: string;
+  isPrimary?: boolean;
 }
 
 interface Recommendations {
   careers: CareerRecommendation[];
+  // Enhanced fields for new format
+  career_suggestions?: CareerSuggestion[];
+  primary_career?: string;
+  primary_score?: number;
 }
 
 interface ResultsProps {
@@ -27,32 +40,32 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
   );
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [selectedCareers, setSelectedCareers] = useState<string[]>([]);
+  const [showAllCareers, setShowAllCareers] = useState(false);
 
   useEffect(() => {
     setRecommendations(initialRecommendations);
   }, [initialRecommendations]);
 
-  const handleSave = async () => {
-    if (!recommendations.careers[0]) return;
-
+  const handleSaveCareer = async (careerName: string, score: number) => {
     try {
       setError(null);
-      setSuccess(null);
-      const career = recommendations.careers[0];
-      const careerName = career.career_name;
-      const assessmentScore = career.score;
-      await saveCareer(careerName, assessmentScore);
+      await saveCareer(careerName, score);
+      setSelectedCareers([...selectedCareers, careerName]);
       setSuccess(`Career "${careerName}" saved successfully!`);
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 2000);
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err: unknown) {
       const errorMessage =
         (err as Error).message || "Failed to save career. Please try again.";
       setError(errorMessage);
       console.error("Save Career Error:", err);
+      setTimeout(() => setError(null), 5000);
     }
   };
+
+
+
+
 
   if (!recommendations.careers.length) {
     return (
@@ -99,49 +112,109 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
           </Alert>
         )}
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold mb-4">Your Career Path</h2>
+          <h2 className="text-3xl font-bold mb-4">Your Career Assessment Results</h2>
           <p className="text-lg text-gray-400">
             Based on your assessment, here’s the career path that matches your
             skills and interests.
           </p>
         </div>
 
-        <div className="space-y-6 mb-4">
-          {recommendations.careers.map((career, index) => (
-            <div
-              key={index}
-              className="bg-[#1F2937] rounded-lg p-6 border border-gray-700 hover:border-blue-400 transition-colors"
-            >
-              <h3 className="text-xl font-semibold mb-2">
-                {career.career_name}
-              </h3>
-              <p className="text-gray-400">
-                {career.career_name === "Software Engineer" &&
-                  "Build applications and systems with cutting-edge technologies."}
-                {career.career_name === "Data Scientist" &&
-                  "Analyze data and develop models for data-driven decisions."}
-                {career.career_name === "Graphic Designer" &&
-                  "Create visually stunning graphics and layouts."}
-                {career.career_name === "Software Tester/Quality Assurance" &&
-                  "Ensure software quality through rigorous testing."}
-              </p>
-              <p className="text-sm text-gray-500 mt-2">
-                Confidence Score: {career.score}%
-              </p>
+        {/* Primary Career */}
+        {recommendations.careers.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold mb-4 text-center">🎯 Your Best Match</h3>
+            <div className="bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-lg p-6 border-2 border-green-500/50 hover:border-green-400 transition-colors">
+              <div className="flex justify-between items-start mb-4">
+                <h4 className="text-2xl font-bold text-green-400">
+                  {recommendations.careers[0].career_name}
+                </h4>
+                <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                  {recommendations.careers[0].score}% Match
+                </div>
+              </div>
+              {recommendations.careers[0].reason && (
+                <p className="text-gray-300 italic mb-4">
+                  {recommendations.careers[0].reason}
+                </p>
+              )}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => handleSaveCareer(recommendations.careers[0].career_name, recommendations.careers[0].score)}
+                  disabled={selectedCareers.includes(recommendations.careers[0].career_name)}
+                  className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                >
+                  {selectedCareers.includes(recommendations.careers[0].career_name) 
+                    ? "✓ Saved" 
+                    : "Save This Career"
+                  }
+                </button>
+              </div>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
+
+        {/* Additional Careers */}
+        {recommendations.careers.length > 1 && (
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">🔍 Other Great Matches</h3>
+              {!showAllCareers && (
+                <button
+                  onClick={() => setShowAllCareers(true)}
+                  className="text-blue-400 hover:text-blue-300 underline"
+                >
+                  Show All {recommendations.careers.length - 1} Options
+                </button>
+              )}
+            </div>
+
+            {showAllCareers && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {recommendations.careers.slice(1).map((career, index) => (
+                  <div
+                    key={index + 1}
+                    className="bg-[#1F2937] rounded-lg p-5 border border-gray-700 hover:border-blue-400 transition-colors"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="text-lg font-semibold">
+                        {career.career_name}
+                      </h4>
+                      <div className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-bold">
+                        {career.score}% Match
+                      </div>
+                    </div>
+                    {career.reason && (
+                      <p className="text-gray-400 text-sm italic mb-4">
+                        {career.reason}
+                      </p>
+                    )}
+                    <button
+                      onClick={() => handleSaveCareer(career.career_name, career.score)}
+                      disabled={selectedCareers.includes(career.career_name)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-3 py-2 rounded font-medium transition-colors text-sm"
+                    >
+                      {selectedCareers.includes(career.career_name) 
+                        ? "✓ Saved" 
+                        : "Save This Career"
+                      }
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="flex space-x-4 mb-4 justify-center">
           <button
-            onClick={handleSave}
+            onClick={() => navigate("/dashboard")}
             className="bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-2 px-6 rounded-lg transition duration-300"
           >
-            Save Career Path
+            View My Saved Careers ({selectedCareers.length})
           </button>
           <button
             onClick={onRestart}
-            className="bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-2 px-6 rounded-lg transition duration-300"
+            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300"
           >
             Retake Assessment
           </button>

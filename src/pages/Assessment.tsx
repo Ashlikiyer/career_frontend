@@ -20,12 +20,24 @@ interface Question {
   assessment_id?: number;
 }
 
+// New enhanced career suggestion interface
+interface CareerSuggestion {
+  career: string;
+  compatibility: number;
+  reason: string;
+}
+
 interface Feedback {
   message?: string;
   career?: string;
   confidence?: number;
+  // Legacy fields (for backward compatibility)
   career_suggestion?: string;
   score?: number;
+  // New enhanced fields
+  career_suggestions?: CareerSuggestion[];
+  primary_career?: string;
+  primary_score?: number;
   feedbackMessage?: string;
   nextQuestionId?: number;
   saveOption?: boolean;
@@ -38,10 +50,16 @@ interface CareerRecommendation {
   career_name: string;
   saved_career_id: number;
   score: number;
+  reason?: string; // New field for compatibility reason
+  isPrimary?: boolean; // New field to identify primary career
 }
 
 interface Recommendations {
   careers: CareerRecommendation[];
+  // Enhanced fields for new format
+  career_suggestions?: CareerSuggestion[];
+  primary_career?: string;
+  primary_score?: number;
 }
 
 const Assessment = () => {
@@ -148,15 +166,37 @@ const Assessment = () => {
 
       if (data.completed || data.message === "Assessment completed") {
         setCompleted(true);
-        setRecommendations({
-          careers: [
-            {
-              career_name: data.career_suggestion || "Undecided",
-              saved_career_id: 0,
-              score: data.score || 0,
-            },
-          ],
-        });
+        
+        // Handle new multiple career suggestions format
+        if (data.career_suggestions && data.career_suggestions.length > 0) {
+          // Convert new format to existing format for compatibility
+          const careerRecommendations = data.career_suggestions.map((suggestion, index) => ({
+            career_name: suggestion.career,
+            saved_career_id: 0,
+            score: suggestion.compatibility,
+            reason: suggestion.reason, // Add reason for enhanced display
+            isPrimary: index === 0, // Mark first as primary
+          }));
+          
+          setRecommendations({
+            careers: careerRecommendations,
+            // Store raw career suggestions for enhanced UI
+            career_suggestions: data.career_suggestions,
+            primary_career: data.primary_career,
+            primary_score: data.primary_score,
+          });
+        } else {
+          // Fallback to legacy format
+          setRecommendations({
+            careers: [
+              {
+                career_name: data.career_suggestion || "Undecided",
+                saved_career_id: 0,
+                score: data.score || 0,
+              },
+            ],
+          });
+        }
         setShowResults(true);
       } else if (data.nextQuestionId) {
         try {

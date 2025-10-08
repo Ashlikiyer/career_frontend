@@ -3,12 +3,16 @@ import Navbar from '../components/Navbar';
 import { fetchRoadmap } from '../../services/dataService';
 
 interface RoadmapStep {
-  roadmap_id: number;
-  saved_career_id: number; // Changed to number to match backend response
-  step_order: string;
-  step_description: string;
+  step: number;
+  title: string;
+  description: string;
   duration: string;
   resources: string[];
+}
+
+interface RoadmapResponse {
+  career_name: string;
+  roadmap: RoadmapStep[];
 }
 
 interface RoadmapPageProps {
@@ -26,9 +30,25 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({ savedCareerId, careerName, on
     const loadRoadmap = async () => {
       try {
         setLoading(true);
-        const data = await fetchRoadmap(savedCareerId); // Use savedCareerId instead of careerName
-        console.log("Roadmap Data:", JSON.stringify(data, null, 2));
-        setRoadmap(Array.isArray(data) ? data : []);
+        const response: RoadmapResponse = await fetchRoadmap(savedCareerId);
+        console.log("Roadmap Data:", JSON.stringify(response, null, 2));
+        
+        // Handle new backend response format
+        if (response && response.roadmap && Array.isArray(response.roadmap)) {
+          setRoadmap(response.roadmap);
+        } else if (Array.isArray(response)) {
+          // Fallback for old format - convert to new format
+          const convertedSteps: RoadmapStep[] = (response as any[]).map((step, index) => ({
+            step: index + 1,
+            title: step.step_description || `Step ${index + 1}`,
+            description: step.step_description || '',
+            duration: step.duration || '',
+            resources: step.resources || []
+          }));
+          setRoadmap(convertedSteps);
+        } else {
+          setRoadmap([]);
+        }
       } catch (err: unknown) {
         setError((err as Error).message || "Failed to load roadmap.");
         console.error("Fetch Roadmap Error:", err);
@@ -69,18 +89,20 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({ savedCareerId, careerName, on
           <h1 className="text-3xl font-bold mb-6 text-center">{careerName} Roadmap</h1>
           <div className="relative">
             {roadmap.length > 0 ? (
-              roadmap.map((step) => (
-                <div key={step.roadmap_id} className="mb-12">
+              roadmap.map((step, index) => (
+                <div key={step.step} className="mb-12">
                   <div className="flex items-start">
                     <div className="w-1/12 text-center">
-                      <div className="w-4 h-4 bg-blue-400 rounded-full mx-auto"></div>
-                      {step.roadmap_id < roadmap.length && (
-                        <div className="w-1 h-full bg-gray-600 mx-auto mt-2"></div>
+                      <div className="w-8 h-8 bg-blue-400 rounded-full mx-auto flex items-center justify-center text-white font-bold">
+                        {step.step}
+                      </div>
+                      {index < roadmap.length - 1 && (
+                        <div className="w-1 h-24 bg-gray-600 mx-auto mt-2"></div>
                       )}
                     </div>
                     <div className="w-11/12 pl-6">
-                      <h2 className="text-xl font-semibold mb-2">{step.step_order}</h2>
-                      <p className="text-gray-300 mb-2">{step.step_description}</p>
+                      <h2 className="text-xl font-semibold mb-2">{step.title}</h2>
+                      <p className="text-gray-300 mb-2">{step.description}</p>
                       <p className="text-sm text-gray-400 mb-2">Duration: {step.duration}</p>
                       <h3 className="text-sm font-medium text-gray-200 mb-1">Resources:</h3>
                       <ul className="list-disc list-inside space-y-1 text-gray-300 text-sm">
