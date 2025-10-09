@@ -273,7 +273,8 @@ export async function submitAnswer(
         primary_career: response.primary_career,
         primary_score: response.primary_score,
         // Legacy fields for backward compatibility
-        career_suggestion: response.career_suggestion || response.primary_career,
+        career_suggestion:
+          response.career_suggestion || response.primary_career,
         score: response.score || response.primary_score,
         feedbackMessage: response.feedbackMessage,
         message: response.message || "Assessment completed",
@@ -421,11 +422,11 @@ export async function testSessionConnectivity() {
     // Test basic connectivity
     const health = await ensureValidSession();
     console.log("Health check:", health);
-    
+
     // Test session debug info
     const sessionInfo = await debugSession();
     console.log("Session info:", sessionInfo);
-    
+
     return { health, sessionInfo };
   } catch (error) {
     console.error("Session connectivity test failed:", error);
@@ -436,7 +437,10 @@ export async function testSessionConnectivity() {
 // New Career Suggestions API Functions
 export async function getCareerSuggestions(assessmentId: number) {
   try {
-    const response = await dataFetch(`career-suggestions/${assessmentId}`, "GET");
+    const response = await dataFetch(
+      `career-suggestions/${assessmentId}`,
+      "GET"
+    );
     return response;
     /*
     Response format:
@@ -450,14 +454,20 @@ export async function getCareerSuggestions(assessmentId: number) {
     }
     */
   } catch (error) {
-    console.error('Error getting career suggestions:', error);
+    console.error("Error getting career suggestions:", error);
     throw error;
   }
 }
 
-export async function getCareerDetails(assessmentId: number, careerName: string) {
+export async function getCareerDetails(
+  assessmentId: number,
+  careerName: string
+) {
   try {
-    const response = await dataFetch(`career-suggestions/${assessmentId}/career/${careerName}`, "GET");
+    const response = await dataFetch(
+      `career-suggestions/${assessmentId}/career/${careerName}`,
+      "GET"
+    );
     return response;
     /*
     Response format:
@@ -472,7 +482,7 @@ export async function getCareerDetails(assessmentId: number, careerName: string)
     }
     */
   } catch (error) {
-    console.error('Error getting career details:', error);
+    console.error("Error getting career details:", error);
     throw error;
   }
 }

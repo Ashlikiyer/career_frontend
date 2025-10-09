@@ -166,18 +166,20 @@ const Assessment = () => {
 
       if (data.completed || data.message === "Assessment completed") {
         setCompleted(true);
-        
+
         // Handle new multiple career suggestions format
         if (data.career_suggestions && data.career_suggestions.length > 0) {
           // Convert new format to existing format for compatibility
-          const careerRecommendations = data.career_suggestions.map((suggestion, index) => ({
-            career_name: suggestion.career,
-            saved_career_id: 0,
-            score: suggestion.compatibility,
-            reason: suggestion.reason, // Add reason for enhanced display
-            isPrimary: index === 0, // Mark first as primary
-          }));
-          
+          const careerRecommendations = data.career_suggestions.map(
+            (suggestion, index) => ({
+              career_name: suggestion.career,
+              saved_career_id: 0,
+              score: suggestion.compatibility,
+              reason: suggestion.reason, // Add reason for enhanced display
+              isPrimary: index === 0, // Mark first as primary
+            })
+          );
+
           setRecommendations({
             careers: careerRecommendations,
             // Store raw career suggestions for enhanced UI
@@ -292,24 +294,29 @@ const Assessment = () => {
 
   if (completed && !showResults) {
     return (
-      <div className="min-h-screen bg-[#111827] text-gray-200 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
         <Navbar />
-        <div className="flex-grow p-8 -mt-7 flex items-center justify-center">
-          <div className="max-w-2xl mx-auto bg-[#1F2937] rounded-lg p-8 shadow-lg text-center">
-            <h2 className="text-3xl font-bold mb-6">Assessment Completed</h2>
-            <p className="text-xl mb-8">
-              {feedbackMessage || "Your career recommendations are ready."}
+        <div className="flex-grow p-8 flex items-center justify-center">
+          <div className="max-w-2xl mx-auto bg-white rounded-2xl p-8 shadow-xl text-center border border-gray-100">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-bold mb-4 text-gray-900">Assessment Complete!</h2>
+            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+              {feedbackMessage || "Great job! Your personalized career recommendations are ready to explore."}
             </p>
-            <div className="space-x-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => setShowResults(true)}
-                className="bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-3 px-8 rounded-lg transition duration-300"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
               >
-                View Recommendations
+                View My Results
               </button>
               <button
                 onClick={handleRestart}
-                className="bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-3 px-8 rounded-lg transition duration-300"
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-8 rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-300"
               >
                 Retake Assessment
               </button>
@@ -322,10 +329,13 @@ const Assessment = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#111827] text-gray-200 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
         <Navbar />
         <div className="flex-grow p-8 flex items-center justify-center">
-          <p>Loading...</p>
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-lg text-gray-600">Loading your assessment...</p>
+          </div>
         </div>
       </div>
     );
@@ -333,39 +343,64 @@ const Assessment = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#111827] text-gray-200 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
         <Navbar />
         <div className="flex-grow p-8 flex items-center justify-center">
-          <p className="text-red-400">{error}</p>
-          <button
-            onClick={() => handleAnswerSelect(0)}
-            className="ml-4 bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-2 px-4 rounded-lg transition duration-300"
-          >
-            Retry
-          </button>
-          <button
-            onClick={handleRestart}
-            className="ml-4 bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-2 px-4 rounded-lg transition duration-300"
-          >
-            Restart Assessment
-          </button>
+          <div className="max-w-md mx-auto bg-white rounded-2xl p-8 shadow-xl text-center border border-gray-100">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Oops! Something went wrong</h3>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => handleAnswerSelect(0)}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={handleRestart}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg border border-gray-200 transition-all duration-300"
+              >
+                Start Over
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#111827] text-gray-200 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Navbar />
       <div className="flex-grow p-6">
-        <div className="max-w-3xl mx-auto bg-[#1F2937] rounded-lg p-4">
-          <div className="mb-4">
-            <span className="text-sm text-gray-400">
+        <div className="max-w-4xl mx-auto">
+          {/* Header Section */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-4">
+              📋 Career Assessment
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Question {currentQuestion?.question_id} of 10
-            </span>
-            <div className="w-full bg-gray-400 rounded-full h-4 mt-2">
+            </h1>
+            <p className="text-gray-600">
+              Discover your perfect tech career path with our AI-powered assessment
+            </p>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="flex justify-between text-sm text-gray-500 mb-2">
+              <span>Progress</span>
+              <span>{((currentQuestion?.question_id || 0) * 10)}% Complete</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3">
               <div
-                className="bg-blue-400 h-4 rounded-lg"
+                className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500 ease-out"
                 style={{
                   width: `${(currentQuestion?.question_id || 0) * 10}%`,
                 }}
@@ -373,37 +408,69 @@ const Assessment = () => {
             </div>
           </div>
 
-          <h2 className="text-lg font-semibold mb-4">
-            {currentQuestion?.question_text}
-          </h2>
+          {/* Main Question Card */}
+          <div className="max-w-3xl mx-auto bg-white rounded-2xl p-8 shadow-xl border border-gray-100 mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center leading-relaxed">
+              {currentQuestion?.question_text}
+            </h2>
 
-          {feedbackMessage && (
-            <div className="mt-4 p-4 bg-gray-800 rounded-lg">
-              <h3 className="text-base font-medium mb-2">Feedback:</h3>
-              <p className="text-gray-400">{feedbackMessage}</p>
+            {/* Feedback Message - Always visible between question and choices */}
+            {feedbackMessage && (
+              <div className="mb-8">
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                  <div className="flex items-start">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                      <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-green-800 mb-1">Great choice!</h3>
+                      <p className="text-sm text-green-700">{feedbackMessage}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Answer Options */}
+            <div className="space-y-4">
+              {currentQuestion?.options?.map((option: string, index: number) => (
+                <button
+                  key={index}
+                  onClick={() => handleAnswerSelect(index)}
+                  className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-300 hover:shadow-md ${
+                    answers[currentQuestion?.question_id] === option
+                      ? "border-blue-500 bg-blue-50 shadow-lg transform scale-[1.02]"
+                      : "border-gray-200 hover:border-blue-300 hover:bg-blue-50/50"
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <div className={`w-6 h-6 rounded-full border-2 mr-4 flex items-center justify-center ${
+                      answers[currentQuestion?.question_id] === option
+                        ? "border-blue-500 bg-blue-500"
+                        : "border-gray-300"
+                    }`}>
+                      {answers[currentQuestion?.question_id] === option && (
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </div>
+                    <span className="text-lg text-gray-700 font-medium">{option}</span>
+                  </div>
+                </button>
+              ))}
             </div>
-          )}
-
-          <div className="space-y-3">
-            {currentQuestion?.options?.map((option: string, index: number) => (
-              <button
-                key={index}
-                onClick={() => handleAnswerSelect(index)}
-                className={`w-full text-left p-3 rounded-lg border ${
-                  answers[currentQuestion?.question_id] === option
-                    ? "border-blue-400 bg-blue-900/20"
-                    : "border-gray-600 hover:bg-gray-700"
-                }`}
-              >
-                {option}
-              </button>
-            ))}
           </div>
 
-          <div className="flex justify-between mt-6">
-            <span className="text-sm text-gray-400 self-center">
-              {Object.keys(answers).length} / 10 answered
-            </span>
+          {/* Bottom Stats */}
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200">
+              <span className="text-sm text-gray-600">
+                <span className="font-semibold text-blue-600">{Object.keys(answers).length}</span> of 10 questions answered
+              </span>
+            </div>
           </div>
         </div>
       </div>

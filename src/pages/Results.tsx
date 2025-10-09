@@ -63,23 +63,21 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
     }
   };
 
-
-
-
-
   if (!recommendations.careers.length) {
     return (
-      <div className="min-h-screen bg-[#111827] text-gray-200 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
         <Navbar />
         <div className="flex-grow p-8 flex items-center justify-center">
-          <p className="text-red-500">No recommendations available.</p>
+          <div className="bg-white rounded-xl shadow-lg p-8 border border-red-200">
+            <p className="text-red-600 text-center">No recommendations available.</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#111827] text-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       <style>
         {`
           @keyframes slideInFromRight {
@@ -98,42 +96,52 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
         `}
       </style>
       <Navbar />
-      <div className="pt-4 p-6 max-w-3xl mx-auto">
+      <div className="pt-8 p-6 max-w-4xl mx-auto">
         {error && (
-          <div className="mb-6 p-4 bg-gray-800 text-red-400 rounded-lg">
-            {error}
-          </div>
+          <Alert variant="destructive" className="mb-6">
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
         {success && (
-          <Alert className="fixed top-4 right-4 z-50 max-w-sm bg-white border border-gray-300 text-black shadow-lg rounded-lg animate-slide-in">
+          <Alert variant="success" className="fixed top-4 right-4 z-50 max-w-sm animate-slide-in">
             <CheckCircle2Icon className="h-4 w-4" />
             <AlertTitle>Success!</AlertTitle>
             <AlertDescription>{success}</AlertDescription>
           </Alert>
         )}
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold mb-4">Your Career Assessment Results</h2>
-          <p className="text-lg text-gray-400">
-            Based on your assessment, here’s the career path that matches your
-            skills and interests.
+        
+        {/* Header Section */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-green-500 rounded-full mb-6">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+            Your Career Assessment Results
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Based on your assessment, we've identified career paths that align perfectly with your
+            skills, interests, and aspirations.
           </p>
         </div>
 
         {/* Primary Career */}
         {recommendations.careers.length > 0 && (
           <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-4 text-center">🎯 Your Best Match</h3>
-            <div className="bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-lg p-6 border-2 border-green-500/50 hover:border-green-400 transition-colors">
-              <div className="flex justify-between items-start mb-4">
-                <h4 className="text-2xl font-bold text-green-400">
+            <h3 className="text-xl font-semibold mb-6 text-center text-gray-700">🎯 Your Best Match</h3>
+            <div className="bg-white rounded-xl shadow-lg p-8 border-2 border-green-200 hover:border-green-300 transition-all duration-300 hover:shadow-xl">
+              <div className="flex justify-between items-start mb-6">
+                <h4 className="text-2xl font-bold text-gray-800">
                   {recommendations.careers[0].career_name}
                 </h4>
-                <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md">
                   {recommendations.careers[0].score}% Match
                 </div>
               </div>
               {recommendations.careers[0].reason && (
-                <p className="text-gray-300 italic mb-4">
+                <p className="text-gray-600 italic mb-6 text-lg leading-relaxed">
                   {recommendations.careers[0].reason}
                 </p>
               )}
@@ -141,7 +149,7 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
                 <button
                   onClick={() => handleSaveCareer(recommendations.careers[0].career_name, recommendations.careers[0].score)}
                   disabled={selectedCareers.includes(recommendations.careers[0].career_name)}
-                  className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   {selectedCareers.includes(recommendations.careers[0].career_name) 
                     ? "✓ Saved" 
@@ -156,12 +164,12 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
         {/* Additional Careers */}
         {recommendations.careers.length > 1 && (
           <div className="mb-8">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold">🔍 Other Great Matches</h3>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-semibold text-gray-700">🔍 Other Great Matches</h3>
               {!showAllCareers && (
                 <button
                   onClick={() => setShowAllCareers(true)}
-                  className="text-blue-400 hover:text-blue-300 underline"
+                  className="text-blue-600 hover:text-blue-700 underline font-medium"
                 >
                   Show All {recommendations.careers.length - 1} Options
                 </button>
@@ -169,29 +177,29 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
             </div>
 
             {showAllCareers && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {recommendations.careers.slice(1).map((career, index) => (
                   <div
                     key={index + 1}
-                    className="bg-[#1F2937] rounded-lg p-5 border border-gray-700 hover:border-blue-400 transition-colors"
+                    className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:border-blue-300 transition-all duration-300 hover:shadow-lg"
                   >
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="text-lg font-semibold">
+                    <div className="flex justify-between items-start mb-4">
+                      <h4 className="text-lg font-semibold text-gray-800">
                         {career.career_name}
                       </h4>
-                      <div className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-bold">
+                      <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">
                         {career.score}% Match
                       </div>
                     </div>
                     {career.reason && (
-                      <p className="text-gray-400 text-sm italic mb-4">
+                      <p className="text-gray-600 text-sm italic mb-4 leading-relaxed">
                         {career.reason}
                       </p>
                     )}
                     <button
                       onClick={() => handleSaveCareer(career.career_name, career.score)}
                       disabled={selectedCareers.includes(career.career_name)}
-                      className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-3 py-2 rounded font-medium transition-colors text-sm"
+                      className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 text-sm shadow-md hover:shadow-lg"
                     >
                       {selectedCareers.includes(career.career_name) 
                         ? "✓ Saved" 
@@ -205,40 +213,49 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
           </div>
         )}
 
-        <div className="flex space-x-4 mb-4 justify-center">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
           <button
             onClick={() => navigate("/dashboard")}
-            className="bg-[#4C4C86] hover:bg-[#5D5DA3] text-white font-bold py-2 px-6 rounded-lg transition duration-300"
+            className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
           >
             View My Saved Careers ({selectedCareers.length})
           </button>
           <button
             onClick={onRestart}
-            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300"
+            className="bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-800 font-bold py-3 px-8 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg"
           >
             Retake Assessment
           </button>
         </div>
 
-        <div className="bg-[#1F2937] rounded-lg p-6 border border-gray-700">
-          <h3 className="text-xl font-semibold mb-4">Where to Learn?</h3>
-          <p className="text-gray-400 mb-4">
+        {/* Learning Resources */}
+        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+          <div className="flex items-center mb-6">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mr-3">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800">Where to Learn?</h3>
+          </div>
+          <p className="text-gray-600 mb-6 text-lg">
             Enhance your skills with these recommended platforms:
           </p>
-          <ul className="space-y-2">
-            <li className="text-base">
-              • <span className="font-medium">Coursera</span> - Courses in
-              programming, data science, and design.
-            </li>
-            <li className="text-base">
-              • <span className="font-medium">Codecademy</span> - Interactive
-              coding lessons for all levels.
-            </li>
-            <li className="text-base">
-              • <span className="font-medium">AWS Skill Builder</span> - Cloud
-              computing and technical training.
-            </li>
-          </ul>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 className="font-semibold text-blue-800 mb-2">Coursera</h4>
+              <p className="text-blue-600 text-sm">Courses in programming, data science, and design.</p>
+            </div>
+            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+              <h4 className="font-semibold text-green-800 mb-2">Codecademy</h4>
+              <p className="text-green-600 text-sm">Interactive coding lessons for all levels.</p>
+            </div>
+            <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+              <h4 className="font-semibold text-purple-800 mb-2">AWS Skill Builder</h4>
+              <p className="text-purple-600 text-sm">Cloud computing and technical training.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
