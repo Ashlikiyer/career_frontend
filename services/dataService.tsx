@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, ResponseType } from "axios";
 import { Cookies } from "react-cookie";
 
 const api = axios.create({
-  baseURL: "https://career.careerapp.xyz/", // Production URL
+  baseURL: import.meta.env.VITE_API_URL || "https://career.careerapp.xyz",
   withCredentials: true, // REQUIRED for sessions
   timeout: 10000, // 10 second timeout
   headers: {
@@ -291,16 +291,14 @@ export async function submitAnswer(
         nextQuestionId: response.nextQuestionId,
       };
     }
-  } catch (error) {
-    // Handle specific error codes
-    if (
-      error instanceof Error &&
-      error.message.includes("Assessment session expired")
-    ) {
+  } catch (error: any) {
+    // Handle specific error codes from backend
+    if (error.response?.data?.code === "INVALID_ASSESSMENT_SESSION") {
       throw new Error(
         "Assessment session expired. Please start a new assessment."
       );
     }
+    handleApiError(error);
     throw error;
   }
 }

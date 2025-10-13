@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
 import Navbar from "../components/Navbar";
 import Results from "./Results";
+import FloatingChatbot from "../components/FloatingChatbot";
 import {
   startAssessment,
   fetchNextQuestion,
   submitAnswer,
   restartAssessment,
   getCurrentOrStartAssessment,
+  checkAssessmentStatus,
 } from "../../services/dataService";
 
 interface Question {
@@ -95,6 +97,17 @@ const Assessment = () => {
       try {
         isLoadingRef.current = true;
         setLoading(true);
+
+        // First check for existing assessment status
+        const status = await checkAssessmentStatus();
+        console.log("Assessment Status:", status);
+
+        if (status.hasActiveAssessment) {
+          // Load existing assessment
+          console.log("Found active assessment, loading...");
+          setAssessmentId(status.assessment_id);
+          // Continue with existing assessment flow
+        }
 
         // Use single combined endpoint to get existing OR create new assessment
         const data: Question = await getCurrentOrStartAssessment();
@@ -299,13 +312,26 @@ const Assessment = () => {
         <div className="flex-grow p-8 flex items-center justify-center">
           <div className="max-w-2xl mx-auto bg-white rounded-2xl p-8 shadow-xl text-center border border-gray-100">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-10 h-10 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold mb-4 text-gray-900">Assessment Complete!</h2>
+            <h2 className="text-3xl font-bold mb-4 text-gray-900">
+              Assessment Complete!
+            </h2>
             <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-              {feedbackMessage || "Great job! Your personalized career recommendations are ready to explore."}
+              {feedbackMessage ||
+                "Great job! Your personalized career recommendations are ready to explore."}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
@@ -348,11 +374,23 @@ const Assessment = () => {
         <div className="flex-grow p-8 flex items-center justify-center">
           <div className="max-w-md mx-auto bg-white rounded-2xl p-8 shadow-xl text-center border border-gray-100">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              <svg
+                className="w-8 h-8 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Oops! Something went wrong</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Oops! Something went wrong
+            </h3>
             <p className="text-gray-600 mb-6">{error}</p>
             <div className="flex flex-col gap-3">
               <button
@@ -388,7 +426,8 @@ const Assessment = () => {
               Question {currentQuestion?.question_id} of 10
             </h1>
             <p className="text-gray-600">
-              Discover your perfect tech career path with our AI-powered assessment
+              Discover your perfect tech career path with our AI-powered
+              assessment
             </p>
           </div>
 
@@ -396,7 +435,7 @@ const Assessment = () => {
           <div className="max-w-2xl mx-auto mb-8">
             <div className="flex justify-between text-sm text-gray-500 mb-2">
               <span>Progress</span>
-              <span>{((currentQuestion?.question_id || 0) * 10)}% Complete</span>
+              <span>{(currentQuestion?.question_id || 0) * 10}% Complete</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
@@ -420,13 +459,27 @@ const Assessment = () => {
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                   <div className="flex items-start">
                     <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        className="w-3 h-3 text-green-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-base font-semibold text-green-800 mb-1">Great choice!</h3>
-                      <p className="text-sm text-green-700">{feedbackMessage}</p>
+                      <h3 className="text-base font-semibold text-green-800 mb-1">
+                        Great choice!
+                      </h3>
+                      <p className="text-sm text-green-700">
+                        {feedbackMessage}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -435,32 +488,46 @@ const Assessment = () => {
 
             {/* Answer Options */}
             <div className="space-y-4">
-              {currentQuestion?.options?.map((option: string, index: number) => (
-                <button
-                  key={index}
-                  onClick={() => handleAnswerSelect(index)}
-                  className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-300 hover:shadow-md ${
-                    answers[currentQuestion?.question_id] === option
-                      ? "border-blue-500 bg-blue-50 shadow-lg transform scale-[1.02]"
-                      : "border-gray-200 hover:border-blue-300 hover:bg-blue-50/50"
-                  }`}
-                >
-                  <div className="flex items-center">
-                    <div className={`w-6 h-6 rounded-full border-2 mr-4 flex items-center justify-center ${
+              {currentQuestion?.options?.map(
+                (option: string, index: number) => (
+                  <button
+                    key={index}
+                    onClick={() => handleAnswerSelect(index)}
+                    className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-300 hover:shadow-md ${
                       answers[currentQuestion?.question_id] === option
-                        ? "border-blue-500 bg-blue-500"
-                        : "border-gray-300"
-                    }`}>
-                      {answers[currentQuestion?.question_id] === option && (
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
+                        ? "border-blue-500 bg-blue-50 shadow-lg transform scale-[1.02]"
+                        : "border-gray-200 hover:border-blue-300 hover:bg-blue-50/50"
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <div
+                        className={`w-6 h-6 rounded-full border-2 mr-4 flex items-center justify-center ${
+                          answers[currentQuestion?.question_id] === option
+                            ? "border-blue-500 bg-blue-500"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {answers[currentQuestion?.question_id] === option && (
+                          <svg
+                            className="w-3 h-3 text-white"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <span className="text-lg text-gray-700 font-medium">
+                        {option}
+                      </span>
                     </div>
-                    <span className="text-lg text-gray-700 font-medium">{option}</span>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                )
+              )}
             </div>
           </div>
 
@@ -468,12 +535,18 @@ const Assessment = () => {
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200">
               <span className="text-sm text-gray-600">
-                <span className="font-semibold text-blue-600">{Object.keys(answers).length}</span> of 10 questions answered
+                <span className="font-semibold text-blue-600">
+                  {Object.keys(answers).length}
+                </span>{" "}
+                of 10 questions answered
               </span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Floating Chatbot */}
+      <FloatingChatbot position="bottom-right" />
     </div>
   );
 };

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { generateRoadmap } from '../../../services/dataService';
+import React, { useState } from "react";
+import { generateRoadmap } from "../../../services/dataService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface RoadmapModalProps {
@@ -9,7 +9,12 @@ interface RoadmapModalProps {
   onGenerateRoadmap: (savedCareerId: number) => void;
 }
 
-const RoadmapModal: React.FC<RoadmapModalProps> = ({ isOpen, onClose, savedCareers, onGenerateRoadmap }) => {
+const RoadmapModal: React.FC<RoadmapModalProps> = ({
+  isOpen,
+  onClose,
+  savedCareers,
+  onGenerateRoadmap,
+}) => {
   const [selectedCareerId, setSelectedCareerId] = useState<number | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,13 +43,25 @@ const RoadmapModal: React.FC<RoadmapModalProps> = ({ isOpen, onClose, savedCaree
       <div className="bg-white p-6 rounded-xl w-full max-w-md border border-gray-200 shadow-xl">
         <div className="flex items-center mb-6">
           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mr-3">
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            <svg
+              className="w-5 h-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+              />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-800">Generate Career Roadmap</h2>
+          <h2 className="text-2xl font-bold text-gray-800">
+            Generate Career Roadmap
+          </h2>
         </div>
-        
+
         {error && (
           <Alert variant="destructive" className="mb-4">
             <AlertTitle>Error</AlertTitle>
@@ -53,18 +70,26 @@ const RoadmapModal: React.FC<RoadmapModalProps> = ({ isOpen, onClose, savedCaree
         )}
 
         <div className="mb-6">
-          <label htmlFor="career-select" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="career-select"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             Select a Saved Career
           </label>
           <select
             id="career-select"
-            value={selectedCareerId || ''}
-            onChange={(e) => setSelectedCareerId(Number(e.target.value) || null)}
+            value={selectedCareerId || ""}
+            onChange={(e) =>
+              setSelectedCareerId(Number(e.target.value) || null)
+            }
             className="w-full p-3 bg-white border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="">Select a career</option>
             {savedCareers.map((career) => (
-              <option key={career.saved_career_id} value={career.saved_career_id}>
+              <option
+                key={career.saved_career_id}
+                value={career.saved_career_id}
+              >
                 {career.career_name}
               </option>
             ))}
@@ -109,7 +134,7 @@ const RoadmapModal: React.FC<RoadmapModalProps> = ({ isOpen, onClose, savedCaree
                 Generating...
               </>
             ) : (
-              'Generate Roadmap'
+              "Generate Roadmap"
             )}
           </button>
         </div>

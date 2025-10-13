@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/dataService";
@@ -17,7 +16,10 @@ const Login = () => {
       setMessage(response.message || "Login successful!");
       navigate("/"); // Changed to redirect to homepage
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Login failed. Please try again.";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Login failed. Please try again.";
       setMessage(errorMessage);
     }
   };
@@ -28,7 +30,10 @@ const Login = () => {
         <div className="container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="flex w-full max-w-5xl">
             <div className="w-1/2 p-8 text-white flex flex-col items-start justify-center">
-              <div className="-mb-8 -mt-15 ml-10" style={{ height: "250px", overflow: "hidden" }}>
+              <div
+                className="-mb-8 -mt-15 ml-10"
+                style={{ height: "250px", overflow: "hidden" }}
+              >
                 <img
                   src="src/assets/logo.svg"
                   className="w-full h-full object-contain"

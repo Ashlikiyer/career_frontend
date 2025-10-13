@@ -38,7 +38,10 @@ const Register = () => {
           <div className="flex w-full max-w-5xl">
             {/* Left Side (Logo and Description) */}
             <div className="w-1/2 p-8 text-white flex flex-col items-start justify-center">
-              <div className="-mb-8 -mt-15 ml-10" style={{ height: "250px", overflow: "hidden" }}>
+              <div
+                className="-mb-8 -mt-15 ml-10"
+                style={{ height: "250px", overflow: "hidden" }}
+              >
                 <img
                   src="src/assets/logo.svg"
                   className="w-full h-full object-contain"
