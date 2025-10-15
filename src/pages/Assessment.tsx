@@ -64,6 +64,21 @@ interface Recommendations {
   primary_score?: number;
 }
 
+// Helper function to generate progress messages
+const getProgressMessage = (
+  confidence: number,
+  questionsAnswered: number
+): string => {
+  if (confidence >= 90) return "Assessment complete! High confidence achieved.";
+  if (confidence >= 70)
+    return "Almost there! A few more questions should do it.";
+  if (confidence >= 50)
+    return "Making good progress! Keep answering consistently.";
+  if (questionsAnswered > 10)
+    return "Taking time to find the right fit - that's okay!";
+  return "Building your career profile...";
+};
+
 const Assessment = () => {
   const navigate = useNavigate();
   const cookies = new Cookies();
@@ -79,6 +94,11 @@ const Assessment = () => {
   });
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [assessmentId, setAssessmentId] = useState<number | null>(null);
+  // New state for enhanced assessment system
+  const [confidence, setConfidence] = useState<number>(0);
+  const [currentCareer, setCurrentCareer] = useState<string | null>(null);
+  const [questionsAnswered, setQuestionsAnswered] = useState<number>(0);
+  const [isLongAssessment, setIsLongAssessment] = useState<boolean>(false);
   const isLoadingRef = useRef(false);
 
   useEffect(() => {
@@ -177,7 +197,32 @@ const Assessment = () => {
       setError(null);
       setFeedbackMessage(data.feedbackMessage || null);
 
-      if (data.completed || data.message === "Assessment completed") {
+      // Update questions answered count
+      const newQuestionsAnswered = questionsAnswered + 1;
+      setQuestionsAnswered(newQuestionsAnswered);
+
+      // Update confidence and current career from response
+      if (data.confidence !== undefined) {
+        setConfidence(data.confidence);
+      }
+      if (data.career) {
+        setCurrentCareer(data.career);
+      }
+
+      // Check for long assessment
+      if (
+        newQuestionsAnswered > 12 &&
+        data.confidence !== undefined &&
+        data.confidence < 90
+      ) {
+        setIsLongAssessment(true);
+      }
+
+      if (
+        data.completed ||
+        data.message === "Assessment completed" ||
+        (data.confidence && data.confidence >= 90)
+      ) {
         setCompleted(true);
 
         // Handle new multiple career suggestions format
@@ -258,6 +303,11 @@ const Assessment = () => {
         setFeedbackMessage(null);
         setAssessmentId(null);
         setCurrentQuestion(null);
+        // Reset new state variables
+        setConfidence(0);
+        setCurrentCareer(null);
+        setQuestionsAnswered(0);
+        setIsLongAssessment(false);
         setError(
           "Your assessment session has expired. Please start a new assessment."
         );
@@ -279,6 +329,11 @@ const Assessment = () => {
       setAnswers({});
       setFeedbackMessage(null);
       setAssessmentId(restartData.assessment_id || null);
+      // Reset new state variables
+      setConfidence(0);
+      setCurrentCareer(null);
+      setQuestionsAnswered(0);
+      setIsLongAssessment(false);
       const questionData: Question = await startAssessment();
       if (typeof questionData.options_answer === "string") {
         questionData.options = questionData.options_answer
@@ -423,7 +478,12 @@ const Assessment = () => {
               📋 Career Assessment
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Question {currentQuestion?.question_id} of 10
+              Question {questionsAnswered + 1}
+              {confidence < 90 && (
+                <span className="text-lg font-normal text-gray-600 ml-2">
+                  (Continue until 90% confidence)
+                </span>
+              )}
             </h1>
             <p className="text-gray-600">
               Discover your perfect tech career path with our AI-powered
@@ -431,27 +491,68 @@ const Assessment = () => {
             </p>
           </div>
 
-          {/* Progress Bar */}
+          {/* Confidence Progress Bar */}
           <div className="max-w-2xl mx-auto mb-8">
             <div className="flex justify-between text-sm text-gray-500 mb-2">
-              <span>Progress</span>
-              <span>{(currentQuestion?.question_id || 0) * 10}% Complete</span>
+              <span>Confidence Level</span>
+              <span>
+                {confidence}% confidence in {currentCareer || "career path"}
+              </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
                 className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500 ease-out"
                 style={{
-                  width: `${(currentQuestion?.question_id || 0) * 10}%`,
+                  width: `${confidence}%`,
                 }}
               ></div>
+            </div>
+            <div className="flex justify-between items-center mt-2">
+              <span className="text-xs text-gray-400">
+                Questions answered: {questionsAnswered}
+              </span>
+              <div className="flex items-center text-xs text-gray-500">
+                <span className="mr-1">Target:</span>
+                <div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
+                <span>90%</span>
+              </div>
             </div>
           </div>
 
           {/* Main Question Card */}
           <div className="max-w-3xl mx-auto bg-white rounded-2xl p-8 shadow-xl border border-gray-100 mb-6">
+            {/* Dynamic Progress Message */}
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+                {getProgressMessage(confidence, questionsAnswered)}
+              </div>
+            </div>
+
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center leading-relaxed">
               {currentQuestion?.question_text}
             </h2>
+
+            {/* Encouraging Message for Long Assessments */}
+            {isLongAssessment && (
+              <div className="mb-6">
+                <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                  <div className="flex items-start">
+                    <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                      🎯
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-purple-800 mb-1">
+                        Taking your time to find the perfect career match!
+                      </h3>
+                      <p className="text-sm text-purple-700">
+                        Your thoroughness will lead to better recommendations.
+                        The assessment continues until we reach 90% confidence.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Feedback Message - Always visible between question and choices */}
             {feedbackMessage && (
@@ -531,15 +632,37 @@ const Assessment = () => {
             </div>
           </div>
 
-          {/* Bottom Stats */}
-          <div className="max-w-3xl mx-auto text-center">
+          {/* Bottom Stats and Information */}
+          <div className="max-w-3xl mx-auto text-center space-y-4">
             <div className="inline-flex items-center px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200">
               <span className="text-sm text-gray-600">
                 <span className="font-semibold text-blue-600">
-                  {Object.keys(answers).length}
+                  {questionsAnswered}
                 </span>{" "}
-                of 10 questions answered
+                questions answered •{" "}
+                <span className="font-semibold text-purple-600">
+                  {confidence}%
+                </span>{" "}
+                confidence
               </span>
+            </div>
+
+            {/* Assessment Information */}
+            <div className="bg-gray-50 rounded-xl p-4 text-left">
+              <h4 className="text-sm font-semibold text-gray-800 mb-2">
+                How it works:
+              </h4>
+              <ul className="text-xs text-gray-600 space-y-1">
+                <li>• Answer questions to build confidence in career paths</li>
+                <li>• Assessment completes when you reach 90% confidence</li>
+                <li>
+                  • Consistent answers = faster completion (5-6 questions)
+                </li>
+                <li>
+                  • Mixed answers = more questions for accurate results (10-20
+                  questions)
+                </li>
+              </ul>
             </div>
           </div>
         </div>

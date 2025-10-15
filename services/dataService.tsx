@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, ResponseType } from "axios";
 import { Cookies } from "react-cookie";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://career.careerapp.xyz",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
   withCredentials: true, // REQUIRED for sessions
   timeout: 10000, // 10 second timeout
   headers: {
@@ -320,6 +320,13 @@ export async function saveCareer(careerName: string, assessmentScore?: number) {
     };
     console.log("Saving Career Payload:", JSON.stringify(data, null, 2));
     const response = await dataFetch("saved-careers", "POST", data);
+
+    // Enhanced response includes:
+    // - message: "Career saved and roadmap generated automatically"
+    // - savedCareer: { saved_career_id, user_id, career_name, saved_at }
+    // - roadmapGenerated: true/false
+    // - roadmapSteps: number of steps generated
+
     return response;
   } catch (error) {
     throw error;
@@ -341,20 +348,37 @@ export async function deleteCareer(savedCareerId: number) {
       `saved-careers/${savedCareerId}`,
       "DELETE"
     );
+
+    // Enhanced response includes:
+    // - message: "Saved career and associated roadmap deleted"
+    // - roadmapStepsDeleted: number of roadmap steps deleted
+
     return response;
   } catch (error) {
     throw error;
   }
 }
 
+// DEPRECATED: Roadmaps are now auto-generated when careers are saved
+// This function is kept for backward compatibility but is no longer needed
 export async function generateRoadmap(savedCareerId: number) {
+  console.warn(
+    "generateRoadmap is deprecated - roadmaps are now auto-generated when careers are saved"
+  );
   return { success: true, saved_career_id: savedCareerId };
 }
 
 export async function fetchRoadmap(savedCareerId: number) {
   try {
     const response = await dataFetch(`roadmaps/${savedCareerId}`, "GET");
-    return response; // Return the response directly as it's already an array
+
+    // Enhanced response includes:
+    // - career_name: Name of the career
+    // - roadmap: Array of roadmap steps
+    // - auto_generated: Boolean indicating if roadmap was auto_generated
+    // - total_steps: Total number of learning steps
+
+    return response;
   } catch (error) {
     console.error("Fetch Roadmap Error:", error);
     throw new Error("Failed to load roadmap from server.");

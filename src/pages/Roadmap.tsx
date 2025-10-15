@@ -13,7 +13,9 @@ interface RoadmapStep {
 
 interface RoadmapResponse {
   career_name: string;
-  roadmap: RoadmapStep[];
+  roadmap: any[];
+  auto_generated?: boolean;
+  total_steps?: number;
 }
 
 interface RoadmapPageProps {
@@ -30,6 +32,20 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   const [roadmap, setRoadmap] = useState<RoadmapStep[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [roadmapData, setRoadmapData] = useState<RoadmapResponse | null>(null);
+
+  const toggleStepCompletion = (stepNumber: number) => {
+    setCompletedSteps((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(stepNumber)) {
+        newSet.delete(stepNumber);
+      } else {
+        newSet.add(stepNumber);
+      }
+      return newSet;
+    });
+  };
 
   useEffect(() => {
     const loadRoadmap = async () => {
@@ -38,9 +54,22 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
         const response: RoadmapResponse = await fetchRoadmap(savedCareerId);
         console.log("Roadmap Data:", JSON.stringify(response, null, 2));
 
+        // Store the complete response data
+        setRoadmapData(response);
+
         // Handle new backend response format
         if (response && response.roadmap && Array.isArray(response.roadmap)) {
-          setRoadmap(response.roadmap);
+          // Convert backend format to frontend format
+          const convertedSteps: RoadmapStep[] = response.roadmap.map(
+            (step, index) => ({
+              step: index + 1,
+              title: step.step_order || `Step ${index + 1}`,
+              description: step.step_description || "",
+              duration: step.duration || "",
+              resources: step.resources || [],
+            })
+          );
+          setRoadmap(convertedSteps);
         } else if (Array.isArray(response)) {
           // Fallback for old format - convert to new format
           const convertedSteps: RoadmapStep[] = (response as any[]).map(
@@ -148,11 +177,49 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
               </svg>
             </div>
             <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-              {careerName} Roadmap
+              {roadmapData?.career_name || careerName} Learning Path
             </h1>
-            <p className="text-lg text-gray-600">
-              Your personalized learning path to success
+            <div className="flex justify-center items-center gap-4 mb-4">
+              <div className="text-lg text-gray-600">
+                {roadmapData?.total_steps || roadmap.length} learning steps
+              </div>
+              {roadmapData?.auto_generated && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                  🤖 Auto-generated
+                </span>
+              )}
+            </div>
+            <p className="text-lg text-gray-600 mb-6">
+              Track your progress as you master each skill
             </p>
+
+            {/* Progress Bar */}
+            <div className="max-w-md mx-auto mb-8">
+              <div className="flex justify-between text-sm text-gray-500 mb-2">
+                <span>Progress</span>
+                <span>
+                  {completedSteps.size} of {roadmap.length} completed
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div
+                  className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all duration-500 ease-out"
+                  style={{
+                    width: `${
+                      roadmap.length > 0
+                        ? (completedSteps.size / roadmap.length) * 100
+                        : 0
+                    }%`,
+                  }}
+                ></div>
+              </div>
+              <div className="text-center mt-2 text-sm text-gray-600">
+                {roadmap.length > 0
+                  ? Math.round((completedSteps.size / roadmap.length) * 100)
+                  : 0}
+                % complete
+              </div>
+            </div>
           </div>
           <div className="relative">
             {roadmap.length > 0 ? (
@@ -160,18 +227,49 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                 <div key={step.step} className="mb-10">
                   <div className="flex items-start">
                     <div className="w-1/12 text-center flex-shrink-0">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full mx-auto flex items-center justify-center text-white font-bold shadow-lg">
-                        {step.step}
-                      </div>
+                      <button
+                        onClick={() => toggleStepCompletion(step.step)}
+                        className={`w-10 h-10 rounded-full mx-auto flex items-center justify-center font-bold shadow-lg transition-all duration-300 ${
+                          completedSteps.has(step.step)
+                            ? "bg-gradient-to-br from-green-500 to-green-600 text-white"
+                            : "bg-gradient-to-br from-blue-500 to-green-500 text-white hover:from-blue-600 hover:to-green-600"
+                        }`}
+                        title={
+                          completedSteps.has(step.step)
+                            ? "Mark as incomplete"
+                            : "Mark as complete"
+                        }
+                      >
+                        {completedSteps.has(step.step) ? "✓" : step.step}
+                      </button>
                       {index < roadmap.length - 1 && (
                         <div className="w-1 h-20 bg-gradient-to-b from-blue-300 to-green-300 mx-auto mt-4 rounded-full"></div>
                       )}
                     </div>
                     <div className="w-11/12 pl-8">
-                      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300">
-                        <h2 className="text-2xl font-bold mb-3 text-gray-800">
-                          {step.title}
-                        </h2>
+                      <div
+                        className={`rounded-xl shadow-lg p-6 border transition-all duration-300 ${
+                          completedSteps.has(step.step)
+                            ? "bg-green-50 border-green-200 hover:shadow-xl"
+                            : "bg-white border-gray-200 hover:shadow-xl"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <h2
+                            className={`text-2xl font-bold ${
+                              completedSteps.has(step.step)
+                                ? "text-green-800"
+                                : "text-gray-800"
+                            }`}
+                          >
+                            {step.title}
+                          </h2>
+                          {completedSteps.has(step.step) && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              ✓ Completed
+                            </span>
+                          )}
+                        </div>
                         <p className="text-gray-600 mb-4 leading-relaxed">
                           {step.description}
                         </p>

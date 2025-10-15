@@ -43,24 +43,57 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
   const [success, setSuccess] = useState<string | null>(null);
   const [selectedCareers, setSelectedCareers] = useState<string[]>([]);
   const [showAllCareers, setShowAllCareers] = useState(false);
+  const [savingCareers, setSavingCareers] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     setRecommendations(initialRecommendations);
   }, [initialRecommendations]);
 
   const handleSaveCareer = async (careerName: string, score: number) => {
+    // Add to saving state
+    setSavingCareers((prev) => new Set([...prev, careerName]));
+
     try {
       setError(null);
-      await saveCareer(careerName, score);
+      const response = await saveCareer(careerName, score);
       setSelectedCareers([...selectedCareers, careerName]);
-      setSuccess(`Career "${careerName}" saved successfully!`);
-      setTimeout(() => setSuccess(null), 3000);
+
+      // Enhanced success message with roadmap info
+      if (response.roadmapGenerated && response.roadmapSteps) {
+        setSuccess(
+          `✅ ${careerName} saved! 🗺️ ${response.roadmapSteps} learning steps ready to explore. Your roadmap is ready!`
+        );
+      } else {
+        setSuccess(`✅ ${careerName} saved successfully!`);
+      }
+
+      setTimeout(() => setSuccess(null), 5000);
     } catch (err: unknown) {
-      const errorMessage =
-        (err as Error).message || "Failed to save career. Please try again.";
+      const error = err as any;
+      let errorMessage = "Failed to save career. Please try again.";
+
+      // Enhanced error handling
+      if (
+        error.response?.status === 400 &&
+        error.response?.data?.message?.includes("already saved")
+      ) {
+        errorMessage = "This career is already in your collection.";
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
       setError(errorMessage);
       console.error("Save Career Error:", err);
       setTimeout(() => setError(null), 5000);
+    } finally {
+      // Remove from saving state
+      setSavingCareers((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(careerName);
+        return newSet;
+      });
     }
   };
 
@@ -171,16 +204,26 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
                       recommendations.careers[0].score
                     )
                   }
-                  disabled={selectedCareers.includes(
-                    recommendations.careers[0].career_name
-                  )}
-                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg"
+                  disabled={
+                    selectedCareers.includes(
+                      recommendations.careers[0].career_name
+                    ) ||
+                    savingCareers.has(recommendations.careers[0].career_name)
+                  }
+                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
                 >
-                  {selectedCareers.includes(
-                    recommendations.careers[0].career_name
-                  )
-                    ? "✓ Saved"
-                    : "Save This Career"}
+                  {savingCareers.has(recommendations.careers[0].career_name) ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                      Saving & Generating Roadmap...
+                    </>
+                  ) : selectedCareers.includes(
+                      recommendations.careers[0].career_name
+                    ) ? (
+                    "✓ Saved"
+                  ) : (
+                    "Save This Career"
+                  )}
                 </button>
               </div>
             </div>
@@ -228,12 +271,22 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
                       onClick={() =>
                         handleSaveCareer(career.career_name, career.score)
                       }
-                      disabled={selectedCareers.includes(career.career_name)}
-                      className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 text-sm shadow-md hover:shadow-lg"
+                      disabled={
+                        selectedCareers.includes(career.career_name) ||
+                        savingCareers.has(career.career_name)
+                      }
+                      className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 text-sm shadow-md hover:shadow-lg flex items-center justify-center"
                     >
-                      {selectedCareers.includes(career.career_name)
-                        ? "✓ Saved"
-                        : "Save This Career"}
+                      {savingCareers.has(career.career_name) ? (
+                        <>
+                          <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent mr-2"></div>
+                          Saving...
+                        </>
+                      ) : selectedCareers.includes(career.career_name) ? (
+                        "✓ Saved"
+                      ) : (
+                        "Save This Career"
+                      )}
                     </button>
                   </div>
                 ))}

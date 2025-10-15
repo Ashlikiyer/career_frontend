@@ -46,12 +46,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [warning, setWarning] = useState<string | null>(null);
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
   const [isRoadmapModalOpen, setIsRoadmapModalOpen] = useState(false);
-  const [generatedRoadmaps, setGeneratedRoadmaps] = useState<
-    { savedCareerId: number; careerName: string }[]
-  >(() => JSON.parse(localStorage.getItem("generatedRoadmaps") || "[]"));
   const [selectedCareer, setSelectedCareer] = useState<{
     savedCareerId: number;
     careerName: string;
@@ -60,21 +56,6 @@ const Dashboard = () => {
     savedCareerId: number;
     careerName: string;
   } | null>(null);
-  const [roadmapToDelete, setRoadmapToDelete] = useState<{
-    savedCareerId: number;
-    careerName: string;
-  } | null>(null);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "generatedRoadmaps",
-      JSON.stringify(generatedRoadmaps)
-    );
-    console.log(
-      "Saved to localStorage:",
-      JSON.stringify(generatedRoadmaps, null, 2)
-    );
-  }, [generatedRoadmaps]);
 
   useEffect(() => {
     if (!authToken) {
@@ -92,22 +73,6 @@ const Dashboard = () => {
           ? data
           : [data].filter(Boolean);
         setSavedCareers(fetchedCareers);
-
-        // Sync generatedRoadmaps with savedCareers after fetch
-        const validRoadmaps = generatedRoadmaps.filter((item) =>
-          fetchedCareers.some(
-            (career) => career.saved_career_id === item.savedCareerId
-          )
-        );
-        if (
-          JSON.stringify(validRoadmaps) !== JSON.stringify(generatedRoadmaps)
-        ) {
-          setGeneratedRoadmaps(validRoadmaps);
-          console.log(
-            "Synced generatedRoadmaps:",
-            JSON.stringify(validRoadmaps, null, 2)
-          );
-        }
 
         const elapsedTime = Date.now() - startTime;
         const minimumLoadingTime = 2000;
@@ -133,37 +98,40 @@ const Dashboard = () => {
     try {
       setError(null);
       setSuccess(null);
-      await deleteCareer(savedCareerId);
+      const response = await deleteCareer(savedCareerId);
       setSavedCareers(
         savedCareers.filter(
           (career) => career.saved_career_id !== savedCareerId
         )
       );
-      setGeneratedRoadmaps(
-        generatedRoadmaps.filter((item) => item.savedCareerId !== savedCareerId)
-      );
-      setSuccess(`Career "${careerName}" deleted successfully!`);
+
+      // Enhanced success message with roadmap deletion info
+      const deletedSteps = response.roadmapStepsDeleted || 0;
+      if (deletedSteps > 0) {
+        setSuccess(
+          `${careerName} deleted successfully. ${deletedSteps} learning steps removed from your collection.`
+        );
+      } else {
+        setSuccess(`${careerName} deleted successfully.`);
+      }
+
       setMenuOpenId(null);
       setCareerToDelete(null);
-      setTimeout(() => setSuccess(null), 3000);
+      setTimeout(() => setSuccess(null), 4000);
     } catch (err: unknown) {
-      const errorMessage = (err as Error).message || "Failed to delete career.";
+      const error = err as any;
+      let errorMessage = `Failed to delete ${careerName}. Please try again.`;
+
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
       setError(errorMessage);
       console.error("Delete Career Error:", err);
-      setTimeout(() => setError(null), 3000);
+      setTimeout(() => setError(null), 4000);
     }
-  };
-
-  const handleDeleteRoadmap = () => {
-    if (!roadmapToDelete) return;
-
-    const { savedCareerId, careerName } = roadmapToDelete;
-    setGeneratedRoadmaps(
-      generatedRoadmaps.filter((item) => item.savedCareerId !== savedCareerId)
-    );
-    setSuccess(`Roadmap for "${careerName}" deleted successfully!`);
-    setRoadmapToDelete(null);
-    setTimeout(() => setSuccess(null), 3000);
   };
 
   const toggleMenu = (savedCareerId: number) => {
@@ -171,37 +139,8 @@ const Dashboard = () => {
   };
 
   const handleViewRoadmap = (savedCareerId: number, careerName: string) => {
-    if (
-      generatedRoadmaps.some((item) => item.savedCareerId === savedCareerId)
-    ) {
-      setSelectedCareer({ savedCareerId, careerName });
-    } else {
-      // Show a warning alert instead of error
-      setWarning(
-        `Please generate a roadmap for "${careerName}" first by clicking the "Generate Roadmap" button.`
-      );
-      setTimeout(() => setWarning(null), 4000);
-    }
-  };
-
-  const handleGenerateRoadmap = (savedCareerId: number) => {
-    const career = savedCareers.find(
-      (c) => c.saved_career_id === savedCareerId
-    );
-    if (
-      career &&
-      !generatedRoadmaps.some((item) => item.savedCareerId === savedCareerId)
-    ) {
-      setGeneratedRoadmaps((prev) => [
-        ...prev,
-        { savedCareerId, careerName: career.career_name },
-      ]);
-      setSuccess(`Roadmap generated for ${career.career_name}!`);
-      setTimeout(() => setSuccess(null), 3000);
-    } else if (career) {
-      setError("Roadmap for this career already generated.");
-      setTimeout(() => setError(null), 3000);
-    }
+    // Roadmaps are now auto-generated when careers are saved, so no need to check
+    setSelectedCareer({ savedCareerId, careerName });
   };
 
   const handleStartAssessment = () => {
@@ -234,8 +173,8 @@ const Dashboard = () => {
                 Your Career Dashboard
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                View your saved career paths or generate a roadmap to plan your
-                journey.
+                View your saved career paths with automatically generated
+                learning roadmaps.
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
@@ -316,28 +255,7 @@ const Dashboard = () => {
               <AlertDescription>{success}</AlertDescription>
             </Alert>
           )}
-          {warning && (
-            <Alert
-              variant="warning"
-              className="fixed top-4 right-4 z-50 max-w-sm animate-slide-in"
-            >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-                />
-              </svg>
-              <AlertTitle>Roadmap Not Generated</AlertTitle>
-              <AlertDescription>{warning}</AlertDescription>
-            </Alert>
-          )}
+
           <div className="text-center mb-12">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-green-500 rounded-full mb-6">
               <svg
@@ -355,11 +273,11 @@ const Dashboard = () => {
               </svg>
             </div>
             <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-              Your Career Dashboard
+              Your Career Collection
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              View your saved career paths or generate a roadmap to plan your
-              journey.
+              Explore your saved careers with automatically generated learning
+              roadmaps ready to guide your journey.
             </p>
           </div>
 
@@ -396,31 +314,53 @@ const Dashboard = () => {
                 {savedCareers.map((career) => (
                   <div
                     key={career.saved_career_id}
-                    className="relative p-6 bg-white rounded-xl shadow-lg border border-gray-200 hover:border-blue-300 transition-all duration-300 hover:shadow-xl"
+                    className="relative p-6 bg-gradient-to-br from-white to-blue-50/30 rounded-xl shadow-lg border-2 border-gray-200 hover:border-blue-400 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
                   >
                     <div className="flex justify-between items-start">
-                      <div>
+                      <div className="flex-grow">
                         <div className="flex items-center flex-wrap gap-2 mb-3">
                           <h3 className="text-xl font-bold text-gray-800">
                             {career.career_name}
                           </h3>
-                          {generatedRoadmaps.some(
-                            (item) =>
-                              item.savedCareerId === career.saved_career_id
-                          ) && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm">
-                              ✓ Roadmap Ready
-                            </span>
-                          )}
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm">
+                            🗺️ Learning Path Ready
+                          </span>
                         </div>
-                        <p className="text-gray-600 text-sm leading-relaxed mb-3">
+                        <p className="text-gray-600 text-sm leading-relaxed mb-4">
                           {careerDescriptions[career.career_name] ||
-                            "No description available."}
+                            "Explore exciting opportunities in this field with structured learning paths designed for success."}
                         </p>
-                        <p className="text-xs text-gray-500">
-                          Saved on{" "}
-                          {new Date(career.saved_at).toLocaleDateString()}
-                        </p>
+                        <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
+                          <div className="flex items-center">
+                            <svg
+                              className="w-3 h-3 mr-1"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            Saved{" "}
+                            {new Date(career.saved_at).toLocaleDateString()}
+                          </div>
+                          <div className="flex items-center text-green-600 font-medium">
+                            <svg
+                              className="w-3 h-3 mr-1"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            Auto-generated roadmap
+                          </div>
+                        </div>
                       </div>
                       <div className="relative">
                         <button
@@ -476,20 +416,11 @@ const Dashboard = () => {
                                 </AlertDialogFooter>
                               </AlertDialogContent>
                             </AlertDialog>
-                            <button
-                              onClick={() => {
-                                setIsRoadmapModalOpen(true);
-                                setMenuOpenId(null);
-                              }}
-                              className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-b-xl transition-colors"
-                            >
-                              Generate Roadmap
-                            </button>
                           </div>
                         )}
                       </div>
                     </div>
-                    <div className="mt-4 space-y-2">
+                    <div className="mt-6">
                       <button
                         onClick={() =>
                           handleViewRoadmap(
@@ -497,113 +428,29 @@ const Dashboard = () => {
                             career.career_name
                           )
                         }
-                        className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
+                        className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center group"
                       >
-                        View Roadmap
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleGenerateRoadmap(career.saved_career_id)
-                        }
-                        className="w-full bg-white border-2 border-blue-300 hover:border-blue-400 text-blue-700 hover:text-blue-800 font-bold py-2 px-4 rounded-lg transition-all duration-300 hover:bg-blue-50"
-                      >
-                        Generate Roadmap
+                        <span className="mr-2">🚀</span>
+                        Start Learning Path
+                        <svg
+                          className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M13 7l5 5m0 0l-5 5m5-5H6"
+                          />
+                        </svg>
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
 
-              {generatedRoadmaps.length > 0 && (
-                <div className="mb-12 bg-white rounded-xl shadow-lg p-8 border border-gray-200">
-                  <div className="flex items-center mb-6">
-                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mr-3">
-                      <svg
-                        className="w-5 h-5 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-800">
-                      Your Generated Roadmaps
-                    </h3>
-                  </div>
-                  <p className="text-gray-600 mb-6">
-                    Quick access to all your generated roadmaps:
-                  </p>
-                  <div className="space-y-3">
-                    {generatedRoadmaps.map((roadmap) => (
-                      <div
-                        key={roadmap.savedCareerId}
-                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200"
-                      >
-                        <span className="text-gray-800 font-medium">
-                          {roadmap.careerName}
-                        </span>
-                        <div className="flex space-x-3">
-                          <button
-                            onClick={() =>
-                              handleViewRoadmap(
-                                roadmap.savedCareerId,
-                                roadmap.careerName
-                              )
-                            }
-                            className="text-blue-600 hover:text-blue-700 font-medium text-sm underline decoration-2 underline-offset-2"
-                          >
-                            View Roadmap
-                          </button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <button
-                                onClick={() =>
-                                  setRoadmapToDelete({
-                                    savedCareerId: roadmap.savedCareerId,
-                                    careerName: roadmap.careerName,
-                                  })
-                                }
-                                className="text-red-600 hover:text-red-700 font-medium text-sm underline decoration-2 underline-offset-2"
-                              >
-                                Delete
-                              </button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent className="bg-white border-gray-200 text-gray-800">
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Are you sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription className="text-gray-600">
-                                  This will permanently delete the roadmap for "
-                                  {roadmapToDelete?.careerName}". This action
-                                  cannot be undone.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel className="bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-300">
-                                  Cancel
-                                </AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={handleDeleteRoadmap}
-                                  className="bg-red-600 hover:bg-red-700 text-white"
-                                >
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
               {savedCareers.length > 0 && (
                 <div className="text-center mb-12">
                   <button
@@ -622,7 +469,6 @@ const Dashboard = () => {
               isOpen={isRoadmapModalOpen}
               onClose={() => setIsRoadmapModalOpen(false)}
               savedCareers={savedCareers}
-              onGenerateRoadmap={handleGenerateRoadmap}
             />
           )}
 
