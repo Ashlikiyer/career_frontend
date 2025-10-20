@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, ResponseType } from "axios";
 import { Cookies } from "react-cookie";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
+  baseURL: import.meta.env.VITE_API_URL || "https://career.careerapp.xyz/",
   withCredentials: true, // REQUIRED for sessions
   timeout: 10000, // 10 second timeout
   headers: {
@@ -179,7 +179,7 @@ export async function logoutUser() {
 // Check for existing assessment session
 export async function checkAssessmentStatus() {
   try {
-    const response = await dataFetch("assessment/status", "GET");
+    const response = await dataFetch("assessment/status", "GET"); // Reverted to original endpoint
     return response;
     /*
     Response format:
@@ -198,19 +198,56 @@ export async function checkAssessmentStatus() {
 
 export async function startAssessment() {
   try {
-    const response = await dataFetch("assessment/start", "GET");
-    return response;
+    const response = await dataFetch("assessment/start", "GET"); // Reverted to original endpoint
+    // Enhanced response now includes options_descriptions for tooltips
+    const enhancedResponse = {
+      question_id: response.question_id,
+      question_text: response.question_text,
+      options_answer: response.options_answer,
+      options_descriptions: response.options_descriptions || {}, // Handle null/undefined safely
+      career_category: response.career_category,
+      assessment_id: response.assessment_id
+    };
+    
+    // Debug logging for tooltip integration
+    console.log("🚀 Start Assessment API Response:", {
+      hasDescriptions: !!response.options_descriptions,
+      descriptionsType: typeof response.options_descriptions,
+      descriptionsCount: response.options_descriptions ? Object.keys(response.options_descriptions).length : 0,
+      questionsHasOptions: !!response.options_answer
+    });
+    
+    return enhancedResponse;
   } catch (error) {
     console.error("Failed to start assessment:", error);
     throw error;
   }
 }
 
-// New combined endpoint that safely gets existing OR creates new assessment
 export async function getCurrentOrStartAssessment() {
   try {
-    const response = await dataFetch("assessment/current", "GET");
-    return response;
+    const response = await dataFetch("assessment/current", "GET"); // Reverted to original endpoint
+    // Enhanced response now includes options_descriptions for tooltips
+    const enhancedResponse = {
+      question_id: response.question_id,
+      question_text: response.question_text,
+      options_answer: response.options_answer,
+      options_descriptions: response.options_descriptions || {}, // Handle null/undefined safely
+      career_category: response.career_category,
+      assessment_id: response.assessment_id,
+      isExisting: response.isExisting || false
+    };
+    
+    // Debug logging for tooltip integration
+    console.log("📊 Assessment API Response:", {
+      hasDescriptions: !!response.options_descriptions,
+      descriptionsType: typeof response.options_descriptions,
+      descriptionsCount: response.options_descriptions ? Object.keys(response.options_descriptions).length : 0,
+      questionsHasOptions: !!response.options_answer,
+      optionsCount: response.options_answer ? response.options_answer.split(',').length : 0
+    });
+    
+    return enhancedResponse;
   } catch (error) {
     // Fallback to old method if new endpoint doesn't exist
     if (error instanceof Error && error.message.includes("404")) {
@@ -228,17 +265,34 @@ export async function fetchNextQuestion(
 ) {
   try {
     const response = await dataFetch(
-      `assessment/next?currentQuestionId=${currentQuestionId}&assessment_id=${assessmentId}`,
+      `assessment/next?currentQuestionId=${currentQuestionId}&assessment_id=${assessmentId}`, // Reverted to original endpoint
       "GET"
     );
-    return {
+    // Enhanced response now includes options_descriptions for tooltips
+    const enhancedResponse = {
       question_id: response.question_id,
       question_text: response.question_text,
+      options_answer: response.options_answer,
+      options_descriptions: response.options_descriptions || {}, // Handle null/undefined safely
+      career_mapping: response.career_mapping || {},
+      career_category: response.career_category,
+      assessment_id: response.assessment_id,
+      // Legacy format for backward compatibility
       options: response.options_answer
         ? response.options_answer.split(",")
         : [],
-      assessment_id: response.assessment_id,
     };
+    
+    // Debug logging for tooltip integration
+    console.log("➡️ Next Question API Response:", {
+      questionId: response.question_id,
+      hasDescriptions: !!response.options_descriptions,
+      descriptionsType: typeof response.options_descriptions,
+      descriptionsCount: response.options_descriptions ? Object.keys(response.options_descriptions).length : 0,
+      hasCareerMapping: !!response.career_mapping
+    });
+    
+    return enhancedResponse;
   } catch (error) {
     if (error instanceof Error && error.message.includes("404")) {
       // No more questions
@@ -261,7 +315,7 @@ export async function submitAnswer(
     };
     console.log("Submitting Answer Payload:", JSON.stringify(data, null, 2));
 
-    const response = await dataFetch("assessment/answer", "POST", data);
+    const response = await dataFetch("assessment/answer", "POST", data); // Reverted to original endpoint
 
     // Handle different response types
     if (response.saveOption) {
@@ -305,7 +359,7 @@ export async function submitAnswer(
 
 export async function restartAssessment() {
   try {
-    const response = await dataFetch("assessment/restart", "POST");
+    const response = await dataFetch("assessment/restart", "POST"); // Reverted to original endpoint
     return response; // { message, nextQuestionId: 1, assessment_id }
   } catch (error) {
     throw error;

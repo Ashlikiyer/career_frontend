@@ -4,6 +4,7 @@ import { Cookies } from "react-cookie";
 import Navbar from "../components/Navbar";
 import Results from "./Results";
 import FloatingChatbot from "../components/FloatingChatbot";
+import "../components/AssessmentTooltips.css";
 import {
   startAssessment,
   fetchNextQuestion,
@@ -17,7 +18,9 @@ interface Question {
   question_id: number;
   question_text: string;
   options_answer: string;
+  options_descriptions?: { [key: string]: string }; // New field for tooltips
   career_category?: string;
+  career_mapping?: { [key: string]: string };
   options?: string[];
   assessment_id?: number;
 }
@@ -64,6 +67,53 @@ interface Recommendations {
   primary_score?: number;
 }
 
+// Helper function to validate tooltip data quality
+const validateTooltipData = (questionData: Question): boolean => {
+  console.log('🧪 Validating tooltip data...');
+  
+  // Check if options_descriptions exists and is not null
+  if (!questionData.options_descriptions || questionData.options_descriptions === null) {
+    console.warn('⚠️ No descriptions available - tooltips disabled');
+    return false;
+  }
+  
+  // Validate format
+  if (typeof questionData.options_descriptions !== 'object') {
+    console.error('❌ options_descriptions should be object, got:', typeof questionData.options_descriptions);
+    return false;
+  }
+  
+  // Check if all options have descriptions
+  const options = questionData.options_answer?.split(',').map(opt => opt.trim()) || [];
+  const descriptions = questionData.options_descriptions;
+  
+  let validCount = 0;
+  
+  options.forEach(option => {
+    const trimmedOption = option.trim();
+    if (descriptions[trimmedOption]) {
+      validCount++;
+      // Check for meaningful descriptions (not just placeholder text)
+      if (descriptions[trimmedOption].length < 20) {
+        console.warn(`⚠️ Description too short for "${trimmedOption}": ${descriptions[trimmedOption]}`);
+      }
+    }
+  });
+  
+  if (validCount === options.length) {
+    console.log('✅ ALL TOOLTIP DESCRIPTIONS AVAILABLE! 🎉');
+    console.log(`✅ ${validCount}/${options.length} options have descriptions`);
+    console.log('✅ Backend integration successful - tooltips active!');
+    return true;
+  } else if (validCount > 0) {
+    console.log(`⚠️ Partial descriptions: ${validCount}/${options.length} options have descriptions`);
+    return true; // Still enable tooltips for available descriptions
+  } else {
+    console.log('❌ No descriptions found for any options');
+    return false;
+  }
+};
+
 // Helper function to generate progress messages
 const getProgressMessage = (
   confidence: number,
@@ -100,12 +150,25 @@ const Assessment = () => {
   const [questionsAnswered, setQuestionsAnswered] = useState<number>(0);
   const [isLongAssessment, setIsLongAssessment] = useState<boolean>(false);
   const isLoadingRef = useRef(false);
+  
+  // New state for tooltip functionality
+  const [hoveredOption, setHoveredOption] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [expandedOption, setExpandedOption] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authToken) {
       navigate("/login");
       return;
     }
+
+    // Check if mobile device
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
 
     const checkExistingAssessment = async () => {
       // Prevent duplicate calls
@@ -132,6 +195,20 @@ const Assessment = () => {
         // Use single combined endpoint to get existing OR create new assessment
         const data: Question = await getCurrentOrStartAssessment();
         console.log("Assessment Data:", JSON.stringify(data, null, 2));
+        
+        // Validate tooltip data quality
+        const hasValidTooltips = validateTooltipData(data);
+        
+        // Enhanced success logging for real backend data
+        if (hasValidTooltips) {
+          console.log('🎯 TOOLTIPS SUCCESSFULLY INTEGRATED! 🎯');
+          console.log('✨ Users will now see educational explanations for all career options');
+          console.log('🚀 Assessment experience enhanced - tooltips are live!');
+        } else {
+          console.log('ℹ️ Using basic assessment interface (no tooltips available)');
+          console.log('📝 If descriptions should be available, check backend implementation');
+        }
+        
         if (typeof data.options_answer === "string") {
           data.options = data.options_answer
             .split(",")
@@ -170,6 +247,10 @@ const Assessment = () => {
       }
     };
     checkExistingAssessment();
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
   }, [authToken, navigate]);
 
   const handleAnswerSelect = async (optionIndex: number) => {
@@ -268,15 +349,24 @@ const Assessment = () => {
             const nextQuestion: Question = {
               question_id: nextQuestionData.question_id,
               question_text: nextQuestionData.question_text,
-              options_answer: nextQuestionData.options.join(","),
-              options: nextQuestionData.options,
+              options_answer: nextQuestionData.options_answer || nextQuestionData.options.join(","),
+              options_descriptions: nextQuestionData.options_descriptions || {},
+              career_mapping: nextQuestionData.career_mapping || {},
+              career_category: nextQuestionData.career_category,
               assessment_id: nextQuestionData.assessment_id,
+              // Legacy format for backward compatibility
+              options: nextQuestionData.options || 
+                      (nextQuestionData.options_answer ? nextQuestionData.options_answer.split(",").map((opt: string) => opt.trim()) : [])
             };
             console.log(
               "Next Question:",
               JSON.stringify(nextQuestion, null, 2)
             );
             setCurrentQuestion(nextQuestion);
+            // Reset tooltip states when moving to new question
+            setHoveredOption(null);
+            setSelectedOption(null);
+            setExpandedOption(null);
           } else {
             // No more questions available
             setCompleted(true);
@@ -334,6 +424,11 @@ const Assessment = () => {
       setCurrentCareer(null);
       setQuestionsAnswered(0);
       setIsLongAssessment(false);
+      // Reset tooltip states
+      setHoveredOption(null);
+      setSelectedOption(null);
+      setExpandedOption(null);
+      
       const questionData: Question = await startAssessment();
       if (typeof questionData.options_answer === "string") {
         questionData.options = questionData.options_answer
@@ -587,47 +682,179 @@ const Assessment = () => {
               </div>
             )}
 
-            {/* Answer Options */}
+            {/* Help Section */}
+            {currentQuestion?.options_descriptions && Object.keys(currentQuestion.options_descriptions).length > 0 ? (
+              <div className="mb-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <div className="flex items-center justify-center gap-2 text-blue-700">
+                    <div className="text-lg">💡</div>
+                    <span className="text-sm font-medium">
+                      {isMobile 
+                        ? "Tap any option to see detailed explanations, tap again to select"
+                        : "Hover over options to see detailed explanations"
+                      }
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-6">
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                  <div className="flex items-center justify-center gap-2 text-gray-600">
+                    <div className="text-lg">📝</div>
+                    <span className="text-sm font-medium">
+                      Choose the option that best describes your preferences
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Answer Options with Tooltips */}
             <div className="space-y-4">
               {currentQuestion?.options?.map(
-                (option: string, index: number) => (
-                  <button
-                    key={index}
-                    onClick={() => handleAnswerSelect(index)}
-                    className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-300 hover:shadow-md ${
-                      answers[currentQuestion?.question_id] === option
-                        ? "border-blue-500 bg-blue-50 shadow-lg transform scale-[1.02]"
-                        : "border-gray-200 hover:border-blue-300 hover:bg-blue-50/50"
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <div
-                        className={`w-6 h-6 rounded-full border-2 mr-4 flex items-center justify-center ${
-                          answers[currentQuestion?.question_id] === option
-                            ? "border-blue-500 bg-blue-500"
-                            : "border-gray-300"
+                (option: string, index: number) => {
+                  const trimmedOption = option.trim();
+                  const hasDescription = currentQuestion?.options_descriptions?.[trimmedOption];
+                  const isExpanded = expandedOption === trimmedOption;
+                  const isSelected = selectedOption === trimmedOption;
+                  const isHovered = hoveredOption === trimmedOption;
+
+                  const handleOptionClick = () => {
+                    if (isMobile && hasDescription) {
+                      if (isExpanded) {
+                        // Second tap - select the option
+                        setSelectedOption(trimmedOption);
+                        setTimeout(() => handleAnswerSelect(index), 300);
+                      } else {
+                        // First tap - show description
+                        setExpandedOption(trimmedOption);
+                      }
+                    } else {
+                      // Desktop or no description - direct selection
+                      handleAnswerSelect(index);
+                    }
+                  };
+
+                  return (
+                    <div key={index} className="relative">
+                      <button
+                        onClick={handleOptionClick}
+                        onMouseEnter={() => !isMobile && setHoveredOption(trimmedOption)}
+                        onMouseLeave={() => !isMobile && setHoveredOption(null)}
+                        onFocus={() => setHoveredOption(trimmedOption)}
+                        onBlur={() => setHoveredOption(null)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleOptionClick();
+                          }
+                          if (e.key === 'Escape') {
+                            setHoveredOption(null);
+                            setExpandedOption(null);
+                          }
+                        }}
+                        aria-describedby={hasDescription ? `tooltip-${index}` : undefined}
+                        aria-expanded={isMobile ? isExpanded : undefined}
+                        role="option"
+                        tabIndex={0}
+                        className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-300 hover:shadow-md relative ${
+                          answers[currentQuestion?.question_id] === option || isSelected
+                            ? "border-blue-500 bg-blue-50 shadow-lg transform scale-[1.02]"
+                            : isHovered || isExpanded
+                            ? "border-blue-300 bg-blue-50/50 shadow-md"
+                            : "border-gray-200 hover:border-blue-300 hover:bg-blue-50/50"
                         }`}
                       >
-                        {answers[currentQuestion?.question_id] === option && (
-                          <svg
-                            className="w-3 h-3 text-white"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center flex-1">
+                            <div
+                              className={`w-6 h-6 rounded-full border-2 mr-4 flex items-center justify-center flex-shrink-0 ${
+                                answers[currentQuestion?.question_id] === option || isSelected
+                                  ? "border-blue-500 bg-blue-500"
+                                  : "border-gray-300"
+                              }`}
+                            >
+                              {(answers[currentQuestion?.question_id] === option || isSelected) && (
+                                <svg
+                                  className="w-3 h-3 text-white"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              )}
+                            </div>
+                            <span className="text-lg text-gray-700 font-medium">
+                              {trimmedOption}
+                            </span>
+                          </div>
+                          
+                          {/* Tooltip Icon */}
+                          {hasDescription && (
+                            <div className="ml-4 flex-shrink-0">
+                              <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
+                                isHovered || isExpanded ? 'text-blue-600 bg-blue-100' : 'text-gray-400 bg-gray-100'
+                              }`}>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+                                </svg>
+                              </div>
+                              {isMobile && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                  {isExpanded ? '▼' : '▶️'}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Mobile Expanded Description */}
+                        {isMobile && isExpanded && hasDescription && (
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700 leading-relaxed">
+                              <div className="font-semibold text-blue-700 mb-2">
+                                {trimmedOption}
+                              </div>
+                              <div>{currentQuestion.options_descriptions![trimmedOption]}</div>
+                              <div className="mt-3 text-center">
+                                <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                                  👆 Tap again to select this option
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                         )}
-                      </div>
-                      <span className="text-lg text-gray-700 font-medium">
-                        {option}
-                      </span>
+                      </button>
+
+                      {/* Desktop Tooltip */}
+                      {!isMobile && hasDescription && isHovered && (
+                        <div 
+                          id={`tooltip-${index}`}
+                          role="tooltip"
+                          aria-hidden={!isHovered}
+                          className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 z-50 opacity-100 transition-opacity duration-300"
+                        >
+                          <div className="bg-gray-900 text-white p-4 rounded-xl shadow-2xl max-w-80 text-sm">
+                            <div className="font-semibold text-blue-300 mb-2">
+                              {trimmedOption}
+                            </div>
+                            <div className="text-gray-200 leading-relaxed">
+                              {currentQuestion.options_descriptions![trimmedOption]}
+                            </div>
+                          </div>
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2">
+                            <div className="w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-gray-900"></div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </button>
-                )
+                  );
+                }
               )}
             </div>
           </div>
@@ -647,22 +874,39 @@ const Assessment = () => {
               </span>
             </div>
 
-            {/* Assessment Information */}
+            {/* Enhanced Assessment Information with Tooltip Help */}
             <div className="bg-gray-50 rounded-xl p-4 text-left">
               <h4 className="text-sm font-semibold text-gray-800 mb-2">
-                How it works:
+                💡 Assessment Guide:
               </h4>
               <ul className="text-xs text-gray-600 space-y-1">
+                <li>• {isMobile ? "Tap" : "Hover over"} options with info icons to see detailed explanations</li>
                 <li>• Answer questions to build confidence in career paths</li>
                 <li>• Assessment completes when you reach 90% confidence</li>
-                <li>
-                  • Consistent answers = faster completion (5-6 questions)
-                </li>
-                <li>
-                  • Mixed answers = more questions for accurate results (10-20
-                  questions)
-                </li>
+                <li>• Consistent answers = faster completion (5-6 questions)</li>
+                <li>• Mixed answers = more questions for accurate results (10-20 questions)</li>
               </ul>
+              
+              {/* Tooltip Status Indicator */}
+              {currentQuestion?.options_descriptions && Object.keys(currentQuestion.options_descriptions).length > 0 ? (
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <div className="flex items-center text-xs text-green-600 font-medium">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Educational tooltips active - hover for explanations!
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <div className="flex items-center text-xs text-gray-500 font-medium">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    Basic assessment mode - answer based on your preferences
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
