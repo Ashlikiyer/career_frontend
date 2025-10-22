@@ -206,17 +206,19 @@ export async function startAssessment() {
       options_answer: response.options_answer,
       options_descriptions: response.options_descriptions || {}, // Handle null/undefined safely
       career_category: response.career_category,
-      assessment_id: response.assessment_id
+      assessment_id: response.assessment_id,
     };
-    
+
     // Debug logging for tooltip integration
     console.log("🚀 Start Assessment API Response:", {
       hasDescriptions: !!response.options_descriptions,
       descriptionsType: typeof response.options_descriptions,
-      descriptionsCount: response.options_descriptions ? Object.keys(response.options_descriptions).length : 0,
-      questionsHasOptions: !!response.options_answer
+      descriptionsCount: response.options_descriptions
+        ? Object.keys(response.options_descriptions).length
+        : 0,
+      questionsHasOptions: !!response.options_answer,
     });
-    
+
     return enhancedResponse;
   } catch (error) {
     console.error("Failed to start assessment:", error);
@@ -235,18 +237,22 @@ export async function getCurrentOrStartAssessment() {
       options_descriptions: response.options_descriptions || {}, // Handle null/undefined safely
       career_category: response.career_category,
       assessment_id: response.assessment_id,
-      isExisting: response.isExisting || false
+      isExisting: response.isExisting || false,
     };
-    
+
     // Debug logging for tooltip integration
     console.log("📊 Assessment API Response:", {
       hasDescriptions: !!response.options_descriptions,
       descriptionsType: typeof response.options_descriptions,
-      descriptionsCount: response.options_descriptions ? Object.keys(response.options_descriptions).length : 0,
+      descriptionsCount: response.options_descriptions
+        ? Object.keys(response.options_descriptions).length
+        : 0,
       questionsHasOptions: !!response.options_answer,
-      optionsCount: response.options_answer ? response.options_answer.split(',').length : 0
+      optionsCount: response.options_answer
+        ? response.options_answer.split(",").length
+        : 0,
     });
-    
+
     return enhancedResponse;
   } catch (error) {
     // Fallback to old method if new endpoint doesn't exist
@@ -282,16 +288,18 @@ export async function fetchNextQuestion(
         ? response.options_answer.split(",")
         : [],
     };
-    
+
     // Debug logging for tooltip integration
     console.log("➡️ Next Question API Response:", {
       questionId: response.question_id,
       hasDescriptions: !!response.options_descriptions,
       descriptionsType: typeof response.options_descriptions,
-      descriptionsCount: response.options_descriptions ? Object.keys(response.options_descriptions).length : 0,
-      hasCareerMapping: !!response.career_mapping
+      descriptionsCount: response.options_descriptions
+        ? Object.keys(response.options_descriptions).length
+        : 0,
+      hasCareerMapping: !!response.career_mapping,
     });
-    
+
     return enhancedResponse;
   } catch (error) {
     if (error instanceof Error && error.message.includes("404")) {
@@ -559,6 +567,108 @@ export async function getCareerDetails(
     */
   } catch (error) {
     console.error("Error getting career details:", error);
+    throw error;
+  }
+}
+
+// ============================================
+// FEEDBACK SYSTEM API FUNCTIONS
+// ============================================
+
+/**
+ * Submit user feedback for assessment experience
+ */
+export async function submitUserFeedback(feedbackData: {
+  rating: number;
+  feedback_text?: string;
+  assessment_id?: number;
+}) {
+  try {
+    console.log("Submitting feedback:", feedbackData);
+    const response = await dataFetch("feedback", "POST", feedbackData);
+
+    console.log("✅ Feedback submitted successfully:", response);
+    return response;
+    /*
+    Response format:
+    {
+      "success": true,
+      "message": "Feedback submitted successfully",
+      "data": {
+        "id": 15,
+        "rating": 5,
+        "feedback_text": "Great assessment experience!",
+        "created_at": "2025-10-21T13:25:30.000Z"
+      }
+    }
+    */
+  } catch (error) {
+    console.error("Error submitting feedback:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get feedback analytics for admin dashboard
+ */
+export async function getFeedbackAnalytics(timeRange: string = "30d") {
+  try {
+    const response = await dataFetch(
+      `feedback/analytics?timeRange=${timeRange}`,
+      "GET"
+    );
+
+    console.log("📊 Feedback analytics retrieved:", response);
+    return response;
+    /*
+    Response format:
+    {
+      "success": true,
+      "data": {
+        "summary": {
+          "totalFeedback": 25,
+          "averageRating": "4.32",
+          "timeRange": "30d"
+        },
+        "ratingDistribution": {
+          "1": 1, "2": 2, "3": 4, "4": 8, "5": 10
+        },
+        "recentFeedback": [...]
+      }
+    }
+    */
+  } catch (error) {
+    console.error("Error fetching feedback analytics:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get user's feedback history (requires authentication)
+ */
+export async function getUserFeedbackHistory() {
+  try {
+    const response = await dataFetch("feedback/user", "GET");
+
+    console.log("📝 User feedback history retrieved:", response);
+    return response;
+    /*
+    Response format:
+    {
+      "success": true,
+      "data": [
+        {
+          "id": 15,
+          "rating": 5,
+          "feedback_text": "Great assessment experience!",
+          "created_at": "2025-10-21T13:25:30.000Z",
+          "assessment_name": "General Feedback"
+        }
+      ]
+    }
+    */
+  } catch (error) {
+    console.error("Error fetching user feedback history:", error);
     throw error;
   }
 }

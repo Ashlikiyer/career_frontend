@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import FloatingChatbot from "../components/FloatingChatbot";
+import FeedbackModal from "../components/ui/FeedbackModal";
 import { saveCareer } from "../../services/dataService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
@@ -32,9 +33,14 @@ interface Recommendations {
 interface ResultsProps {
   initialRecommendations: Recommendations;
   onRestart: () => void;
+  assessmentId?: number | null;
 }
 
-const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
+const Results = ({
+  initialRecommendations,
+  onRestart,
+  assessmentId,
+}: ResultsProps) => {
   const navigate = useNavigate();
   const [recommendations, setRecommendations] = useState<Recommendations>(
     initialRecommendations
@@ -44,6 +50,10 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
   const [selectedCareers, setSelectedCareers] = useState<string[]>([]);
   const [showAllCareers, setShowAllCareers] = useState(false);
   const [savingCareers, setSavingCareers] = useState<Set<string>>(new Set());
+
+  // Feedback modal state
+  const [showFeedbackModal, setShowFeedbackModal] = useState(true); // Auto-show after assessment
+  const [feedbackSuccess, setFeedbackSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     setRecommendations(initialRecommendations);
@@ -95,6 +105,14 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
         return newSet;
       });
     }
+  };
+
+  // Feedback handling functions
+  const handleFeedbackSuccess = () => {
+    setFeedbackSuccess(
+      "Thank you for your feedback! Your input helps us improve our assessment experience."
+    );
+    setTimeout(() => setFeedbackSuccess(null), 5000);
   };
 
   if (!recommendations.careers.length) {
@@ -363,6 +381,29 @@ const Results = ({ initialRecommendations, onRestart }: ResultsProps) => {
 
       {/* Floating Chatbot */}
       <FloatingChatbot position="bottom-right" />
+
+      {/* Feedback Success Alert */}
+      {feedbackSuccess && (
+        <div className="fixed top-4 right-4 z-50">
+          <Alert className="bg-green-50 border-green-200">
+            <CheckCircle2Icon className="h-4 w-4 text-green-600" />
+            <AlertTitle className="text-green-800">
+              Feedback Submitted!
+            </AlertTitle>
+            <AlertDescription className="text-green-700">
+              {feedbackSuccess}
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        assessmentId={assessmentId}
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+        onSuccess={handleFeedbackSuccess}
+      />
     </div>
   );
 };
