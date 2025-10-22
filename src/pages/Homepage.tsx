@@ -298,29 +298,35 @@ const Homepage = () => {
           ) : analytics ? (
             <div className="max-w-4xl mx-auto">
               {/* Summary Stats */}
-              <div className="grid md:grid-cols-3 gap-8 mb-12">
+              <div className="grid md:grid-cols-4 gap-6 mb-12">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">
+                  <div className="text-3xl font-bold text-blue-600 mb-2">
                     {analytics.summary.totalFeedback}
                   </div>
-                  <p className="text-gray-600">Student Reviews</p>
+                  <p className="text-gray-600">Total Reviews</p>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center justify-center mb-2">
-                    <span className="text-4xl font-bold text-green-600 mr-2">
+                    <span className="text-3xl font-bold text-green-600 mr-2">
                       {analytics.summary.averageRating}
                     </span>
                     {renderStars(
                       Math.round(parseFloat(analytics.summary.averageRating))
                     )}
                   </div>
-                  <p className="text-gray-600">Average Rating</p>
+                  <p className="text-gray-600">Overall Rating</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-purple-600 mb-2">
-                    {analytics.summary.timeRange}
+                  <div className="text-3xl font-bold text-purple-600 mb-2">
+                    {analytics.summary.assessmentFeedback || 0}
                   </div>
-                  <p className="text-gray-600">Period</p>
+                  <p className="text-gray-600">Assessment Reviews</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-orange-600 mb-2">
+                    {analytics.summary.roadmapFeedback || 0}
+                  </div>
+                  <p className="text-gray-600">Roadmap Reviews</p>
                 </div>
               </div>
 
@@ -330,35 +336,97 @@ const Homepage = () => {
                   <h3 className="text-xl font-bold text-center text-gray-800 mb-6">
                     Rating Distribution
                   </h3>
-                  <div className="space-y-3">
-                    {[5, 4, 3, 2, 1].map((rating) => {
-                      const count =
-                        analytics.ratingDistribution[rating.toString()] || 0;
-                      const percentage =
-                        analytics.summary.totalFeedback > 0
-                          ? (count / analytics.summary.totalFeedback) * 100
-                          : 0;
+                  <div className="grid md:grid-cols-2 gap-8">
+                    {/* Overall Distribution */}
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-700 mb-4 text-center">
+                        Overall Ratings
+                      </h4>
+                      <div className="space-y-3">
+                        {[5, 4, 3, 2, 1].map((rating) => {
+                          const count =
+                            analytics.ratingDistribution.overall?.[
+                              rating.toString()
+                            ] ||
+                            analytics.ratingDistribution[rating.toString()] ||
+                            0;
+                          const percentage =
+                            analytics.summary.totalFeedback > 0
+                              ? (count / analytics.summary.totalFeedback) * 100
+                              : 0;
 
-                      return (
-                        <div key={rating} className="flex items-center gap-3">
-                          <div className="flex items-center gap-2 min-w-[60px]">
-                            {renderStars(rating)}
-                            <span className="text-sm font-medium text-gray-600">
-                              {rating}
+                          return (
+                            <div
+                              key={rating}
+                              className="flex items-center gap-3"
+                            >
+                              <div className="flex items-center gap-2 min-w-[60px]">
+                                {renderStars(rating)}
+                                <span className="text-sm font-medium text-gray-600">
+                                  {rating}
+                                </span>
+                              </div>
+                              <div className="flex-1 bg-gray-200 rounded-full h-3">
+                                <div
+                                  className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-3 rounded-full transition-all duration-500"
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                              <span className="text-sm text-gray-600 min-w-[30px] text-right">
+                                {count}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Assessment vs Roadmap Comparison */}
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-700 mb-4 text-center">
+                        By Feedback Type
+                      </h4>
+                      <div className="space-y-4">
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium text-blue-800">
+                              Assessment
+                            </span>
+                            <span className="text-sm text-blue-600">
+                              {analytics.summary.assessmentAverage || "N/A"}
                             </span>
                           </div>
-                          <div className="flex-1 bg-gray-200 rounded-full h-3">
-                            <div
-                              className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-3 rounded-full transition-all duration-500"
-                              style={{ width: `${percentage}%` }}
-                            />
+                          <div className="flex items-center">
+                            {analytics.summary.assessmentAverage &&
+                              renderStars(
+                                Math.round(
+                                  parseFloat(
+                                    analytics.summary.assessmentAverage
+                                  )
+                                )
+                              )}
                           </div>
-                          <span className="text-sm text-gray-600 min-w-[30px] text-right">
-                            {count}
-                          </span>
                         </div>
-                      );
-                    })}
+                        <div className="bg-orange-50 p-4 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium text-orange-800">
+                              Roadmap
+                            </span>
+                            <span className="text-sm text-orange-600">
+                              {analytics.summary.roadmapAverage || "N/A"}
+                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            {analytics.summary.roadmapAverage &&
+                              renderStars(
+                                Math.round(
+                                  parseFloat(analytics.summary.roadmapAverage)
+                                )
+                              )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -372,20 +440,20 @@ const Homepage = () => {
                     </h3>
                     <div className="grid md:grid-cols-2 gap-6">
                       {analytics.recentFeedback
-                        .slice(0, 4)
+                        .slice(0, 6)
                         .map((feedback: any) => (
                           <div
                             key={feedback.id}
                             className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
                           >
-                            <div className="flex items-center mb-4">
+                            <div className="flex items-center justify-between mb-4">
                               <div className="flex items-center">
                                 {renderStars(feedback.rating)}
                                 <span className="ml-2 font-semibold text-gray-800">
                                   {feedback.rating}/5
                                 </span>
                               </div>
-                              <div className="ml-auto text-sm text-gray-500">
+                              <div className="text-sm text-gray-500">
                                 {new Date(
                                   feedback.created_at
                                 ).toLocaleDateString()}
@@ -396,8 +464,25 @@ const Homepage = () => {
                                 "{feedback.feedback_text}"
                               </p>
                             )}
-                            <div className="text-sm text-gray-500">
-                              - Student Assessment Feedback
+                            <div className="flex items-center justify-between">
+                              <div className="text-sm text-gray-500">
+                                {feedback.feedback_type === "roadmap"
+                                  ? `Roadmap: ${
+                                      feedback.reference_name || "Career Path"
+                                    }`
+                                  : "Assessment Experience"}
+                              </div>
+                              <div
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  feedback.feedback_type === "roadmap"
+                                    ? "bg-orange-100 text-orange-800"
+                                    : "bg-blue-100 text-blue-800"
+                                }`}
+                              >
+                                {feedback.feedback_type === "roadmap"
+                                  ? "Roadmap"
+                                  : "Assessment"}
+                              </div>
                             </div>
                           </div>
                         ))}

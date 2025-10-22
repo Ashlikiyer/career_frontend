@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import {
   fetchRoadmap,
   updateRoadmapStepProgress,
+  submitRoadmapFeedback,
 } from "../../services/dataService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -24,6 +25,9 @@ interface RoadmapResponse {
   roadmap: RoadmapStep[];
   total_steps: number;
   completed_steps: number;
+  is_completed?: boolean; // NEW: All steps completed
+  feedback_submitted?: boolean; // NEW: User already submitted feedback
+  can_submit_feedback?: boolean; // NEW: Show feedback prompt
 }
 
 interface RoadmapPageProps {
@@ -42,6 +46,12 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [roadmapData, setRoadmapData] = useState<RoadmapResponse | null>(null);
   const [updatingStep, setUpdatingStep] = useState<number | null>(null);
+
+  // Feedback modal state
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackRating, setFeedbackRating] = useState<number>(5);
+  const [feedbackText, setFeedbackText] = useState<string>("");
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
 
   const toggleStepCompletion = async (step: RoadmapStep) => {
     try {
@@ -64,17 +74,70 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
         )
       );
 
-      // Update roadmap data summary
+      // Update roadmap data summary and check for completion
       setRoadmapData((prevData) => {
         if (!prevData) return prevData;
         const completedSteps = prevData.completed_steps + (newIsDone ? 1 : -1);
-        return { ...prevData, completed_steps: Math.max(0, completedSteps) };
+        const newCompletedSteps = Math.max(0, completedSteps);
+        const isCompleted = newCompletedSteps === prevData.total_steps;
+        const canSubmitFeedback = isCompleted && !prevData.feedback_submitted;
+
+        // Check if feedback should be shown (only when it becomes eligible)
+        if (canSubmitFeedback && !prevData.can_submit_feedback) {
+          setTimeout(() => setShowFeedbackModal(true), 500); // Small delay for better UX
+        }
+
+        return {
+          ...prevData,
+          completed_steps: newCompletedSteps,
+          is_completed: isCompleted,
+          can_submit_feedback: canSubmitFeedback,
+        };
       });
     } catch (err: unknown) {
       setError((err as Error).message || "Failed to update step progress.");
       console.error("Update Step Progress Error:", err);
     } finally {
       setUpdatingStep(null);
+    }
+  };
+
+  const handleSubmitFeedback = async () => {
+    if (!roadmapData?.roadmap_id) return;
+
+    try {
+      setSubmittingFeedback(true);
+      await submitRoadmapFeedback({
+        rating: feedbackRating,
+        feedback_text: feedbackText || undefined,
+        roadmap_id: roadmapData.roadmap_id,
+        feedback_type: "roadmap",
+      });
+
+      // Update roadmap data to reflect feedback submitted
+      setRoadmapData((prevData) => {
+        if (!prevData) return prevData;
+        return {
+          ...prevData,
+          feedback_submitted: true,
+          can_submit_feedback: false,
+        };
+      });
+
+      // Close modal and reset form
+      setShowFeedbackModal(false);
+      setFeedbackRating(5);
+      setFeedbackText("");
+
+      // Show success message
+      alert(
+        "Thank you for your feedback! Your input helps us improve our roadmap content."
+      );
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to submit feedback.");
+      console.error("Submit Feedback Error:", err);
+    } finally {
+      setSubmittingFeedback(false);
     }
   };
 
@@ -93,6 +156,11 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
           setRoadmap(response.roadmap);
         } else {
           setRoadmap([]);
+        }
+
+        // Show feedback modal if roadmap is completed and feedback can be submitted
+        if (response.can_submit_feedback) {
+          setTimeout(() => setShowFeedbackModal(true), 1000); // Small delay for better UX
         }
       } catch (err: unknown) {
         setError((err as Error).message || "Failed to load roadmap.");
@@ -422,6 +490,97 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Roadmap Feedback Modal */}
+      {showFeedbackModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full mb-4">
+                <svg
+                  className="w-8 h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                🎉 Congratulations!
+              </h2>
+              <p className="text-gray-600">
+                You've completed the{" "}
+                <span className="font-semibold text-blue-600">
+                  {roadmapData?.career_name}
+                </span>{" "}
+                learning roadmap!
+              </p>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                How was your learning experience?
+              </h3>
+
+              {/* Star Rating */}
+              <div className="flex justify-center gap-2 mb-4">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => setFeedbackRating(star)}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-2xl transition-all duration-200 ${
+                      star <= feedbackRating
+                        ? "text-yellow-400 bg-yellow-50"
+                        : "text-gray-300 hover:text-yellow-400"
+                    }`}
+                  >
+                    ★
+                  </button>
+                ))}
+              </div>
+
+              {/* Feedback Text */}
+              <textarea
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                placeholder="Share your thoughts about this roadmap... (optional)"
+                className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows={3}
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowFeedbackModal(false)}
+                className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                disabled={submittingFeedback}
+              >
+                Skip for Now
+              </button>
+              <button
+                onClick={handleSubmitFeedback}
+                disabled={submittingFeedback}
+                className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+              >
+                {submittingFeedback ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                    Submitting...
+                  </div>
+                ) : (
+                  "Submit Feedback"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

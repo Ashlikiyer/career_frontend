@@ -684,6 +684,42 @@ export async function submitUserFeedback(feedbackData: {
 }
 
 /**
+ * Submit user feedback for completed roadmap
+ */
+export async function submitRoadmapFeedback(feedbackData: {
+  rating: number;
+  feedback_text?: string;
+  roadmap_id: number;
+  feedback_type: "roadmap";
+}) {
+  try {
+    console.log("Submitting roadmap feedback:", feedbackData);
+    const response = await dataFetch("feedback", "POST", feedbackData);
+
+    console.log("✅ Roadmap feedback submitted successfully:", response);
+    return response;
+    /*
+    Response format:
+    {
+      "success": true,
+      "message": "Roadmap feedback submitted successfully",
+      "data": {
+        "id": 16,
+        "rating": 5,
+        "feedback_text": "Great roadmap experience!",
+        "roadmap_id": 1,
+        "feedback_type": "roadmap",
+        "created_at": "2025-10-22T12:00:00.000Z"
+      }
+    }
+    */
+  } catch (error) {
+    console.error("Error submitting roadmap feedback:", error);
+    throw error;
+  }
+}
+
+/**
  * Get feedback analytics for admin dashboard
  */
 export async function getFeedbackAnalytics(timeRange: string = "30d") {
