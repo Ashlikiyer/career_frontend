@@ -434,16 +434,91 @@ export async function fetchRoadmap(savedCareerId: number) {
   try {
     const response = await dataFetch(`roadmaps/${savedCareerId}`, "GET");
 
-    // Enhanced response includes:
+    // Enhanced response now includes user-specific progress tracking:
     // - career_name: Name of the career
-    // - roadmap: Array of roadmap steps
-    // - auto_generated: Boolean indicating if roadmap was auto_generated
-    // - total_steps: Total number of learning steps
+    // - roadmap_id: Unique roadmap identifier
+    // - roadmap: Array of roadmap steps with is_done, completed_at fields
+    // - total_steps: Total number of steps
+    // - completed_steps: Number of completed steps
 
     return response;
   } catch (error) {
     console.error("Fetch Roadmap Error:", error);
     throw new Error("Failed to load roadmap from server.");
+  }
+}
+
+/**
+ * Get progress summary for a roadmap
+ */
+export async function getRoadmapProgress(savedCareerId: number) {
+  try {
+    const response = await dataFetch(
+      `roadmaps/${savedCareerId}/progress`,
+      "GET"
+    );
+
+    console.log("📊 Roadmap progress retrieved:", response);
+    return response;
+    /*
+    Response format:
+    {
+      "career_name": "UX/UI Designer",
+      "roadmap_id": 9,
+      "total_steps": 10,
+      "completed_steps": 2,
+      "progress_percentage": 20,
+      "steps": [
+        {
+          "step_id": 1,
+          "step_number": 1,
+          "title": "Design Fundamentals",
+          "is_done": true,
+          "completed_at": "2025-10-22T11:43:56.706Z"
+        }
+      ]
+    }
+    */
+  } catch (error) {
+    console.error("Error fetching roadmap progress:", error);
+    throw error;
+  }
+}
+
+/**
+ * Update progress for a specific roadmap step
+ */
+export async function updateRoadmapStepProgress(
+  stepId: number,
+  isDone: boolean
+) {
+  try {
+    const response = await dataFetch(
+      `roadmaps/step/${stepId}/progress`,
+      "PUT",
+      {
+        is_done: isDone,
+      }
+    );
+
+    console.log("✅ Step progress updated:", response);
+    return response;
+    /*
+    Response format:
+    {
+      "message": "Step marked as completed",
+      "step": {
+        "step_id": 1,
+        "step_number": 1,
+        "title": "Design Fundamentals",
+        "is_done": true,
+        "completed_at": "2025-10-22T11:43:56.706Z"
+      }
+    }
+    */
+  } catch (error) {
+    console.error("Error updating step progress:", error);
+    throw error;
   }
 }
 

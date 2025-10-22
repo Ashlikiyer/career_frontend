@@ -1,21 +1,29 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { fetchRoadmap } from "../../services/dataService";
+import {
+  fetchRoadmap,
+  updateRoadmapStepProgress,
+} from "../../services/dataService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface RoadmapStep {
-  step: number;
+  step_id: number;
+  roadmap_id: number;
+  step_number: number;
   title: string;
   description: string;
   duration: string;
   resources: string[];
+  is_done: boolean;
+  completed_at: string | null;
 }
 
 interface RoadmapResponse {
   career_name: string;
-  roadmap: any[];
-  auto_generated?: boolean;
-  total_steps?: number;
+  roadmap_id: number;
+  roadmap: RoadmapStep[];
+  total_steps: number;
+  completed_steps: number;
 }
 
 interface RoadmapPageProps {
@@ -32,19 +40,42 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   const [roadmap, setRoadmap] = useState<RoadmapStep[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [roadmapData, setRoadmapData] = useState<RoadmapResponse | null>(null);
+  const [updatingStep, setUpdatingStep] = useState<number | null>(null);
 
-  const toggleStepCompletion = (stepNumber: number) => {
-    setCompletedSteps((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(stepNumber)) {
-        newSet.delete(stepNumber);
-      } else {
-        newSet.add(stepNumber);
-      }
-      return newSet;
-    });
+  const toggleStepCompletion = async (step: RoadmapStep) => {
+    try {
+      setUpdatingStep(step.step_id);
+      const newIsDone = !step.is_done;
+
+      // Update progress via API
+      await updateRoadmapStepProgress(step.step_id, newIsDone);
+
+      // Update local state optimistically
+      setRoadmap((prevRoadmap) =>
+        prevRoadmap.map((s) =>
+          s.step_id === step.step_id
+            ? {
+                ...s,
+                is_done: newIsDone,
+                completed_at: newIsDone ? new Date().toISOString() : null,
+              }
+            : s
+        )
+      );
+
+      // Update roadmap data summary
+      setRoadmapData((prevData) => {
+        if (!prevData) return prevData;
+        const completedSteps = prevData.completed_steps + (newIsDone ? 1 : -1);
+        return { ...prevData, completed_steps: Math.max(0, completedSteps) };
+      });
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to update step progress.");
+      console.error("Update Step Progress Error:", err);
+    } finally {
+      setUpdatingStep(null);
+    }
   };
 
   useEffect(() => {
@@ -57,31 +88,9 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
         // Store the complete response data
         setRoadmapData(response);
 
-        // Handle new backend response format
+        // Use the roadmap steps directly from the backend response
         if (response && response.roadmap && Array.isArray(response.roadmap)) {
-          // Convert backend format to frontend format
-          const convertedSteps: RoadmapStep[] = response.roadmap.map(
-            (step, index) => ({
-              step: index + 1,
-              title: step.step_order || `Step ${index + 1}`,
-              description: step.step_description || "",
-              duration: step.duration || "",
-              resources: step.resources || [],
-            })
-          );
-          setRoadmap(convertedSteps);
-        } else if (Array.isArray(response)) {
-          // Fallback for old format - convert to new format
-          const convertedSteps: RoadmapStep[] = (response as any[]).map(
-            (step, index) => ({
-              step: index + 1,
-              title: step.step_description || `Step ${index + 1}`,
-              description: step.step_description || "",
-              duration: step.duration || "",
-              resources: step.resources || [],
-            })
-          );
-          setRoadmap(convertedSteps);
+          setRoadmap(response.roadmap);
         } else {
           setRoadmap([]);
         }
@@ -183,11 +192,6 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
               <div className="text-lg text-gray-600">
                 {roadmapData?.total_steps || roadmap.length} learning steps
               </div>
-              {roadmapData?.auto_generated && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                  🤖 Auto-generated
-                </span>
-              )}
             </div>
             <p className="text-lg text-gray-600 mb-6">
               Track your progress as you master each skill
@@ -198,7 +202,8 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
               <div className="flex justify-between text-sm text-gray-500 mb-2">
                 <span>Progress</span>
                 <span>
-                  {completedSteps.size} of {roadmap.length} completed
+                  {roadmapData?.completed_steps || 0} of{" "}
+                  {roadmapData?.total_steps || roadmap.length} completed
                 </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
@@ -206,16 +211,21 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                   className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all duration-500 ease-out"
                   style={{
                     width: `${
-                      roadmap.length > 0
-                        ? (completedSteps.size / roadmap.length) * 100
+                      roadmapData?.total_steps
+                        ? (roadmapData.completed_steps /
+                            roadmapData.total_steps) *
+                          100
                         : 0
                     }%`,
                   }}
                 ></div>
               </div>
               <div className="text-center mt-2 text-sm text-gray-600">
-                {roadmap.length > 0
-                  ? Math.round((completedSteps.size / roadmap.length) * 100)
+                {roadmapData?.total_steps
+                  ? Math.round(
+                      (roadmapData.completed_steps / roadmapData.total_steps) *
+                        100
+                    )
                   : 0}
                 % complete
               </div>
@@ -224,23 +234,30 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
           <div className="relative">
             {roadmap.length > 0 ? (
               roadmap.map((step, index) => (
-                <div key={step.step} className="mb-10">
+                <div key={step.step_id} className="mb-10">
                   <div className="flex items-start">
                     <div className="w-1/12 text-center flex-shrink-0">
                       <button
-                        onClick={() => toggleStepCompletion(step.step)}
+                        onClick={() => toggleStepCompletion(step)}
+                        disabled={updatingStep === step.step_id}
                         className={`w-10 h-10 rounded-full mx-auto flex items-center justify-center font-bold shadow-lg transition-all duration-300 ${
-                          completedSteps.has(step.step)
+                          step.is_done
                             ? "bg-gradient-to-br from-green-500 to-green-600 text-white"
                             : "bg-gradient-to-br from-blue-500 to-green-500 text-white hover:from-blue-600 hover:to-green-600"
                         }`}
                         title={
-                          completedSteps.has(step.step)
+                          step.is_done
                             ? "Mark as incomplete"
                             : "Mark as complete"
                         }
                       >
-                        {completedSteps.has(step.step) ? "✓" : step.step}
+                        {updatingStep === step.step_id ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                        ) : step.is_done ? (
+                          "✓"
+                        ) : (
+                          step.step_number
+                        )}
                       </button>
                       {index < roadmap.length - 1 && (
                         <div className="w-1 h-20 bg-gradient-to-b from-blue-300 to-green-300 mx-auto mt-4 rounded-full"></div>
@@ -249,7 +266,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                     <div className="w-11/12 pl-8">
                       <div
                         className={`rounded-xl shadow-lg p-6 border transition-all duration-300 ${
-                          completedSteps.has(step.step)
+                          step.is_done
                             ? "bg-green-50 border-green-200 hover:shadow-xl"
                             : "bg-white border-gray-200 hover:shadow-xl"
                         }`}
@@ -257,14 +274,12 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                         <div className="flex items-center justify-between mb-3">
                           <h2
                             className={`text-2xl font-bold ${
-                              completedSteps.has(step.step)
-                                ? "text-green-800"
-                                : "text-gray-800"
+                              step.is_done ? "text-green-800" : "text-gray-800"
                             }`}
                           >
                             {step.title}
                           </h2>
-                          {completedSteps.has(step.step) && (
+                          {step.is_done && (
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                               ✓ Completed
                             </span>
@@ -294,22 +309,44 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                           </div>
                         </div>
                         <div className="border-t border-gray-200 pt-4">
-                          <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                            <svg
-                              className="w-5 h-5 text-green-600 mr-2"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
+                          <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                              <svg
+                                className="w-5 h-5 text-green-600 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                                />
+                              </svg>
+                              Resources:
+                            </h3>
+                            <button
+                              onClick={() => toggleStepCompletion(step)}
+                              disabled={updatingStep === step.step_id}
+                              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 shadow-md hover:shadow-lg ${
+                                step.is_done
+                                  ? "bg-red-100 text-red-700 hover:bg-red-200 border border-red-200"
+                                  : "bg-green-100 text-green-700 hover:bg-green-200 border border-green-200"
+                              }`}
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                              />
-                            </svg>
-                            Resources:
-                          </h3>
+                              {updatingStep === step.step_id ? (
+                                <div className="flex items-center">
+                                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2"></div>
+                                  Updating...
+                                </div>
+                              ) : step.is_done ? (
+                                "Mark as Incomplete"
+                              ) : (
+                                "Mark as Done"
+                              )}
+                            </button>
+                          </div>
                           <div className="grid grid-cols-1 gap-2">
                             {step.resources.map((resource, resIndex) => (
                               <div
