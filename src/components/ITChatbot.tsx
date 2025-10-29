@@ -11,7 +11,6 @@ import {
   type ChatbotMessage,
   type ChatSession,
 } from "../services/chatbotService";
-import "./ITChatbot.css";
 
 const ITChatbot: React.FC = () => {
   const [messages, setMessages] = useState<ChatbotMessage[]>([]);
@@ -157,11 +156,6 @@ const ITChatbot: React.FC = () => {
     adjustTextareaHeight();
   }, [inputValue]);
 
-  const getCharCounterClass = () => {
-    if (inputValue.length > 900) return "char-counter warning";
-    return "char-counter";
-  };
-
   const sendMessage = async (question: string) => {
     if (!question.trim() || isLoading) return;
 
@@ -256,23 +250,23 @@ const ITChatbot: React.FC = () => {
   };
 
   return (
-    <div className="chatbot-container">
-      <div className="chat-header">
-        <div className="header-left">
+    <div className="max-w-4xl mx-auto border border-gray-200 rounded-2xl bg-white shadow-2xl overflow-hidden font-sans flex flex-col min-h-0">
+      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 flex items-center justify-between relative border-b border-white/10">
+        <div className="flex items-center gap-3">
           <button
-            className="history-toggle-btn"
+            className="bg-white/20 hover:bg-white/30 rounded-lg p-2 text-white transition-all duration-200 flex items-center justify-center w-9 h-9"
             onClick={() => setShowHistory(!showHistory)}
             title={showHistory ? "Hide sidebar" : "Show chat history"}
           >
             {showHistory ? "✕" : "📚"}
           </button>
           <div className="header-content">
-            <h3>IT Career Assistant</h3>
+            <h3 className="text-lg font-semibold">IT Career Assistant</h3>
           </div>
         </div>
-        <div className="header-actions">
+        <div className="absolute top-4 right-4 flex gap-2">
           <button
-            className="new-chat-btn"
+            className="bg-white/20 hover:bg-white/30 rounded-lg p-2 text-white transition-all duration-200"
             onClick={startNewChat}
             title="New chat"
           >
@@ -282,39 +276,52 @@ const ITChatbot: React.FC = () => {
       </div>
 
       {error && (
-        <div className="error-banner">
-          <span>⚠️ {error}</span>
-          <button onClick={retry} disabled={isLoading}>
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 flex items-center justify-between text-red-700">
+          <span className="text-sm">⚠️ {error}</span>
+          <button
+            onClick={retry}
+            disabled={isLoading}
+            className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white px-3 py-1 rounded text-xs transition-colors duration-200"
+          >
             {isLoading ? "🔄 Retrying..." : "🔄 Retry"}
           </button>
         </div>
       )}
 
-      <div className="chat-layout">
+      <div className="flex flex-1 min-h-0">
         {showHistory && (
-          <div className="chat-sidebar">
-            <div className="sidebar-header">
-              <button className="new-chat-sidebar-btn" onClick={startNewChat}>
-                <span className="new-chat-icon">➕</span>
+          <div className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden">
+            <div className="p-4 border-b border-gray-200">
+              <button
+                className="w-full bg-white border border-gray-300 rounded-lg p-3 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors duration-200"
+                onClick={startNewChat}
+              >
+                <span>➕</span>
                 New chat
               </button>
             </div>
-            <div className="history-list">
-              <div className="history-section-title">Recent</div>
+            <div className="flex-1 overflow-y-auto p-2">
+              <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">
+                Recent
+              </div>
               {chatSessions.length === 0 ? (
-                <div className="no-history">No previous chats</div>
+                <div className="text-sm text-gray-500 p-4 text-center">
+                  No previous chats
+                </div>
               ) : (
                 chatSessions.map((session) => (
                   <div
                     key={session.session_uuid}
-                    className="history-item"
+                    className="flex items-center p-2 mb-1 bg-transparent hover:bg-gray-200 rounded-lg transition-colors duration-200 cursor-pointer group"
                     onClick={() => loadSession(session.session_uuid)}
                   >
-                    <div className="session-info">
-                      <div className="session-title">{session.title}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-normal text-gray-700 truncate">
+                        {session.title}
+                      </div>
                     </div>
                     <button
-                      className="delete-session-btn"
+                      className="opacity-0 group-hover:opacity-100 bg-none border-none text-xs cursor-pointer p-1 rounded transition-opacity duration-200 hover:bg-red-100 hover:text-red-600 ml-2"
                       onClick={(e) => {
                         e.stopPropagation();
                         deleteSession(session.session_uuid);
@@ -330,46 +337,72 @@ const ITChatbot: React.FC = () => {
           </div>
         )}
 
-        <div className="chat-main">
-          <div className="chat-messages">
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 min-h-80 max-h-96 overflow-y-auto p-5 bg-gradient-to-b from-gray-50 to-gray-100 scroll-smooth">
             {messages.length === 0 && (
-              <div className="welcome-message">
-                <div className="welcome-icon">👋</div>
-                <h4>Hi! I'm your IT career assistant</h4>
-                <p>I can help you with:</p>
-                <ul>
-                  <li>🏢 Career information and guidance</li>
-                  <li>🛠️ Technology skills and learning paths</li>
-                  <li>💻 Programming and development questions</li>
-                  <li>📈 Industry trends and opportunities</li>
-                  <li>💰 Salary information and growth prospects</li>
+              <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-7 rounded-xl mb-6 border-l-5 border-blue-500 text-center">
+                <div className="text-4xl mb-3">👋</div>
+                <h4 className="text-xl font-semibold text-gray-800 mb-4">
+                  Hi! I'm your IT career assistant
+                </h4>
+                <p className="text-gray-700 font-medium mb-4">
+                  I can help you with:
+                </p>
+                <ul className="text-left space-y-2 mb-4">
+                  <li className="bg-white/60 p-2 rounded-lg text-gray-700 font-medium">
+                    🏢 Career information and guidance
+                  </li>
+                  <li className="bg-white/60 p-2 rounded-lg text-gray-700 font-medium">
+                    🛠️ Technology skills and learning paths
+                  </li>
+                  <li className="bg-white/60 p-2 rounded-lg text-gray-700 font-medium">
+                    💻 Programming and development questions
+                  </li>
+                  <li className="bg-white/60 p-2 rounded-lg text-gray-700 font-medium">
+                    📈 Industry trends and opportunities
+                  </li>
+                  <li className="bg-white/60 p-2 rounded-lg text-gray-700 font-medium">
+                    💰 Salary information and growth prospects
+                  </li>
                 </ul>
-                <p>Try asking one of the suggested questions below!</p>
+                <p className="text-gray-600">
+                  Try asking one of the suggested questions below!
+                </p>
               </div>
             )}
 
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`message ${message.message_type}-message`}
+                className={`mb-5 animate-fade-in ${
+                  message.message_type === "user" ? "text-right" : ""
+                }`}
               >
-                <div className="message-content">
+                <div
+                  className={`inline-block max-w-[85%] ${
+                    message.message_type === "user"
+                      ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-3xl rounded-br-md shadow-lg"
+                      : "bg-white text-gray-800 p-4 rounded-3xl rounded-bl-md border border-gray-200 shadow-sm"
+                  }`}
+                >
                   {message.message_type === "bot" &&
                     message.response_type === "career_info" &&
                     message.career && (
-                      <div className="career-info-badge">
+                      <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold mb-3 inline-block">
                         💼 Career Information: {message.career}
                       </div>
                     )}
                   {message.message_type === "bot" &&
                     message.response_type === "scope_limitation" && (
-                      <div className="scope-limitation-badge">
+                      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-semibold mb-3 inline-block">
                         🎯 IT Career Focus
                       </div>
                     )}
-                  <pre className="message-text">{message.content}</pre>
+                  <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed m-0">
+                    {message.content}
+                  </pre>
                 </div>
-                <div className="message-time">
+                <div className="text-xs text-gray-500 mt-2 font-medium">
                   {message.timestamp
                     ? message.timestamp.toLocaleTimeString()
                     : new Date(message.created_at).toLocaleTimeString()}
@@ -378,11 +411,19 @@ const ITChatbot: React.FC = () => {
             ))}
 
             {isLoading && (
-              <div className="message bot-message loading">
-                <div className="typing-indicator">
-                  <span></span>
-                  <span></span>
-                  <span></span>
+              <div className="mb-5">
+                <div className="inline-block bg-white text-gray-800 p-4 rounded-3xl rounded-bl-md border border-gray-200 shadow-sm">
+                  <div className="flex gap-1.5 p-4">
+                    <span className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-bounce"></span>
+                    <span
+                      className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.1s" }}
+                    ></span>
+                    <span
+                      className="w-2.5 h-2.5 bg-gray-400 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.2s" }}
+                    ></span>
+                  </div>
                 </div>
               </div>
             )}
@@ -390,9 +431,9 @@ const ITChatbot: React.FC = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="chat-input">
-            <form onSubmit={handleSubmit}>
-              <div className="input-container">
+          <div className="p-5 bg-white border-t border-gray-200">
+            <form onSubmit={handleSubmit} className="flex gap-3 items-end">
+              <div className="flex-1 relative">
                 <textarea
                   ref={textareaRef}
                   value={inputValue}
@@ -402,27 +443,38 @@ const ITChatbot: React.FC = () => {
                   disabled={isLoading}
                   maxLength={1000}
                   rows={1}
+                  className="w-full p-4 pr-16 border-2 border-gray-200 rounded-2xl text-sm font-sans outline-none transition-all duration-300 bg-gray-50 focus:border-indigo-500 resize-none min-h-14 max-h-30"
                 />
-                <div className={getCharCounterClass()}>
+                <div
+                  className={`absolute bottom-2 right-3 text-xs font-medium ${
+                    inputValue.length > 900 ? "text-red-500" : "text-gray-400"
+                  }`}
+                >
                   {inputValue.length}/1000
                 </div>
               </div>
-              <button type="submit" disabled={isLoading || !inputValue.trim()}>
+              <button
+                type="submit"
+                disabled={isLoading || !inputValue.trim()}
+                className="p-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full hover:from-indigo-600 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 transition-all duration-300 shadow-lg hover:shadow-xl disabled:cursor-not-allowed disabled:shadow-none"
+              >
                 {isLoading ? "⏳" : "📤"}
               </button>
             </form>
           </div>
 
           {messages.length === 0 && suggestions.length > 0 && (
-            <div className="suggestions">
-              <h4>💡 Suggested Questions:</h4>
-              <div className="suggestion-buttons">
+            <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 border-t border-gray-200">
+              <h4 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                💡 Suggested Questions:
+              </h4>
+              <div className="flex flex-wrap gap-2.5">
                 {suggestions.map((suggestion, index) => (
                   <button
                     key={index}
                     onClick={() => handleSuggestionClick(suggestion)}
-                    className="suggestion-btn"
                     disabled={isLoading}
+                    className="px-4 py-2 bg-white border-2 border-gray-200 rounded-full text-sm cursor-pointer transition-all duration-300 text-gray-600 font-medium hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-600 hover:text-white hover:border-indigo-500 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     {suggestion}
                   </button>

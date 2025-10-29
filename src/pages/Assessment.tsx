@@ -4,7 +4,6 @@ import { Cookies } from "react-cookie";
 import Navbar from "../components/Navbar";
 import Results from "./Results";
 import FloatingChatbot from "../components/FloatingChatbot";
-import "../components/AssessmentTooltips.css";
 import {
   startAssessment,
   fetchNextQuestion,

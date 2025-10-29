@@ -6,7 +6,6 @@ import FeedbackModal from "../components/ui/FeedbackModal";
 import { saveCareer } from "../../services/dataService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
-import "../components/CareerResults.css";
 
 interface CareerSuggestion {
   career: string;
@@ -258,7 +257,7 @@ const Results = ({
               {!showAllCareers && (
                 <button
                   onClick={() => setShowAllCareers(true)}
-                  className="text-blue-600 hover:text-blue-700 underline font-medium"
+                  className="text-blue-600 hover:text-blue-700 underline font-medium transition-colors duration-200"
                 >
                   Show All {recommendations.careers.length - 1} Options
                 </button>
@@ -270,13 +269,17 @@ const Results = ({
                 {recommendations.careers.slice(1).map((career, index) => (
                   <div
                     key={index + 1}
-                    className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:border-blue-300 transition-all duration-300 hover:shadow-lg"
+                    className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300 animate-fade-in"
+                    style={{
+                      animationDelay: `${(index + 1) * 0.1}s`,
+                      animationFillMode: "both",
+                    }}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <h4 className="text-lg font-semibold text-gray-800">
                         {career.career_name}
                       </h4>
-                      <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                      <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
                         {career.score}% Match
                       </div>
                     </div>
@@ -293,7 +296,7 @@ const Results = ({
                         selectedCareers.includes(career.career_name) ||
                         savingCareers.has(career.career_name)
                       }
-                      className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 text-sm shadow-md hover:shadow-lg flex items-center justify-center"
+                      className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 text-sm shadow-md hover:shadow-lg flex items-center justify-center disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {savingCareers.has(career.career_name) ? (
                         <>

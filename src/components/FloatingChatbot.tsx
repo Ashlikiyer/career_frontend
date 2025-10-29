@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import ITChatbot from "./ITChatbot";
-import "./FloatingChatbot.css";
 
 interface FloatingChatbotProps {
   position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
@@ -82,7 +81,17 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
     <>
       {/* Floating Button */}
       {!isOpen && (
-        <div className={`floating-chatbot-trigger ${position}`}>
+        <div
+          className={`fixed z-50 ${
+            position === "bottom-right"
+              ? "bottom-6 right-6"
+              : position === "bottom-left"
+              ? "bottom-6 left-6"
+              : position === "top-right"
+              ? "top-6 right-6"
+              : "top-6 left-6"
+          }`}
+        >
           {customTriggerButton ? (
             <div
               onClick={handleOpen}
@@ -94,16 +103,20 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
             </div>
           ) : (
             <button
-              className="floating-chat-btn"
+              className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 border-none rounded-full cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 relative overflow-hidden"
               onClick={handleOpen}
               aria-label="Open IT Career Assistant"
               title="Need help with your IT career? Click to chat!"
             >
-              <span className="chat-icon">🤖</span>
-              <span className="chat-text">💬</span>
+              <span className="text-2xl transition-all duration-300 hover:scale-125">
+                🤖
+              </span>
+              <span className="text-lg transition-all duration-300 hover:translate-x-0.5">
+                💬
+              </span>
               {hasUnreadMessages && showUnreadIndicator && (
                 <span
-                  className="unread-indicator"
+                  className="absolute top-2 right-2 w-3 h-3 bg-red-500 border-2 border-white rounded-full text-xs animate-pulse"
                   aria-label="New messages available"
                 >
                   •
@@ -117,31 +130,37 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
       {/* Modal Overlay */}
       {isOpen && (
         <div
-          className={`chat-modal-overlay ${theme}`}
+          className={`fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex items-center justify-center animate-fade-in ${
+            theme === "dark" ? "bg-black/70" : ""
+          }`}
           onClick={handleClose}
           role="dialog"
           aria-modal="true"
           aria-labelledby="chatbot-title"
         >
           <div
-            className={`chat-modal ${position} ${
-              isMinimized ? "minimized" : ""
-            }`}
+            className={`w-full max-w-lg max-h-[80vh] min-h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-slide-in ${
+              isMinimized ? "max-h-12 overflow-hidden" : ""
+            } ${
+              position.includes("bottom") ? "fixed bottom-24" : "fixed top-4"
+            } ${position.includes("right") ? "right-6" : "left-6"}`}
             onClick={(e) => e.stopPropagation()}
             onKeyDown={handleKeyDown}
           >
             {/* Modal Header */}
-            <div className="chat-modal-header">
-              <div className="header-left">
+            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 flex items-center justify-between relative border-b border-white/10">
+              <div className="flex items-center gap-3">
                 <div
-                  className="status-indicator online"
+                  className="w-2.5 h-2.5 bg-green-400 rounded-full shadow-lg animate-pulse"
                   title="Chatbot is online"
                 ></div>
-                <h3 id="chatbot-title">IT Career Assistant</h3>
+                <h3 id="chatbot-title" className="text-lg font-semibold">
+                  IT Career Assistant
+                </h3>
               </div>
-              <div className="header-actions">
+              <div className="flex gap-2">
                 <button
-                  className="minimize-btn"
+                  className="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-all duration-200 hover:scale-105"
                   onClick={isMinimized ? handleMaximize : handleMinimize}
                   aria-label={isMinimized ? "Maximize chat" : "Minimize chat"}
                   title={isMinimized ? "Maximize" : "Minimize"}
@@ -149,7 +168,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
                   {isMinimized ? "⬆️" : "⬇️"}
                 </button>
                 <button
-                  className="close-btn"
+                  className="bg-white/20 hover:bg-red-500/80 text-white w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-all duration-200 hover:scale-105"
                   onClick={handleClose}
                   aria-label="Close chat"
                   title="Close chat"
@@ -161,14 +180,14 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
 
             {/* Chatbot Content */}
             {!isMinimized && (
-              <div className="chat-modal-content">
+              <div className="flex-1 border-none rounded-none shadow-none max-w-none m-0 flex flex-col min-h-0">
                 <ITChatbot />
               </div>
             )}
 
             {/* Minimized State */}
             {isMinimized && (
-              <div className="minimized-content">
+              <div className="p-3 text-center text-gray-600 text-sm bg-gray-50">
                 <p>💬 Chat minimized - click ⬆️ to expand</p>
               </div>
             )}
@@ -178,7 +197,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
 
       {/* Keyboard shortcuts hint */}
       {isOpen && (
-        <div className="keyboard-hint" aria-live="polite">
+        <div className="fixed bottom-2.5 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-full text-sm z-50 opacity-70 pointer-events-none">
           Press ESC to close chat
         </div>
       )}

@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, ResponseType } from "axios";
 import { Cookies } from "react-cookie";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://career.careerapp.xyz/",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
   withCredentials: true, // REQUIRED for sessions
   timeout: 10000, // 10 second timeout
   headers: {
