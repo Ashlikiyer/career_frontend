@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import FloatingChatbot from "../components/FloatingChatbot";
 import FeedbackModal from "../components/ui/FeedbackModal";
 import { saveCareer } from "../../services/dataService";
@@ -117,7 +116,6 @@ const Results = ({
   if (!recommendations.careers.length) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
-        <Navbar />
         <div className="flex-grow p-8 flex items-center justify-center">
           <div className="bg-white rounded-xl shadow-lg p-8 border border-red-200">
             <p className="text-red-600 text-center">
@@ -148,7 +146,6 @@ const Results = ({
           }
         `}
       </style>
-      <Navbar />
       <div className="pt-8 p-6 max-w-4xl mx-auto">
         {error && (
           <Alert variant="destructive" className="mb-6">

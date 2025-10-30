@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
 import {
   fetchRoadmap,
   updateRoadmapStepProgress,
@@ -175,7 +174,6 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
-        <Navbar />
         <div className="flex-grow p-8 flex items-center justify-center">
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-green-500 rounded-full mb-4">
@@ -211,7 +209,6 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
-        <Navbar />
         <div className="flex-grow p-8 flex items-center justify-center">
           <div className="max-w-md w-full">
             <Alert variant="destructive">
@@ -234,7 +231,6 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
-      <Navbar />
       <div className="flex-grow p-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">

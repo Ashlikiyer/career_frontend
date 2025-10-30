@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
-import Navbar from "../components/Navbar";
 import { fetchSavedCareers, deleteCareer } from "../../services/dataService";
 import RoadmapModal from "@/components/modal/RoadmapModal";
 import RoadmapPage from "../pages/Roadmap";
@@ -150,7 +149,6 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
-        <Navbar />
         <div className="flex-grow p-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
@@ -203,7 +201,6 @@ const Dashboard = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
-        <Navbar />
         <div className="flex-grow p-8 flex items-center justify-center">
           <div className="bg-white p-6 rounded-xl shadow-lg border border-red-200">
             <p className="text-red-700">{error}</p>
@@ -242,7 +239,6 @@ const Dashboard = () => {
           }
         `}
       </style>
-      <Navbar />
       <div className="flex-grow p-8">
         <div className="max-w-4xl mx-auto">
           {success && (

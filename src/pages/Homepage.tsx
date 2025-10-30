@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
-import Navbar from "../components/Navbar";
 import FloatingChatbot from "../components/FloatingChatbot";
 import { getFeedbackAnalytics } from "../../services/dataService";
 
@@ -63,8 +62,6 @@ const Homepage = () => {
 
   return (
     <div className="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
-      <Navbar />
-
       {/* Hero Section */}
       <div className="container mx-auto px-6 py-16">
         <div className="text-center max-w-4xl mx-auto">

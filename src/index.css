@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Tailwind CSS v4 theme configuration */
+/* Tailwind CSS theme configuration */
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

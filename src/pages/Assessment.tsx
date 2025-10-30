@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
-import Navbar from "../components/Navbar";
 import Results from "./Results";
 import FloatingChatbot from "../components/FloatingChatbot";
 import {
@@ -482,7 +481,6 @@ const Assessment = () => {
   if (completed && !showResults) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <Navbar />
         <div className="flex-grow p-8 flex items-center justify-center">
           <div className="max-w-2xl mx-auto bg-white rounded-2xl p-8 shadow-xl text-center border border-gray-100">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -530,7 +528,6 @@ const Assessment = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <Navbar />
         <div className="flex-grow p-8 flex items-center justify-center">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
@@ -544,7 +541,6 @@ const Assessment = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <Navbar />
         <div className="flex-grow p-8 flex items-center justify-center">
           <div className="max-w-md mx-auto bg-white rounded-2xl p-8 shadow-xl text-center border border-gray-100">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -588,7 +584,6 @@ const Assessment = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <Navbar />
       <div className="flex-grow p-6">
         <div className="max-w-4xl mx-auto">
           {/* Header Section */}
