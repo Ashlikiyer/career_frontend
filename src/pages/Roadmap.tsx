@@ -51,6 +51,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   const [feedbackRating, setFeedbackRating] = useState<number>(5);
   const [feedbackText, setFeedbackText] = useState<string>("");
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
+  const [feedbackDismissed, setFeedbackDismissed] = useState(false); // Track if user dismissed the modal
 
   const toggleStepCompletion = async (step: RoadmapStep) => {
     try {
@@ -81,8 +82,17 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
         const isCompleted = newCompletedSteps === prevData.total_steps;
         const canSubmitFeedback = isCompleted && !prevData.feedback_submitted;
 
-        // Check if feedback should be shown (only when it becomes eligible)
-        if (canSubmitFeedback && !prevData.can_submit_feedback) {
+        // Show feedback modal ONLY if:
+        // 1. Roadmap just became complete
+        // 2. Feedback hasn't been submitted yet
+        // 3. Modal isn't already open
+        // 4. User hasn't dismissed it in this session
+        if (
+          canSubmitFeedback &&
+          !prevData.can_submit_feedback &&
+          !showFeedbackModal &&
+          !feedbackDismissed
+        ) {
           setTimeout(() => setShowFeedbackModal(true), 500); // Small delay for better UX
         }
 
@@ -106,6 +116,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
 
     try {
       setSubmittingFeedback(true);
+
       await submitRoadmapFeedback({
         rating: feedbackRating,
         feedback_text: feedbackText || undefined,
@@ -145,7 +156,14 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
       try {
         setLoading(true);
         const response: RoadmapResponse = await fetchRoadmap(savedCareerId);
-        console.log("Roadmap Data:", JSON.stringify(response, null, 2));
+
+        console.log("🔍 DEBUG - Roadmap Response:", {
+          roadmap_id: response.roadmap_id,
+          is_completed: response.is_completed,
+          feedback_submitted: response.feedback_submitted,
+          can_submit_feedback: response.can_submit_feedback,
+          feedbackDismissed_local: feedbackDismissed,
+        });
 
         // Store the complete response data
         setRoadmapData(response);
@@ -157,9 +175,27 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
           setRoadmap([]);
         }
 
-        // Show feedback modal if roadmap is completed and feedback can be submitted
-        if (response.can_submit_feedback) {
+        // Show feedback modal ONLY if:
+        // 1. Roadmap is completed (all steps done)
+        // 2. Feedback has NOT been submitted yet
+        // 3. User can submit feedback
+        // 4. User hasn't dismissed it in this session
+        const shouldShow =
+          response.can_submit_feedback &&
+          !response.feedback_submitted &&
+          !feedbackDismissed;
+        console.log("🔍 Should show modal?", shouldShow);
+
+        if (shouldShow) {
+          console.log("✅ Showing feedback modal");
           setTimeout(() => setShowFeedbackModal(true), 1000); // Small delay for better UX
+        } else {
+          console.log("❌ NOT showing feedback modal because:");
+          if (!response.can_submit_feedback)
+            console.log("  - can_submit_feedback is false");
+          if (response.feedback_submitted)
+            console.log("  - feedback_submitted is true");
+          if (feedbackDismissed) console.log("  - feedbackDismissed is true");
         }
       } catch (err: unknown) {
         setError((err as Error).message || "Failed to load roadmap.");
@@ -169,7 +205,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
       }
     };
     loadRoadmap();
-  }, [savedCareerId]); // Depend on savedCareerId
+  }, [savedCareerId, feedbackDismissed]); // Added feedbackDismissed to dependencies
 
   if (loading) {
     return (
@@ -553,7 +589,10 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
 
             <div className="flex gap-3">
               <button
-                onClick={() => setShowFeedbackModal(false)}
+                onClick={() => {
+                  setShowFeedbackModal(false);
+                  setFeedbackDismissed(true); // Mark as dismissed for this session
+                }}
                 className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 disabled={submittingFeedback}
               >
