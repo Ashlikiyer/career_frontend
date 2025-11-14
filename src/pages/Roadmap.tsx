@@ -5,6 +5,8 @@ import {
   submitRoadmapFeedback,
 } from "../../services/dataService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CheckCircle2Icon } from "lucide-react";
+import "./Roadmap.css";
 
 interface RoadmapStep {
   step_id: number;
@@ -52,6 +54,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   const [feedbackText, setFeedbackText] = useState<string>("");
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const [feedbackDismissed, setFeedbackDismissed] = useState(false); // Track if user dismissed the modal
+  const [feedbackSuccess, setFeedbackSuccess] = useState<string | null>(null);
 
   const toggleStepCompletion = async (step: RoadmapStep) => {
     try {
@@ -140,9 +143,10 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
       setFeedbackText("");
 
       // Show success message
-      alert(
+      setFeedbackSuccess(
         "Thank you for your feedback! Your input helps us improve our roadmap content."
       );
+      setTimeout(() => setFeedbackSuccess(null), 4000);
     } catch (err: unknown) {
       setError((err as Error).message || "Failed to submit feedback.");
       console.error("Submit Feedback Error:", err);
@@ -209,12 +213,12 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
-        <div className="flex-grow p-8 flex items-center justify-center">
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-green-500 rounded-full mb-4">
+      <div className="roadmap-container">
+        <div className="loading-container">
+          <div className="loading-content">
+            <div className="loading-icon-wrapper">
               <svg
-                className="animate-spin w-6 h-6 text-white"
+                className="loading-spinner-icon"
                 fill="none"
                 viewBox="0 0 24 24"
               >
@@ -233,9 +237,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                 ></path>
               </svg>
             </div>
-            <p className="text-gray-600 text-lg">
-              Loading your career roadmap...
-            </p>
+            <p className="loading-text">Loading your career roadmap...</p>
           </div>
         </div>
       </div>
@@ -244,18 +246,15 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
+      <div className="roadmap-container">
         <div className="flex-grow p-8 flex items-center justify-center">
           <div className="max-w-md w-full">
             <Alert variant="destructive">
               <AlertTitle>Error Loading Roadmap</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
-            <div className="text-center mt-6">
-              <button
-                onClick={onBack}
-                className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
-              >
+            <div className="back-button-wrapper">
+              <button onClick={onBack} className="back-button">
                 Back to Dashboard
               </button>
             </div>
@@ -266,13 +265,21 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
+    <div className="roadmap-container">
       <div className="flex-grow p-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-green-500 rounded-full mb-6">
+        <div className="max-w-5xl mx-auto">
+          {feedbackSuccess && (
+            <Alert variant="success" className="success-alert">
+              <CheckCircle2Icon className="h-4 w-4" />
+              <AlertTitle>Success!</AlertTitle>
+              <AlertDescription>{feedbackSuccess}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="roadmap-header">
+            <div className="roadmap-icon-wrapper">
               <svg
-                className="w-8 h-8 text-white"
+                className="roadmap-icon"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -285,30 +292,30 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                 />
               </svg>
             </div>
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+            <h1 className="roadmap-title">
               {roadmapData?.career_name || careerName} Learning Path
             </h1>
-            <div className="flex justify-center items-center gap-4 mb-4">
-              <div className="text-lg text-gray-600">
-                {roadmapData?.total_steps || roadmap.length} learning steps
+            <div className="roadmap-stats">
+              <div className="stat-badge">
+                📚 {roadmapData?.total_steps || roadmap.length} learning steps
               </div>
             </div>
-            <p className="text-lg text-gray-600 mb-6">
+            <p className="roadmap-subtitle">
               Track your progress as you master each skill
             </p>
 
             {/* Progress Bar */}
-            <div className="max-w-md mx-auto mb-8">
-              <div className="flex justify-between text-sm text-gray-500 mb-2">
+            <div className="progress-container">
+              <div className="progress-header">
                 <span>Progress</span>
                 <span>
                   {roadmapData?.completed_steps || 0} of{" "}
                   {roadmapData?.total_steps || roadmap.length} completed
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
+              <div className="progress-bar-wrapper">
                 <div
-                  className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all duration-500 ease-out"
+                  className="progress-bar-fill"
                   style={{
                     width: `${
                       roadmapData?.total_steps
@@ -320,7 +327,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                   }}
                 ></div>
               </div>
-              <div className="text-center mt-2 text-sm text-gray-600">
+              <div className="progress-percentage">
                 {roadmapData?.total_steps
                   ? Math.round(
                       (roadmapData.completed_steps / roadmapData.total_steps) *
@@ -331,19 +338,17 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
               </div>
             </div>
           </div>
-          <div className="relative">
+          <div className="roadmap-timeline">
             {roadmap.length > 0 ? (
               roadmap.map((step, index) => (
-                <div key={step.step_id} className="mb-10">
-                  <div className="flex items-start">
-                    <div className="w-1/12 text-center flex-shrink-0">
+                <div key={step.step_id} className="roadmap-step">
+                  <div className="step-layout">
+                    <div className="step-number-column">
                       <button
                         onClick={() => toggleStepCompletion(step)}
                         disabled={updatingStep === step.step_id}
-                        className={`w-10 h-10 rounded-full mx-auto flex items-center justify-center font-bold shadow-lg transition-all duration-300 ${
-                          step.is_done
-                            ? "bg-gradient-to-br from-green-500 to-green-600 text-white"
-                            : "bg-gradient-to-br from-blue-500 to-green-500 text-white hover:from-blue-600 hover:to-green-600"
+                        className={`step-checkbox ${
+                          step.is_done ? "completed" : ""
                         }`}
                         title={
                           step.is_done
@@ -352,7 +357,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                         }
                       >
                         {updatingStep === step.step_id ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                          <div className="loading-spinner"></div>
                         ) : step.is_done ? (
                           "✓"
                         ) : (
@@ -360,38 +365,79 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                         )}
                       </button>
                       {index < roadmap.length - 1 && (
-                        <div className="w-1 h-20 bg-gradient-to-b from-blue-300 to-green-300 mx-auto mt-4 rounded-full"></div>
+                        <div className="step-connector"></div>
                       )}
                     </div>
-                    <div className="w-11/12 pl-8">
-                      <div
-                        className={`rounded-xl shadow-lg p-6 border transition-all duration-300 ${
-                          step.is_done
-                            ? "bg-green-50 border-green-200 hover:shadow-xl"
-                            : "bg-white border-gray-200 hover:shadow-xl"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <h2
-                            className={`text-2xl font-bold ${
-                              step.is_done ? "text-green-800" : "text-gray-800"
-                            }`}
+                    <div
+                      className={`step-card ${step.is_done ? "completed" : ""}`}
+                    >
+                      <div className="step-card-header">
+                        <h2 className="step-title">{step.title}</h2>
+                        {step.is_done && (
+                          <span className="completed-badge">✓ Completed</span>
+                        )}
+                      </div>
+                      <p className="step-description">{step.description}</p>
+                      <div className="duration-badge">
+                        <svg
+                          className="duration-icon"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <span className="duration-text">
+                          Duration: {step.duration}
+                        </span>
+                      </div>
+                      <hr className="resources-divider" />
+                      <div className="resources-header">
+                        <h3 className="resources-title">
+                          <svg
+                            className="resources-icon"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
                           >
-                            {step.title}
-                          </h2>
-                          {step.is_done && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              ✓ Completed
-                            </span>
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                            />
+                          </svg>
+                          Resources:
+                        </h3>
+                        <button
+                          onClick={() => toggleStepCompletion(step)}
+                          disabled={updatingStep === step.step_id}
+                          className={`mark-done-btn ${
+                            step.is_done ? "incomplete-btn" : "complete-btn"
+                          }`}
+                        >
+                          {updatingStep === step.step_id ? (
+                            <div className="btn-loading">
+                              <div className="loading-spinner"></div>
+                              Updating...
+                            </div>
+                          ) : step.is_done ? (
+                            "Mark as Incomplete"
+                          ) : (
+                            "Mark as Done"
                           )}
-                        </div>
-                        <p className="text-gray-600 mb-4 leading-relaxed">
-                          {step.description}
-                        </p>
-                        <div className="flex items-center mb-4">
-                          <div className="flex items-center bg-blue-50 px-3 py-1 rounded-full">
+                        </button>
+                      </div>
+                      <div className="resources-grid">
+                        {step.resources.map((resource, resIndex) => (
+                          <div key={resIndex} className="resource-item">
                             <svg
-                              className="w-4 h-4 text-blue-600 mr-2"
+                              className="resource-link-icon"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -400,100 +446,33 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
                               />
                             </svg>
-                            <span className="text-sm font-medium text-blue-800">
-                              Duration: {step.duration}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="border-t border-gray-200 pt-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-                              <svg
-                                className="w-5 h-5 text-green-600 mr-2"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
+                            {resource.includes("http") ? (
+                              <a
+                                href={resource.split("(")[1].slice(0, -1)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="resource-link"
                               >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                                />
-                              </svg>
-                              Resources:
-                            </h3>
-                            <button
-                              onClick={() => toggleStepCompletion(step)}
-                              disabled={updatingStep === step.step_id}
-                              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 shadow-md hover:shadow-lg ${
-                                step.is_done
-                                  ? "bg-red-100 text-red-700 hover:bg-red-200 border border-red-200"
-                                  : "bg-green-100 text-green-700 hover:bg-green-200 border border-green-200"
-                              }`}
-                            >
-                              {updatingStep === step.step_id ? (
-                                <div className="flex items-center">
-                                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2"></div>
-                                  Updating...
-                                </div>
-                              ) : step.is_done ? (
-                                "Mark as Incomplete"
-                              ) : (
-                                "Mark as Done"
-                              )}
-                            </button>
+                                {resource.split("(")[0].trim()}
+                              </a>
+                            ) : (
+                              <span className="resource-text">{resource}</span>
+                            )}
                           </div>
-                          <div className="grid grid-cols-1 gap-2">
-                            {step.resources.map((resource, resIndex) => (
-                              <div
-                                key={resIndex}
-                                className="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-100"
-                              >
-                                <svg
-                                  className="w-4 h-4 text-gray-500 mr-3 flex-shrink-0"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                                  />
-                                </svg>
-                                {resource.includes("http") ? (
-                                  <a
-                                    href={resource.split("(")[1].slice(0, -1)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-600 hover:text-blue-800 font-medium underline decoration-2 underline-offset-2"
-                                  >
-                                    {resource.split("(")[0].trim()}
-                                  </a>
-                                ) : (
-                                  <span className="text-gray-700">
-                                    {resource}
-                                  </span>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                        ))}
                       </div>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center py-12">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+              <div className="empty-state">
+                <div className="empty-icon-wrapper">
                   <svg
-                    className="w-8 h-8 text-gray-400"
+                    className="empty-icon"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -506,17 +485,14 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                     />
                   </svg>
                 </div>
-                <p className="text-gray-500 text-lg">
+                <p className="empty-text">
                   No roadmap available for this career.
                 </p>
               </div>
             )}
           </div>
-          <div className="text-center mt-12">
-            <button
-              onClick={onBack}
-              className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
+          <div className="back-button-wrapper">
+            <button onClick={onBack} className="back-button">
               ← Back to Dashboard
             </button>
           </div>
@@ -525,12 +501,12 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
 
       {/* Roadmap Feedback Modal */}
       {showFeedbackModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full mb-4">
+        <div className="feedback-modal-overlay">
+          <div className="feedback-modal">
+            <div className="modal-header">
+              <div className="modal-icon-wrapper">
                 <svg
-                  className="w-8 h-8 text-white"
+                  className="modal-icon"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -543,33 +519,29 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                🎉 Congratulations!
-              </h2>
-              <p className="text-gray-600">
+              <h2 className="modal-title">🎉 Congratulations!</h2>
+              <p className="modal-description">
                 You've completed the{" "}
-                <span className="font-semibold text-blue-600">
+                <span className="modal-career-name">
                   {roadmapData?.career_name}
                 </span>{" "}
                 learning roadmap!
               </p>
             </div>
 
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+            <div className="modal-body">
+              <h3 className="modal-body-title">
                 How was your learning experience?
               </h3>
 
               {/* Star Rating */}
-              <div className="flex justify-center gap-2 mb-4">
+              <div className="star-rating">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     onClick={() => setFeedbackRating(star)}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center text-2xl transition-all duration-200 ${
-                      star <= feedbackRating
-                        ? "text-yellow-400 bg-yellow-50"
-                        : "text-gray-300 hover:text-yellow-400"
+                    className={`star-button ${
+                      star <= feedbackRating ? "active" : ""
                     }`}
                   >
                     ★
@@ -582,18 +554,18 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                 value={feedbackText}
                 onChange={(e) => setFeedbackText(e.target.value)}
                 placeholder="Share your thoughts about this roadmap... (optional)"
-                className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="feedback-textarea"
                 rows={3}
               />
             </div>
 
-            <div className="flex gap-3">
+            <div className="modal-actions">
               <button
                 onClick={() => {
                   setShowFeedbackModal(false);
-                  setFeedbackDismissed(true); // Mark as dismissed for this session
+                  setFeedbackDismissed(true);
                 }}
-                className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="modal-button skip-btn"
                 disabled={submittingFeedback}
               >
                 Skip for Now
@@ -601,11 +573,11 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
               <button
                 onClick={handleSubmitFeedback}
                 disabled={submittingFeedback}
-                className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+                className="modal-button submit-btn"
               >
                 {submittingFeedback ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                  <div className="btn-loading">
+                    <div className="loading-spinner"></div>
                     Submitting...
                   </div>
                 ) : (

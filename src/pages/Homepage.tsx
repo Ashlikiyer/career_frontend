@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
 import FloatingChatbot from "../components/FloatingChatbot";
 import { getFeedbackAnalytics } from "../../services/dataService";
+import "./Homepage.css";
 
 const Homepage = () => {
   const navigate = useNavigate();
@@ -61,140 +62,165 @@ const Homepage = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <div className="homepage-container">
       {/* Hero Section */}
-      <div className="container mx-auto px-6 py-16">
-        <div className="text-center max-w-4xl mx-auto">
-          <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium mb-6">
-            🎓 Free Career Assessment
-          </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Discover Your
-            <span className="text-blue-600"> Future </span>
-            in Tech
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-            Take our AI-powered career assessment to find your perfect tech
-            career path. Get personalized recommendations based on your skills,
-            interests, and goals.
-          </p>
+      <div className="hero-section">
+        <div className="hero-background">
+          <div className="hero-shape hero-shape-1"></div>
+          <div className="hero-shape hero-shape-2"></div>
+          <div className="hero-shape hero-shape-3"></div>
+        </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button
-              onClick={handleStartAssessment}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center gap-2"
-            >
-              <span>Start Free Assessment</span>
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        <div className="container mx-auto px-6 py-20 relative z-10">
+          <div className="text-center max-w-5xl mx-auto">
+            <div className="badge-animated mb-6">
+              <span className="badge-icon">🎓</span>
+              <span className="badge-text">100% Free Career Assessment</span>
+            </div>
+
+            <h1 className="hero-title">
+              Discover Your
+              <span className="hero-title-highlight"> Dream Career </span>
+              in Technology
+            </h1>
+
+            <p className="hero-subtitle">
+              Unlock your potential with our AI-powered career assessment. Get
+              personalized recommendations tailored to your unique skills,
+              interests, and aspirations.
+              <strong> Join thousands of students</strong> who found their
+              perfect tech path.
+            </p>
+
+            <div className="hero-cta-container">
+              <button
+                onClick={handleStartAssessment}
+                className="cta-button cta-button-primary"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            </button>
-            <div className="flex items-center text-gray-500 text-sm">
-              <svg
-                className="w-4 h-4 mr-1"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Takes only 5 minutes
+                <span>Start Free Assessment</span>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+              </button>
+
+              <div className="hero-features">
+                <div className="hero-feature-item">
+                  <svg
+                    className="w-5 h-5 text-green-500"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>Takes only 5 minutes</span>
+                </div>
+                <div className="hero-feature-item">
+                  <svg
+                    className="w-5 h-5 text-green-500"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>No credit card required</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="trust-indicators">
+              <div className="trust-item">
+                <div className="trust-number">16+</div>
+                <div className="trust-label">Career Paths</div>
+              </div>
+              <div className="trust-item">
+                <div className="trust-number">1000+</div>
+                <div className="trust-label">Students Helped</div>
+              </div>
+              <div className="trust-item">
+                <div className="trust-number">4.8/5</div>
+                <div className="trust-label">Average Rating</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* How It Works Section */}
-      <div className="bg-white py-20">
+      <div className="section-how-it-works">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              How It Works
+          <div className="section-header">
+            <div className="section-badge">
+              <span className="badge-dot"></span>
+              <span>Simple Process</span>
+            </div>
+            <h2 className="section-title">
+              Your Journey in{" "}
+              <span className="text-gradient">3 Easy Steps</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Get started with your career discovery in just three simple steps
+            <p className="section-subtitle">
+              Get started with your career discovery journey today
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="steps-container">
             {/* Step 1 */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-2xl border border-blue-100 hover:shadow-lg transition-all duration-300 text-center group">
-              <div className="bg-blue-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-xl font-bold group-hover:scale-110 transition-transform duration-300">
-                1
+            <div className="step-card step-card-blue">
+              <div className="step-number-badge">
+                <span className="step-number">1</span>
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-900">
-                Take Assessment
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <div className="step-icon">
+                <svg
+                  className="w-12 h-12"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                  />
+                </svg>
+              </div>
+              <h3 className="step-title">Take Assessment</h3>
+              <p className="step-description">
                 Answer 10 thoughtful questions about your interests, skills, and
                 career preferences to help us understand your unique profile.
               </p>
+              <div className="step-feature-list">
+                <div className="step-feature">✓ 10 curated questions</div>
+                <div className="step-feature">✓ 5 minutes to complete</div>
+              </div>
             </div>
 
             {/* Step 2 */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-8 rounded-2xl border border-green-100 hover:shadow-lg transition-all duration-300 text-center group">
-              <div className="bg-green-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-xl font-bold group-hover:scale-110 transition-transform duration-300">
-                2
+            <div className="step-card step-card-green">
+              <div className="step-number-badge">
+                <span className="step-number">2</span>
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-900">
-                Get AI Recommendations
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Our advanced AI analyzes your responses and provides 5
-                personalized career recommendations from 16+ tech
-                specializations.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="bg-gradient-to-br from-purple-50 to-violet-50 p-8 rounded-2xl border border-purple-100 hover:shadow-lg transition-all duration-300 text-center group">
-              <div className="bg-purple-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-xl font-bold group-hover:scale-110 transition-transform duration-300">
-                3
-              </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-900">
-                Build Your Path
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Save your favorite careers and generate detailed 10-step
-                learning roadmaps with curated resources and timelines.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Features Section */}
-      <div className="bg-gradient-to-br from-slate-50 to-blue-50 py-20">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Why Choose Our System?
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Powerful features designed to guide you to your perfect tech
-              career
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Feature 1 */}
-            <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 text-center border border-gray-100">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <div className="step-icon">
                 <svg
-                  className="w-8 h-8 text-blue-600"
+                  className="w-12 h-12"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -207,46 +233,26 @@ const Homepage = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-900">
-                AI-Powered Matching
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Advanced machine learning algorithms analyze your responses to
-                provide highly accurate career recommendations.
+              <h3 className="step-title">Get AI Recommendations</h3>
+              <p className="step-description">
+                Our advanced AI analyzes your responses and provides 5
+                personalized career recommendations from 16+ tech
+                specializations.
               </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 text-center border border-gray-100">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
+              <div className="step-feature-list">
+                <div className="step-feature">✓ Top 5 matches</div>
+                <div className="step-feature">✓ Detailed insights</div>
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-900">
-                16+ Career Paths
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Explore diverse tech specializations from Web Development to
-                Machine Learning, each with detailed insights.
-              </p>
             </div>
 
-            {/* Feature 3 */}
-            <div className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 text-center border border-gray-100">
-              <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            {/* Step 3 */}
+            <div className="step-card step-card-purple">
+              <div className="step-number-badge">
+                <span className="step-number">3</span>
+              </div>
+              <div className="step-icon">
                 <svg
-                  className="w-8 h-8 text-purple-600"
+                  className="w-12 h-12"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -259,258 +265,44 @@ const Homepage = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold mb-4 text-gray-900">
-                Structured Roadmaps
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Get step-by-step learning paths with curated resources,
-                timelines, and milestones for your chosen career.
+              <h3 className="step-title">Build Your Path</h3>
+              <p className="step-description">
+                Save your favorite careers and generate detailed 10-step
+                learning roadmaps with curated resources and timelines.
               </p>
+              <div className="step-feature-list">
+                <div className="step-feature">✓ Custom roadmaps</div>
+                <div className="step-feature">✓ Curated resources</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* User Feedback Showcase */}
-      <div className="bg-white py-20">
+      {/* Features Section */}
+      <div className="section-features">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium mb-6">
-              ⭐ Student Feedback
+          <div className="section-header">
+            <div className="section-badge">
+              <span className="badge-dot"></span>
+              <span>Platform Features</span>
             </div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              What Our Students Are Saying
+            <h2 className="section-title">
+              Everything You Need to{" "}
+              <span className="text-gradient">Succeed</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Real feedback from students who have used our career assessment
-              system
+            <p className="section-subtitle">
+              Powerful features designed to guide you to your perfect tech
+              career
             </p>
           </div>
 
-          {isLoadingAnalytics ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-4 text-gray-600">Loading student feedback...</p>
-            </div>
-          ) : analytics ? (
-            <div className="max-w-4xl mx-auto">
-              {/* Summary Stats */}
-              <div className="grid md:grid-cols-4 gap-6 mb-12">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">
-                    {analytics.summary.totalFeedback}
-                  </div>
-                  <p className="text-gray-600">Total Reviews</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <span className="text-3xl font-bold text-green-600 mr-2">
-                      {analytics.summary.averageRating}
-                    </span>
-                    {renderStars(
-                      Math.round(parseFloat(analytics.summary.averageRating))
-                    )}
-                  </div>
-                  <p className="text-gray-600">Overall Rating</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-600 mb-2">
-                    {analytics.summary.assessmentFeedback || 0}
-                  </div>
-                  <p className="text-gray-600">Assessment Reviews</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-orange-600 mb-2">
-                    {analytics.summary.roadmapFeedback || 0}
-                  </div>
-                  <p className="text-gray-600">Roadmap Reviews</p>
-                </div>
-              </div>
-
-              {/* Rating Distribution Chart */}
-              {analytics.ratingDistribution && (
-                <div className="mb-8">
-                  <h3 className="text-xl font-bold text-center text-gray-800 mb-6">
-                    Rating Distribution
-                  </h3>
-                  <div className="grid md:grid-cols-2 gap-8">
-                    {/* Overall Distribution */}
-                    <div>
-                      <h4 className="text-lg font-semibold text-gray-700 mb-4 text-center">
-                        Overall Ratings
-                      </h4>
-                      <div className="space-y-3">
-                        {[5, 4, 3, 2, 1].map((rating) => {
-                          const count =
-                            analytics.ratingDistribution.overall?.[
-                              rating.toString()
-                            ] ||
-                            analytics.ratingDistribution[rating.toString()] ||
-                            0;
-                          const percentage =
-                            analytics.summary.totalFeedback > 0
-                              ? (count / analytics.summary.totalFeedback) * 100
-                              : 0;
-
-                          return (
-                            <div
-                              key={rating}
-                              className="flex items-center gap-3"
-                            >
-                              <div className="flex items-center gap-2 min-w-[60px]">
-                                {renderStars(rating)}
-                                <span className="text-sm font-medium text-gray-600">
-                                  {rating}
-                                </span>
-                              </div>
-                              <div className="flex-1 bg-gray-200 rounded-full h-3">
-                                <div
-                                  className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-3 rounded-full transition-all duration-500"
-                                  style={{ width: `${percentage}%` }}
-                                />
-                              </div>
-                              <span className="text-sm text-gray-600 min-w-[30px] text-right">
-                                {count}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Assessment vs Roadmap Comparison */}
-                    <div>
-                      <h4 className="text-lg font-semibold text-gray-700 mb-4 text-center">
-                        By Feedback Type
-                      </h4>
-                      <div className="space-y-4">
-                        <div className="bg-blue-50 p-4 rounded-lg">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium text-blue-800">
-                              Assessment
-                            </span>
-                            <span className="text-sm text-blue-600">
-                              {analytics.summary.assessmentAverage || "N/A"}
-                            </span>
-                          </div>
-                          <div className="flex items-center">
-                            {analytics.summary.assessmentAverage &&
-                              renderStars(
-                                Math.round(
-                                  parseFloat(
-                                    analytics.summary.assessmentAverage
-                                  )
-                                )
-                              )}
-                          </div>
-                        </div>
-                        <div className="bg-orange-50 p-4 rounded-lg">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium text-orange-800">
-                              Roadmap
-                            </span>
-                            <span className="text-sm text-orange-600">
-                              {analytics.summary.roadmapAverage || "N/A"}
-                            </span>
-                          </div>
-                          <div className="flex items-center">
-                            {analytics.summary.roadmapAverage &&
-                              renderStars(
-                                Math.round(
-                                  parseFloat(analytics.summary.roadmapAverage)
-                                )
-                              )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Recent Feedback */}
-              {analytics.recentFeedback &&
-                analytics.recentFeedback.length > 0 && (
-                  <div>
-                    <h3 className="text-2xl font-bold text-center text-gray-800 mb-8">
-                      Recent Student Experiences
-                    </h3>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      {analytics.recentFeedback
-                        .slice(0, 6)
-                        .map((feedback: any) => (
-                          <div
-                            key={feedback.id}
-                            className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
-                          >
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="flex items-center">
-                                {renderStars(feedback.rating)}
-                                <span className="ml-2 font-semibold text-gray-800">
-                                  {feedback.rating}/5
-                                </span>
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {new Date(
-                                  feedback.created_at
-                                ).toLocaleDateString()}
-                              </div>
-                            </div>
-                            {feedback.feedback_text && (
-                              <p className="text-gray-700 italic mb-3">
-                                "{feedback.feedback_text}"
-                              </p>
-                            )}
-                            <div className="flex items-center justify-between">
-                              <div className="text-sm text-gray-500">
-                                {feedback.feedback_type === "roadmap"
-                                  ? `Roadmap: ${
-                                      feedback.reference_name || "Career Path"
-                                    }`
-                                  : "Assessment Experience"}
-                              </div>
-                              <div
-                                className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  feedback.feedback_type === "roadmap"
-                                    ? "bg-orange-100 text-orange-800"
-                                    : "bg-blue-100 text-blue-800"
-                                }`}
-                              >
-                                {feedback.feedback_type === "roadmap"
-                                  ? "Roadmap"
-                                  : "Assessment"}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
-
-              {/* Call to Action */}
-              <div className="text-center mt-12">
-                <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-8 border border-green-200">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                    Join Our Community of Satisfied Students
-                  </h3>
-                  <p className="text-gray-600 mb-6">
-                    Take your career assessment and share your experience to
-                    help future students
-                  </p>
-                  <button
-                    onClick={handleStartAssessment}
-                    className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg"
-                  >
-                    Start Your Assessment Journey
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="text-gray-500 mb-4">
+          <div className="features-grid">
+            {/* Feature 1 */}
+            <div className="feature-card">
+              <div className="feature-icon feature-icon-blue">
                 <svg
-                  className="w-16 h-16 mx-auto mb-4 text-gray-300"
+                  className="w-8 h-8"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -519,47 +311,435 @@ const Homepage = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
                   />
                 </svg>
-                <p className="text-lg font-medium text-gray-600">
-                  Be the first to share your feedback!
-                </p>
-                <p className="text-gray-500">
-                  Take an assessment and help future students by sharing your
-                  experience.
-                </p>
               </div>
+              <h3 className="feature-title">AI-Powered Matching</h3>
+              <p className="feature-description">
+                Advanced machine learning algorithms analyze your responses to
+                provide highly accurate career recommendations tailored to you.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="feature-card">
+              <div className="feature-icon feature-icon-green">
+                <svg
+                  className="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+              </div>
+              <h3 className="feature-title">16+ Career Paths</h3>
+              <p className="feature-description">
+                Explore diverse tech specializations from Web Development to
+                Machine Learning, each with detailed insights and requirements.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="feature-card">
+              <div className="feature-icon feature-icon-purple">
+                <svg
+                  className="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                  />
+                </svg>
+              </div>
+              <h3 className="feature-title">Structured Roadmaps</h3>
+              <p className="feature-description">
+                Get step-by-step learning paths with curated resources,
+                timelines, and milestones for your chosen career path.
+              </p>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="feature-card">
+              <div className="feature-icon feature-icon-orange">
+                <svg
+                  className="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+              </div>
+              <h3 className="feature-title">Instant Results</h3>
+              <p className="feature-description">
+                Get your personalized career recommendations immediately after
+                completing the assessment. No waiting required.
+              </p>
+            </div>
+
+            {/* Feature 5 */}
+            <div className="feature-card">
+              <div className="feature-icon feature-icon-teal">
+                <svg
+                  className="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
+              </div>
+              <h3 className="feature-title">100% Free</h3>
+              <p className="feature-description">
+                Access all features completely free. No hidden costs, no credit
+                card required. Start your career journey today.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* User Feedback Showcase */}
+      <div className="section-testimonials">
+        <div className="container mx-auto px-6">
+          <div className="section-header">
+            <div className="section-badge">
+              <span className="badge-dot"></span>
+              <span>Student Success Stories</span>
+            </div>
+            <h2 className="section-title">
+              Loved by <span className="text-gradient">Students Worldwide</span>
+            </h2>
+            <p className="section-subtitle">
+              Real feedback from students who found their dream career path
+            </p>
+          </div>
+
+          {isLoadingAnalytics ? (
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+              <p className="loading-text">Loading student testimonials...</p>
+            </div>
+          ) : analytics ? (
+            <div className="testimonials-content">
+              {/* Stats Overview */}
+              <div className="stats-grid">
+                <div className="stat-card stat-card-blue">
+                  <div className="stat-icon">
+                    <svg
+                      className="w-8 h-8"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="stat-number">
+                    {analytics.summary.totalFeedback}
+                  </div>
+                  <div className="stat-label">Happy Students</div>
+                </div>
+
+                <div className="stat-card stat-card-green">
+                  <div className="stat-icon">
+                    <svg
+                      className="w-8 h-8"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="stat-number">
+                    {analytics.summary.averageRating}
+                  </div>
+                  <div className="stat-label">Average Rating</div>
+                </div>
+
+                <div className="stat-card stat-card-purple">
+                  <div className="stat-icon">
+                    <svg
+                      className="w-8 h-8"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="stat-number">
+                    {analytics.summary.assessmentFeedback || 0}
+                  </div>
+                  <div className="stat-label">Assessments Completed</div>
+                </div>
+
+                <div className="stat-card stat-card-orange">
+                  <div className="stat-icon">
+                    <svg
+                      className="w-8 h-8"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="stat-number">
+                    {analytics.summary.roadmapFeedback || 0}
+                  </div>
+                  <div className="stat-label">Roadmaps Generated</div>
+                </div>
+              </div>
+
+              {/* Testimonial Cards */}
+              {analytics.recentFeedback &&
+                analytics.recentFeedback.length > 0 && (
+                  <div className="testimonials-grid">
+                    {analytics.recentFeedback
+                      .slice(0, 6)
+                      .map((feedback: any, index: number) => (
+                        <div
+                          key={feedback.id}
+                          className="testimonial-card"
+                          style={{ animationDelay: `${index * 0.1}s` }}
+                        >
+                          <div className="testimonial-header">
+                            <div className="testimonial-avatar">
+                              <div className="avatar-placeholder">
+                                {feedback.user_name
+                                  ? feedback.user_name.charAt(0).toUpperCase()
+                                  : "U"}
+                              </div>
+                            </div>
+                            <div className="testimonial-user-info">
+                              <div className="testimonial-name">
+                                {feedback.user_name || "Anonymous Student"}
+                              </div>
+                              <div className="testimonial-role">
+                                {feedback.feedback_type === "roadmap"
+                                  ? feedback.reference_name ||
+                                    "Career Path Student"
+                                  : "Assessment Taker"}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="testimonial-rating">
+                            {renderStars(feedback.rating)}
+                          </div>
+
+                          {feedback.feedback_text && (
+                            <p className="testimonial-text">
+                              "{feedback.feedback_text}"
+                            </p>
+                          )}
+
+                          <div className="testimonial-footer">
+                            <div className="testimonial-badge">
+                              {feedback.feedback_type === "roadmap" ? (
+                                <>
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                                    />
+                                  </svg>
+                                  <span>Roadmap</span>
+                                </>
+                              ) : (
+                                <>
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                  </svg>
+                                  <span>Assessment</span>
+                                </>
+                              )}
+                            </div>
+                            <div className="testimonial-date">
+                              {new Date(feedback.created_at).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                }
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+
+              {/* CTA in Testimonials */}
+              <div className="testimonial-cta">
+                <div className="testimonial-cta-content">
+                  <h3 className="testimonial-cta-title">
+                    Ready to Write Your Success Story?
+                  </h3>
+                  <p className="testimonial-cta-text">
+                    Join thousands of satisfied students who discovered their
+                    perfect career path
+                  </p>
+                  <button
+                    onClick={handleStartAssessment}
+                    className="cta-button cta-button-primary"
+                  >
+                    <span>Start Your Free Assessment</span>
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="empty-testimonials">
+              <div className="empty-icon">
+                <svg
+                  className="w-20 h-20"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
+                </svg>
+              </div>
+              <h3 className="empty-title">Be the First to Share!</h3>
+              <p className="empty-text">
+                Start your career assessment journey and help future students by
+                sharing your experience
+              </p>
+              <button
+                onClick={handleStartAssessment}
+                className="cta-button cta-button-secondary"
+              >
+                Take Assessment Now
+              </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* CTA Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ready to Discover Your Tech Career?
-          </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of students who have found their perfect tech career
-            path
-          </p>
-          <button
-            onClick={handleStartAssessment}
-            className="bg-white text-blue-600 hover:bg-gray-50 font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
-          >
-            Start Your Journey Today
-          </button>
-        </div>
-      </div>
-
       {/* Footer */}
-      <footer className="bg-gray-900 py-8">
-        <div className="container mx-auto px-6 text-center">
-          <p className="text-gray-400">
-            © 2025 Career Path Recommendation System | Gordon College
-          </p>
+      <footer className="footer">
+        <div className="container mx-auto px-6 py-12">
+          <div className="footer-content">
+            <div className="footer-section">
+              <h3 className="footer-title">Career Path Finder</h3>
+              <p className="footer-text">
+                Empowering students to discover their perfect tech career
+                through AI-powered assessments.
+              </p>
+            </div>
+
+            <div className="footer-section">
+              <h4 className="footer-heading">Resources</h4>
+              <ul className="footer-links">
+                <li>
+                  <a href="/assessment">Take Assessment</a>
+                </li>
+                <li>
+                  <a href="/dashboard">Dashboard</a>
+                </li>
+                <li>
+                  <a href="/roadmap">Career Roadmaps</a>
+                </li>
+              </ul>
+            </div>
+
+            <div className="footer-section">
+              <h4 className="footer-heading">About</h4>
+              <ul className="footer-links">
+                <li>Gordon College</li>
+                <li>Career Development</li>
+                <li>© 2025 All Rights Reserved</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="footer-bottom">
+            <p className="footer-copyright">
+              © 2025 Career Path Recommendation System | Made with ❤️ for
+              students
+            </p>
+          </div>
         </div>
       </footer>
 

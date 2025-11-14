@@ -5,6 +5,7 @@ import FeedbackModal from "../components/ui/FeedbackModal";
 import { saveCareer } from "../../services/dataService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
+import "./Results.css";
 
 interface CareerSuggestion {
   career: string;
@@ -115,10 +116,10 @@ const Results = ({
 
   if (!recommendations.careers.length) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
-        <div className="flex-grow p-8 flex items-center justify-center">
-          <div className="bg-white rounded-xl shadow-lg p-8 border border-red-200">
-            <p className="text-red-600 text-center">
+      <div className="results-container">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="bg-white rounded-xl shadow-lg p-8 border-2 border-red-200 max-w-md">
+            <p className="text-red-600 text-center text-lg font-medium">
               No recommendations available.
             </p>
           </div>
@@ -128,27 +129,26 @@ const Results = ({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-      <style>
-        {`
-          @keyframes slideInFromRight {
-            0% {
-              transform: translateX(100%);
-              opacity: 0;
-            }
-            100% {
-              transform: translateX(0);
-              opacity: 1;
-            }
-          }
-          .animate-slide-in {
-            animation: slideInFromRight 0.3s ease-out forwards;
-          }
-        `}
-      </style>
-      <div className="pt-8 p-6 max-w-4xl mx-auto">
+    <div className="results-container">
+      <div className="max-w-6xl mx-auto">
         {error && (
-          <Alert variant="destructive" className="mb-6">
+          <Alert
+            variant="destructive"
+            className="fixed top-4 right-4 z-50 max-w-sm success-alert"
+          >
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
             <AlertTitle>Error</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
@@ -156,19 +156,29 @@ const Results = ({
         {success && (
           <Alert
             variant="success"
-            className="fixed top-4 right-4 z-50 max-w-sm animate-slide-in"
+            className="fixed top-4 right-4 z-50 max-w-sm success-alert"
           >
             <CheckCircle2Icon className="h-4 w-4" />
             <AlertTitle>Success!</AlertTitle>
             <AlertDescription>{success}</AlertDescription>
           </Alert>
         )}
+        {feedbackSuccess && (
+          <Alert
+            variant="success"
+            className="fixed top-4 right-4 z-50 max-w-sm success-alert"
+          >
+            <CheckCircle2Icon className="h-4 w-4" />
+            <AlertTitle>Success!</AlertTitle>
+            <AlertDescription>{feedbackSuccess}</AlertDescription>
+          </Alert>
+        )}
 
         {/* Header Section */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-green-500 rounded-full mb-6">
+        <div className="results-header">
+          <div className="results-icon-wrapper">
             <svg
-              className="w-8 h-8 text-white"
+              className="results-icon"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -181,10 +191,8 @@ const Results = ({
               />
             </svg>
           </div>
-          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-            Your Career Assessment Results
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <h2 className="results-title">Your Career Assessment Results</h2>
+          <p className="results-subtitle">
             Based on your assessment, we've identified career paths that align
             perfectly with your skills, interests, and aspirations.
           </p>
@@ -192,25 +200,23 @@ const Results = ({
 
         {/* Primary Career */}
         {recommendations.careers.length > 0 && (
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-6 text-center text-gray-700">
-              🎯 Your Best Match
-            </h3>
-            <div className="bg-white rounded-xl shadow-lg p-8 border-2 border-green-200 hover:border-green-300 transition-all duration-300 hover:shadow-xl">
-              <div className="flex justify-between items-start mb-6">
-                <h4 className="text-2xl font-bold text-gray-800">
+          <div className="primary-career-section">
+            <h3 className="section-title">🎯 Your Best Match</h3>
+            <div className="primary-career-card">
+              <div className="career-card-header">
+                <h4 className="career-name">
                   {recommendations.careers[0].career_name}
                 </h4>
-                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md">
+                <div className="match-badge">
                   {recommendations.careers[0].score}% Match
                 </div>
               </div>
               {recommendations.careers[0].reason && (
-                <p className="text-gray-600 italic mb-6 text-lg leading-relaxed">
+                <p className="career-reason">
                   {recommendations.careers[0].reason}
                 </p>
               )}
-              <div className="flex gap-3">
+              <div className="career-actions">
                 <button
                   onClick={() =>
                     handleSaveCareer(
@@ -224,11 +230,11 @@ const Results = ({
                     ) ||
                     savingCareers.has(recommendations.careers[0].career_name)
                   }
-                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
+                  className="save-career-btn"
                 >
                   {savingCareers.has(recommendations.careers[0].career_name) ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                      <div className="loading-spinner"></div>
                       Saving & Generating Roadmap...
                     </>
                   ) : selectedCareers.includes(
@@ -246,15 +252,13 @@ const Results = ({
 
         {/* Additional Careers */}
         {recommendations.careers.length > 1 && (
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-700">
-                🔍 Other Great Matches
-              </h3>
+          <div className="additional-careers-section">
+            <div className="section-header">
+              <h3 className="section-title">🔍 Other Great Matches</h3>
               {!showAllCareers && (
                 <button
                   onClick={() => setShowAllCareers(true)}
-                  className="text-blue-600 hover:text-blue-700 underline font-medium transition-colors duration-200"
+                  className="show-all-btn"
                 >
                   Show All {recommendations.careers.length - 1} Options
                 </button>
@@ -262,28 +266,17 @@ const Results = ({
             </div>
 
             {showAllCareers && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="careers-grid">
                 {recommendations.careers.slice(1).map((career, index) => (
-                  <div
-                    key={index + 1}
-                    className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300 animate-fade-in"
-                    style={{
-                      animationDelay: `${(index + 1) * 0.1}s`,
-                      animationFillMode: "both",
-                    }}
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <h4 className="text-lg font-semibold text-gray-800">
-                        {career.career_name}
-                      </h4>
-                      <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
+                  <div key={index + 1} className="career-card">
+                    <div className="career-card-header">
+                      <h4 className="career-name">{career.career_name}</h4>
+                      <div className="match-badge secondary">
                         {career.score}% Match
                       </div>
                     </div>
                     {career.reason && (
-                      <p className="text-gray-600 text-sm italic mb-4 leading-relaxed">
-                        {career.reason}
-                      </p>
+                      <p className="career-reason">{career.reason}</p>
                     )}
                     <button
                       onClick={() =>
@@ -293,11 +286,11 @@ const Results = ({
                         selectedCareers.includes(career.career_name) ||
                         savingCareers.has(career.career_name)
                       }
-                      className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 text-sm shadow-md hover:shadow-lg flex items-center justify-center disabled:cursor-not-allowed disabled:opacity-50"
+                      className="save-career-btn secondary"
                     >
                       {savingCareers.has(career.career_name) ? (
                         <>
-                          <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent mr-2"></div>
+                          <div className="loading-spinner"></div>
                           Saving...
                         </>
                       ) : selectedCareers.includes(career.career_name) ? (
@@ -314,27 +307,24 @@ const Results = ({
         )}
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
+        <div className="main-actions">
           <button
             onClick={() => navigate("/dashboard")}
-            className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="primary-action-btn"
           >
             View My Saved Careers ({selectedCareers.length})
           </button>
-          <button
-            onClick={onRestart}
-            className="bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-800 font-bold py-3 px-8 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg"
-          >
+          <button onClick={onRestart} className="secondary-action-btn">
             Retake Assessment
           </button>
         </div>
 
         {/* Learning Resources */}
-        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
-          <div className="flex items-center mb-6">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mr-3">
+        <div className="learning-resources">
+          <div className="resources-header">
+            <div className="resources-icon-wrapper">
               <svg
-                className="w-5 h-5 text-white"
+                className="resources-icon"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -347,32 +337,118 @@ const Results = ({
                 />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-gray-800">
-              Where to Learn?
-            </h3>
+            <h3 className="resources-title">Where to Learn?</h3>
           </div>
-          <p className="text-gray-600 mb-6 text-lg">
-            Enhance your skills with these recommended platforms:
+          <p className="resources-description">
+            Kickstart your career journey with these FREE learning platforms
+            designed to help you master new skills:
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <h4 className="font-semibold text-blue-800 mb-2">Coursera</h4>
-              <p className="text-blue-600 text-sm">
-                Courses in programming, data science, and design.
+          <div className="resources-grid">
+            <div className="resource-card">
+              <div className="resource-card-header">
+                <div className="resource-icon-badge">💻</div>
+                <h4 className="resource-name">freeCodeCamp</h4>
+                <span className="resource-tag">FREE</span>
+              </div>
+              <p className="resource-description">
+                Master web development, data science, and more with interactive
+                coding challenges and certifications.
               </p>
             </div>
-            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-              <h4 className="font-semibold text-green-800 mb-2">Codecademy</h4>
-              <p className="text-green-600 text-sm">
-                Interactive coding lessons for all levels.
+
+            <div className="resource-card">
+              <div className="resource-card-header">
+                <div className="resource-icon-badge">🎓</div>
+                <h4 className="resource-name">Codecademy</h4>
+                <span className="resource-tag">FREE</span>
+              </div>
+              <p className="resource-description">
+                Learn programming languages through hands-on interactive lessons
+                in Python, JavaScript, SQL, and more.
               </p>
             </div>
-            <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-              <h4 className="font-semibold text-purple-800 mb-2">
-                AWS Skill Builder
-              </h4>
-              <p className="text-purple-600 text-sm">
-                Cloud computing and technical training.
+
+            <div className="resource-card">
+              <div className="resource-card-header">
+                <div className="resource-icon-badge">📚</div>
+                <h4 className="resource-name">Coursera</h4>
+                <span className="resource-tag">FREE</span>
+              </div>
+              <p className="resource-description">
+                Access university-level courses from top institutions. Audit
+                courses for free or pay for certificates.
+              </p>
+            </div>
+
+            <div className="resource-card">
+              <div className="resource-card-header">
+                <div className="resource-icon-badge">🚀</div>
+                <h4 className="resource-name">The Odin Project</h4>
+                <span className="resource-tag">FREE</span>
+              </div>
+              <p className="resource-description">
+                Complete full-stack web development curriculum with real
+                projects and supportive community.
+              </p>
+            </div>
+
+            <div className="resource-card">
+              <div className="resource-card-header">
+                <div className="resource-icon-badge">🌟</div>
+                <h4 className="resource-name">Khan Academy</h4>
+                <span className="resource-tag">FREE</span>
+              </div>
+              <p className="resource-description">
+                Build foundational skills in math, computer science, and more
+                with personalized learning paths.
+              </p>
+            </div>
+
+            <div className="resource-card">
+              <div className="resource-card-header">
+                <div className="resource-icon-badge">📖</div>
+                <h4 className="resource-name">MDN Web Docs</h4>
+                <span className="resource-tag">FREE</span>
+              </div>
+              <p className="resource-description">
+                Comprehensive documentation and tutorials for web technologies
+                from Mozilla Developer Network.
+              </p>
+            </div>
+
+            <div className="resource-card">
+              <div className="resource-card-header">
+                <div className="resource-icon-badge">☁️</div>
+                <h4 className="resource-name">AWS Skill Builder</h4>
+                <span className="resource-tag">FREE</span>
+              </div>
+              <p className="resource-description">
+                Learn cloud computing with Amazon Web Services through free
+                training courses and hands-on labs.
+              </p>
+            </div>
+
+            <div className="resource-card">
+              <div className="resource-card-header">
+                <div className="resource-icon-badge">🐍</div>
+                <h4 className="resource-name">Python.org</h4>
+                <span className="resource-tag">FREE</span>
+              </div>
+              <p className="resource-description">
+                Official Python documentation with beginner guides, tutorials,
+                and comprehensive references.
+              </p>
+            </div>
+
+            <div className="resource-card">
+              <div className="resource-card-header">
+                <div className="resource-icon-badge">🎯</div>
+                <h4 className="resource-name">Google Digital Garage</h4>
+                <span className="resource-tag">FREE</span>
+              </div>
+              <p className="resource-description">
+                Free courses on digital marketing, data analytics, career
+                development, and more from Google.
               </p>
             </div>
           </div>

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
+import "./Dashboard.css";
 
 interface SavedCareer {
   saved_career_id: number;
@@ -148,13 +149,13 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
+      <div className="dashboard-container">
         <div className="flex-grow p-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-green-500 rounded-full mb-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="dashboard-header">
+              <div className="dashboard-icon-wrapper">
                 <svg
-                  className="w-8 h-8 text-white"
+                  className="dashboard-icon"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -167,20 +168,15 @@ const Dashboard = () => {
                   />
                 </svg>
               </div>
-              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-                Your Career Dashboard
-              </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              <h2 className="dashboard-title">Your Career Dashboard</h2>
+              <p className="dashboard-subtitle">
                 View your saved career paths with automatically generated
                 learning roadmaps.
               </p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            <div className="careers-grid">
               {Array.from({ length: 3 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="relative p-6 bg-white rounded-xl shadow-lg border border-gray-200"
-                >
+                <div key={index} className="skeleton-card">
                   <div className="flex flex-col space-y-3">
                     <Skeleton className="h-6 w-3/4 rounded-md bg-gray-200" />
                     <div className="space-y-2">
@@ -200,10 +196,23 @@ const Dashboard = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
+      <div className="dashboard-container">
         <div className="flex-grow p-8 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-xl shadow-lg border border-red-200">
-            <p className="text-red-700">{error}</p>
+          <div className="empty-state max-w-lg">
+            <div className="empty-icon-wrapper">
+              <svg
+                className="empty-icon"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <p className="text-red-700 text-lg font-medium">{error}</p>
           </div>
         </div>
       </div>
@@ -221,41 +230,21 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
-      <style>
-        {`
-          @keyframes slideInFromRight {
-            0% {
-              transform: translateX(100%);
-              opacity: 0;
-            }
-            100% {
-              transform: translateX(0);
-              opacity: 1;
-            }
-          }
-          .animate-slide-in {
-            animation: slideInFromRight 0.3s ease-out forwards;
-          }
-        `}
-      </style>
+    <div className="dashboard-container">
       <div className="flex-grow p-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {success && (
-            <Alert
-              variant="success"
-              className="fixed top-4 right-4 z-50 max-w-sm animate-slide-in"
-            >
+            <Alert variant="success" className="success-alert">
               <CheckCircle2Icon className="h-4 w-4" />
               <AlertTitle>Success!</AlertTitle>
               <AlertDescription>{success}</AlertDescription>
             </Alert>
           )}
 
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-green-500 rounded-full mb-6">
+          <div className="dashboard-header">
+            <div className="dashboard-icon-wrapper">
               <svg
-                className="w-8 h-8 text-white"
+                className="dashboard-icon"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -268,20 +257,18 @@ const Dashboard = () => {
                 />
               </svg>
             </div>
-            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-              Your Career Collection
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <h2 className="dashboard-title">Your Career Collection</h2>
+            <p className="dashboard-subtitle">
               Explore your saved careers with automatically generated learning
               roadmaps ready to guide your journey.
             </p>
           </div>
 
           {savedCareers.length === 0 ? (
-            <div className="text-center p-8 bg-white rounded-xl shadow-lg border border-gray-200">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-100 to-green-100 rounded-full mb-4">
+            <div className="empty-state">
+              <div className="empty-icon-wrapper">
                 <svg
-                  className="w-6 h-6 text-blue-600"
+                  className="empty-icon"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -294,74 +281,31 @@ const Dashboard = () => {
                   />
                 </svg>
               </div>
-              <p className="text-gray-600 text-lg mb-6">
+              <p className="empty-text">
                 No saved careers yet. Take the assessment to discover your path!
               </p>
-              <button
-                onClick={handleStartAssessment}
-                className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
-              >
+              <button onClick={handleStartAssessment} className="action-button">
                 Start Assessment
               </button>
             </div>
           ) : (
             <>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              <div className="careers-grid">
                 {savedCareers.map((career) => (
-                  <div
-                    key={career.saved_career_id}
-                    className="relative p-6 bg-gradient-to-br from-white to-blue-50/30 rounded-xl shadow-lg border-2 border-gray-200 hover:border-blue-400 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-grow">
-                        <div className="flex items-center flex-wrap gap-2 mb-3">
-                          <h3 className="text-xl font-bold text-gray-800">
-                            {career.career_name}
-                          </h3>
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-green-500 to-green-600 text-white shadow-sm">
-                            🗺️ Learning Path Ready
-                          </span>
-                        </div>
-                        <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                          {careerDescriptions[career.career_name] ||
-                            "Explore exciting opportunities in this field with structured learning paths designed for success."}
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
-                          <div className="flex items-center">
-                            <svg
-                              className="w-3 h-3 mr-1"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            Saved{" "}
-                            {new Date(career.saved_at).toLocaleDateString()}
-                          </div>
-                          <div className="flex items-center text-green-600 font-medium">
-                            <svg
-                              className="w-3 h-3 mr-1"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            Auto-generated roadmap
-                          </div>
-                        </div>
+                  <div key={career.saved_career_id} className="career-card">
+                    <div className="career-card-header">
+                      <div className="career-card-title-wrapper">
+                        <h3 className="career-card-title">
+                          {career.career_name}
+                        </h3>
+                        <span className="roadmap-badge">
+                          🗺️ Learning Path Ready
+                        </span>
                       </div>
                       <div className="relative">
                         <button
                           onClick={() => toggleMenu(career.saved_career_id)}
-                          className="p-2 text-gray-500 hover:text-gray-700 focus:outline-none rounded-lg hover:bg-gray-100 transition-colors"
+                          className="menu-button"
                         >
                           <svg
                             className="w-5 h-5"
@@ -372,7 +316,7 @@ const Dashboard = () => {
                           </svg>
                         </button>
                         {menuOpenId === career.saved_career_id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-10">
+                          <div className="menu-dropdown">
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <button
@@ -382,7 +326,7 @@ const Dashboard = () => {
                                       careerName: career.career_name,
                                     })
                                   }
-                                  className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-t-xl transition-colors"
+                                  className="menu-delete-btn"
                                 >
                                   Delete
                                 </button>
@@ -416,33 +360,65 @@ const Dashboard = () => {
                         )}
                       </div>
                     </div>
-                    <div className="mt-6">
-                      <button
-                        onClick={() =>
-                          handleViewRoadmap(
-                            career.saved_career_id,
-                            career.career_name
-                          )
-                        }
-                        className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center group"
-                      >
-                        <span className="mr-2">🚀</span>
-                        Start Learning Path
+                    <p className="career-card-description">
+                      {careerDescriptions[career.career_name] ||
+                        "Explore exciting opportunities in this field with structured learning paths designed for success."}
+                    </p>
+                    <div className="career-card-meta">
+                      <div className="meta-item">
                         <svg
-                          className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                          className="meta-icon"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
                         >
                           <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M13 7l5 5m0 0l-5 5m5-5H6"
+                            fillRule="evenodd"
+                            d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                            clipRule="evenodd"
                           />
                         </svg>
-                      </button>
+                        Saved {new Date(career.saved_at).toLocaleDateString()}
+                      </div>
+                      <div className="meta-item success">
+                        <svg
+                          className="meta-icon"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        Auto-generated roadmap
+                      </div>
                     </div>
+                    <button
+                      onClick={() =>
+                        handleViewRoadmap(
+                          career.saved_career_id,
+                          career.career_name
+                        )
+                      }
+                      className="start-learning-btn"
+                    >
+                      <span>🚀</span>
+                      Start Learning Path
+                      <svg
+                        className="btn-arrow"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 7l5 5m0 0l-5 5m5-5H6"
+                        />
+                      </svg>
+                    </button>
                   </div>
                 ))}
               </div>
@@ -451,7 +427,7 @@ const Dashboard = () => {
                 <div className="text-center mb-12">
                   <button
                     onClick={handleStartAssessment}
-                    className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                    className="action-button"
                   >
                     Take Another Assessment
                   </button>
@@ -468,11 +444,11 @@ const Dashboard = () => {
             />
           )}
 
-          <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
-            <div className="flex items-center mb-6">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mr-3">
+          <div className="learning-resources">
+            <div className="resources-header">
+              <div className="resources-icon-wrapper">
                 <svg
-                  className="w-5 h-5 text-white"
+                  className="resources-icon"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -485,56 +461,150 @@ const Dashboard = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800">
-                Where to Learn?
-              </h3>
+              <h3 className="resources-title">Where to Learn?</h3>
             </div>
-            <p className="text-gray-600 mb-6 text-lg">
-              Enhance your skills with these recommended platforms:
+            <p className="resources-description">
+              Start learning today with these top-rated FREE platforms trusted
+              by millions of learners worldwide:
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 hover:shadow-md transition-shadow">
-                <h4 className="font-bold text-blue-800 mb-2">Coursera</h4>
-                <p className="text-blue-600 text-sm mb-3">
-                  Courses in programming, data science, and design.
+            <div className="resources-grid">
+              <div className="resource-card blue">
+                <h4 className="resource-card-title">🎓 freeCodeCamp</h4>
+                <p className="resource-card-description">
+                  100% FREE certifications in web development, data science,
+                  Python, and more. Hands-on projects with real code.
                 </p>
                 <a
-                  href="https://www.coursera.org"
+                  href="https://www.freecodecamp.org"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-700 hover:text-blue-800 font-medium text-sm underline decoration-2 underline-offset-2"
+                  className="resource-card-link"
                 >
-                  Visit Coursera →
+                  Start Learning Free →
                 </a>
               </div>
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200 hover:shadow-md transition-shadow">
-                <h4 className="font-bold text-green-800 mb-2">Codecademy</h4>
-                <p className="text-green-600 text-sm mb-3">
-                  Interactive coding lessons for all levels.
+              <div className="resource-card green">
+                <h4 className="resource-card-title">💻 Codecademy (Free)</h4>
+                <p className="resource-card-description">
+                  Interactive coding lessons FREE for beginners. Learn Python,
+                  JavaScript, HTML/CSS, SQL, and more.
                 </p>
                 <a
-                  href="https://www.codecademy.com"
+                  href="https://www.codecademy.com/catalog/subject/all"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-green-700 hover:text-green-800 font-medium text-sm underline decoration-2 underline-offset-2"
+                  className="resource-card-link"
                 >
-                  Visit Codecademy →
+                  Browse Free Courses →
                 </a>
               </div>
-              <div className="p-4 bg-purple-50 rounded-lg border border-purple-200 hover:shadow-md transition-shadow">
-                <h4 className="font-bold text-purple-800 mb-2">
-                  AWS Skill Builder
+              <div className="resource-card purple">
+                <h4 className="resource-card-title">
+                  📚 Coursera (Free Audit)
                 </h4>
-                <p className="text-purple-600 text-sm mb-3">
-                  Cloud computing and technical training.
+                <p className="resource-card-description">
+                  Audit courses FREE from top universities (Stanford, Yale,
+                  MIT). Pay only if you want certificates.
+                </p>
+                <a
+                  href="https://www.coursera.org/courses?query=free"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="resource-card-link"
+                >
+                  Explore Free Courses →
+                </a>
+              </div>
+              <div className="resource-card blue">
+                <h4 className="resource-card-title">🌐 The Odin Project</h4>
+                <p className="resource-card-description">
+                  Completely FREE full-stack web development curriculum. From
+                  zero to job-ready developer.
+                </p>
+                <a
+                  href="https://www.theodinproject.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="resource-card-link"
+                >
+                  Start Full Course →
+                </a>
+              </div>
+              <div className="resource-card green">
+                <h4 className="resource-card-title">🎬 Khan Academy</h4>
+                <p className="resource-card-description">
+                  FREE courses in computer programming, computer science, math,
+                  and more. Perfect for all ages.
+                </p>
+                <a
+                  href="https://www.khanacademy.org/computing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="resource-card-link"
+                >
+                  Learn for Free →
+                </a>
+              </div>
+              <div className="resource-card purple">
+                <h4 className="resource-card-title">📖 MDN Web Docs</h4>
+                <p className="resource-card-description">
+                  FREE comprehensive web development documentation and
+                  tutorials. The gold standard for web developers.
+                </p>
+                <a
+                  href="https://developer.mozilla.org/en-US/docs/Learn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="resource-card-link"
+                >
+                  Start Learning →
+                </a>
+              </div>
+              <div className="resource-card blue">
+                <h4 className="resource-card-title">☁️ AWS Skill Builder</h4>
+                <p className="resource-card-description">
+                  FREE cloud computing training from Amazon. Essential for
+                  modern tech careers and DevOps.
                 </p>
                 <a
                   href="https://skillbuilder.aws"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-purple-700 hover:text-purple-800 font-medium text-sm underline decoration-2 underline-offset-2"
+                  className="resource-card-link"
                 >
-                  Visit AWS Skill Builder →
+                  Start Free Training →
+                </a>
+              </div>
+              <div className="resource-card green">
+                <h4 className="resource-card-title">🐍 Python.org Tutorial</h4>
+                <p className="resource-card-description">
+                  Official FREE Python tutorial from the creators. Perfect
+                  starting point for Python programming.
+                </p>
+                <a
+                  href="https://docs.python.org/3/tutorial/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="resource-card-link"
+                >
+                  Learn Python Free →
+                </a>
+              </div>
+              <div className="resource-card purple">
+                <h4 className="resource-card-title">
+                  🎨 Google Digital Garage
+                </h4>
+                <p className="resource-card-description">
+                  FREE courses in digital marketing, data science, and career
+                  development with Google certification.
+                </p>
+                <a
+                  href="https://learndigital.withgoogle.com/digitalgarage"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="resource-card-link"
+                >
+                  Get Certified Free →
                 </a>
               </div>
             </div>
