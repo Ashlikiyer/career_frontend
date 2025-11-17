@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/dataService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle2Icon } from "lucide-react";
+import { CheckCircle2Icon, Eye, EyeOff } from "lucide-react";
 import "./Auth.css";
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
@@ -74,65 +76,15 @@ const Register = () => {
         <div className="auth-info-section">
           <div className="auth-logo-container">
             <div className="auth-logo">
-              <img
-                src="src/assets/Career_logo.svg"
-                alt="Career Guidance Logo"
-              />
+              <img src="/Career_logo.svg" alt="Career Guidance Logo" />
             </div>
           </div>
 
           <div className="auth-info-content">
-            <h2 className="auth-info-title">Start Your Career Journey Today</h2>
+            <h2 className="auth-info-title">Start Your Career Journey</h2>
             <p className="auth-info-description">
-              AI-Powered Career Guidance and Roadmap Generation System for CCS
-              Students at Gordon College. Complete our assessment, get
-              GroqAI-powered career suggestions, and access personalized
-              learning roadmaps for IT careers.
+              Discover your perfect career path with AI-powered guidance.
             </p>
-
-            <div className="auth-info-features">
-              <div className="auth-feature-item">
-                <div className="auth-feature-icon">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <span className="auth-feature-text">
-                  Free Career Assessment
-                </span>
-              </div>
-              <div className="auth-feature-item">
-                <div className="auth-feature-icon">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <span className="auth-feature-text">AI-Generated Roadmaps</span>
-              </div>
-              <div className="auth-feature-item">
-                <div className="auth-feature-icon">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <span className="auth-feature-text">Progress Tracking</span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -219,15 +171,43 @@ const Register = () => {
                 </svg>
                 Password
               </label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="auth-form-input"
-                placeholder="Create a strong password"
-                required
-              />
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="auth-form-input"
+                  placeholder="Create a strong password"
+                  required
+                  style={{ paddingRight: "2.5rem" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "0.75rem",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0.25rem",
+                    color: "#9ca3af",
+                  }}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="auth-form-group">
@@ -247,15 +227,45 @@ const Register = () => {
                 </svg>
                 Confirm Password
               </label>
-              <input
-                type="password"
-                id="confirm-password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="auth-form-input"
-                placeholder="Confirm your password"
-                required
-              />
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirm-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="auth-form-input"
+                  placeholder="Confirm your password"
+                  required
+                  style={{ paddingRight: "2.5rem" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "0.75rem",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0.25rem",
+                    color: "#9ca3af",
+                  }}
+                  aria-label={
+                    showConfirmPassword ? "Hide password" : "Show password"
+                  }
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <button type="submit" className="auth-submit-button">

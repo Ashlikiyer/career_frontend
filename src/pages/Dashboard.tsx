@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
-import { fetchSavedCareers, deleteCareer } from "../../services/dataService";
+import {
+  fetchSavedCareers,
+  deleteCareer,
+  getRoadmapProgress,
+} from "../../services/dataService";
 import RoadmapModal from "@/components/modal/RoadmapModal";
 import RoadmapPage from "../pages/Roadmap";
 import FloatingChatbot from "../components/FloatingChatbot";
@@ -26,6 +30,11 @@ interface SavedCareer {
   user_id: number;
   career_name: string;
   saved_at: string;
+  progress?: {
+    total_steps: number;
+    completed_steps: number;
+    is_completed: boolean;
+  };
 }
 
 const careerDescriptions: { [key: string]: string } = {
@@ -72,7 +81,35 @@ const Dashboard = () => {
         const fetchedCareers = Array.isArray(data)
           ? data
           : [data].filter(Boolean);
-        setSavedCareers(fetchedCareers);
+
+        // Fetch progress for each career
+        const careersWithProgress = await Promise.all(
+          fetchedCareers.map(async (career) => {
+            try {
+              const progressData = await getRoadmapProgress(
+                career.saved_career_id
+              );
+              return {
+                ...career,
+                progress: {
+                  total_steps: progressData.total_steps || 0,
+                  completed_steps: progressData.completed_steps || 0,
+                  is_completed:
+                    progressData.completed_steps === progressData.total_steps &&
+                    progressData.total_steps > 0,
+                },
+              };
+            } catch (error) {
+              console.error(
+                `Failed to fetch progress for career ${career.saved_career_id}:`,
+                error
+              );
+              return career; // Return career without progress if fetch fails
+            }
+          })
+        );
+
+        setSavedCareers(careersWithProgress);
 
         const elapsedTime = Date.now() - startTime;
         const minimumLoadingTime = 2000;
@@ -298,9 +335,37 @@ const Dashboard = () => {
                         <h3 className="career-card-title">
                           {career.career_name}
                         </h3>
-                        <span className="roadmap-badge">
-                          🗺️ Learning Path Ready
-                        </span>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          <span className="roadmap-badge">
+                            🗺️ Learning Path Ready
+                          </span>
+                          {career.progress?.is_completed && (
+                            <span
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "0.25rem",
+                                padding: "0.375rem 0.75rem",
+                                background:
+                                  "linear-gradient(135deg, #10b981, #059669)",
+                                color: "white",
+                                fontSize: "0.75rem",
+                                fontWeight: "600",
+                                borderRadius: "8px",
+                                boxShadow: "0 2px 8px rgba(16, 185, 129, 0.3)",
+                              }}
+                            >
+                              ✓ Completed
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="relative">
                         <button
@@ -364,6 +429,47 @@ const Dashboard = () => {
                       {careerDescriptions[career.career_name] ||
                         "Explore exciting opportunities in this field with structured learning paths designed for success."}
                     </p>
+                    {career.progress && (
+                      <div
+                        style={{
+                          marginTop: "0.75rem",
+                          marginBottom: "0.5rem",
+                          fontSize: "0.875rem",
+                          color: "#6b7280",
+                        }}
+                      >
+                        <div style={{ marginBottom: "0.375rem" }}>
+                          Progress: {career.progress.completed_steps} /{" "}
+                          {career.progress.total_steps} steps
+                        </div>
+                        <div
+                          style={{
+                            width: "100%",
+                            height: "6px",
+                            background: "#e5e7eb",
+                            borderRadius: "9999px",
+                            overflow: "hidden",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: `${
+                                career.progress.total_steps > 0
+                                  ? (career.progress.completed_steps /
+                                      career.progress.total_steps) *
+                                    100
+                                  : 0
+                              }%`,
+                              height: "100%",
+                              background: career.progress.is_completed
+                                ? "linear-gradient(135deg, #10b981, #059669)"
+                                : "linear-gradient(135deg, #3b82f6, #2563eb)",
+                              transition: "width 0.3s ease",
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
                     <div className="career-card-meta">
                       <div className="meta-item">
                         <svg

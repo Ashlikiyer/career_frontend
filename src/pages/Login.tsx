@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/dataService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle2Icon } from "lucide-react";
+import { CheckCircle2Icon, Eye, EyeOff } from "lucide-react";
 import "./Auth.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
@@ -65,69 +66,16 @@ const Login = () => {
         <div className="auth-info-section">
           <div className="auth-logo-container">
             <div className="auth-logo">
-              <img
-                src="src/assets/Career_logo.svg"
-                alt="Career Guidance Logo"
-              />
+              <img src="/Career_logo.svg" alt="Career Guidance Logo" />
             </div>
           </div>
 
           <div className="auth-info-content">
-            <h2 className="auth-info-title">
-              Welcome to AI Career Guidance System
-            </h2>
+            <h2 className="auth-info-title">AI Career Guidance System</h2>
             <p className="auth-info-description">
-              AI-Powered Career Guidance and Roadmap Generation System for CCS
-              Students at Gordon College. Complete our assessment, get
-              GroqAI-powered career suggestions, and access personalized
-              learning roadmaps for IT careers.
+              Get AI-powered career suggestions and personalized learning
+              roadmaps.
             </p>
-
-            <div className="auth-info-features">
-              <div className="auth-feature-item">
-                <div className="auth-feature-icon">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <span className="auth-feature-text">
-                  GroqAI-Powered Career Recommendations
-                </span>
-              </div>
-              <div className="auth-feature-item">
-                <div className="auth-feature-icon">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <span className="auth-feature-text">
-                  Personalized Learning Roadmaps
-                </span>
-              </div>
-              <div className="auth-feature-item">
-                <div className="auth-feature-icon">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <span className="auth-feature-text">Track Your Progress</span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -186,15 +134,43 @@ const Login = () => {
                 </svg>
                 Password
               </label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="auth-form-input"
-                placeholder="••••••••"
-                required
-              />
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="auth-form-input"
+                  placeholder="••••••••"
+                  required
+                  style={{ paddingRight: "2.5rem" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "0.75rem",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0.25rem",
+                    color: "#9ca3af",
+                  }}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <button type="submit" className="auth-submit-button">
