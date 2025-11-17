@@ -451,23 +451,216 @@
   transform: scale(1.1);
 }
 
-/* ========== MOBILE RESPONSIVE ========== */
+/* ========== MOBILE RESPONSIVE - COMPREHENSIVE ========== */
+
+/* Mobile devices - Full responsive support */
 @media (max-width: 768px) {
+  /* CRITICAL: Override all group-data collapsible hiding on mobile */
+  [data-mobile="true"] .group-data-\[collapsible\=icon\]\:hidden,
+  [data-mobile="true"] [class*="group-data-[collapsible"]:hidden,
+  [data-mobile="true"] .group-data-\[collapsible\=icon\]\:opacity-0 {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Ensure mobile sidebar takes appropriate width */
   [data-mobile="true"] {
     width: 100% !important;
-    max-width: 320px;
+    max-width: 85vw !important; /* 85% of viewport width for better visibility */
+    min-width: 280px !important; /* Minimum width for content readability */
   }
   
+  /* Optimize header for mobile */
   [data-sidebar="header"] {
-    padding: 1rem;
+    padding: 1.25rem 1rem;
+    min-height: auto;
+  }
+
+  [data-sidebar="header"] h3,
+  [data-sidebar="header"] .sidebar-brand {
+    font-size: 1.125rem;
   }
   
+  /* Optimize content scrolling */
   [data-sidebar="content"] {
-    padding: 0.75rem;
+    padding: 0.875rem 0.75rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(100vh - 200px); /* Account for header and footer */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+
+  /* Larger tap targets for mobile */
+  [data-sidebar="menu-button"] {
+    padding: 1rem 0.875rem;
+    font-size: 1rem;
+    min-height: 48px; /* WCAG minimum touch target */
+  }
+
+  [data-sidebar="menu-button"] svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Ensure text is visible and readable */
+  [data-sidebar="menu-button"] > span:last-child {
+    font-weight: 500;
+    letter-spacing: 0.01em;
   }
   
+  /* Optimize footer for mobile */
   [data-sidebar="footer"] {
-    padding: 1rem;
+    padding: 1rem 0.875rem;
+    min-height: auto;
+  }
+
+  /* Larger logout button on mobile */
+  [data-sidebar="footer"] [data-sidebar="menu-button"] {
+    padding: 0.875rem;
+    min-height: 44px;
+  }
+
+  /* Group labels more compact on mobile */
+  [data-sidebar="group-label"] {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.6875rem;
+  }
+
+  /* Sub-menu items */
+  [data-sidebar="menu-sub"] {
+    margin-left: 1.5rem;
+  }
+
+  [data-sidebar="menu-sub-button"] {
+    padding: 0.75rem;
+    font-size: 0.9375rem;
+    min-height: 44px;
+  }
+
+  /* User profile in footer */
+  [data-sidebar="footer"] .user-profile {
+    padding: 0.875rem;
+  }
+
+  [data-sidebar="footer"] .user-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 1.125rem;
+  }
+
+  [data-sidebar="footer"] .user-name {
+    font-size: 0.9375rem;
+  }
+
+  [data-sidebar="footer"] .user-email {
+    font-size: 0.8125rem;
+  }
+}
+
+/* Small mobile devices (320px - 480px) */
+@media (max-width: 480px) {
+  [data-mobile="true"] {
+    max-width: 90vw !important; /* Use more screen width on small devices */
+    min-width: 280px !important;
+  }
+
+  [data-sidebar="header"] {
+    padding: 1rem 0.875rem;
+  }
+
+  [data-sidebar="header"] h3,
+  [data-sidebar="header"] .sidebar-brand {
+    font-size: 1rem;
+  }
+
+  [data-sidebar="content"] {
+    padding: 0.75rem 0.625rem;
+  }
+
+  [data-sidebar="menu-button"] {
+    padding: 0.875rem 0.75rem;
+    font-size: 0.9375rem;
+  }
+
+  [data-sidebar="group-label"] {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.625rem;
+  }
+
+  [data-sidebar="footer"] {
+    padding: 0.875rem 0.75rem;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+  [data-sidebar="content"] {
+    max-height: calc(100vh - 140px); /* Reduce header/footer space */
+    padding: 0.5rem;
+  }
+
+  [data-sidebar="header"] {
+    padding: 0.75rem 1rem;
+    min-height: 3rem;
+  }
+
+  [data-sidebar="footer"] {
+    padding: 0.75rem 1rem;
+    min-height: 3rem;
+  }
+
+  [data-sidebar="menu-button"] {
+    padding: 0.625rem 0.875rem;
+    min-height: 40px;
+  }
+
+  [data-sidebar="footer"] .user-profile {
+    padding: 0.5rem;
+  }
+}
+
+/* Ensure Sheet content displays properly on mobile */
+@media (max-width: 768px) {
+  /* Override any Sheet constraints */
+  [data-slot="sidebar"][data-mobile="true"] {
+    width: 85vw !important;
+    max-width: 400px !important;
+    min-width: 280px !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Ensure full height on mobile */
+  [data-mobile="true"] .flex.h-full {
+    min-height: 100vh;
+    height: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Fix any potential overflow issues */
+  [data-mobile="true"] [data-sidebar="sidebar"] {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Ensure all sidebar elements are visible on mobile */
+  [data-mobile="true"] [data-sidebar="header"],
+  [data-mobile="true"] [data-sidebar="content"],
+  [data-mobile="true"] [data-sidebar="footer"],
+  [data-mobile="true"] [data-sidebar="menu"],
+  [data-mobile="true"] [data-sidebar="menu-button"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Force menu items to show */
+  [data-mobile="true"] [data-sidebar="menu-item"] {
+    display: block !important;
+    visibility: visible !important;
   }
 }
 

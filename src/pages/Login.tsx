@@ -1,115 +1,228 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/dataService";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CheckCircle2Icon } from "lucide-react";
+import "./Auth.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     setMessage("");
+
     try {
       const response = await loginUser({ email, password });
       setMessage(response.message || "Login successful!");
-      navigate("/"); // Changed to redirect to homepage
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Login failed. Please try again.";
+      setIsSuccess(true);
+      setTimeout(() => {
+        setMessage("");
+        navigate("/");
+      }, 2000);
+    } catch (error: any) {
+      // Prevent any navigation/redirect on error
+      e.preventDefault();
+
+      let errorMessage = "Login failed. Please try again.";
+
+      // Handle different error types
+      if (error.response?.status === 401) {
+        errorMessage = "Invalid email or password. Account does not exist.";
+      } else if (error.response?.status === 404) {
+        errorMessage = "Account not found. Please check your credentials.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+
       setMessage(errorMessage);
+      setIsSuccess(false);
+      setTimeout(() => setMessage(""), 5000);
     }
+
+    return false;
   };
 
   return (
-    <div>
-      <section className="bg-[#111827] min-h-screen flex items-center justify-center">
-        <div className="container mx-auto px-4 py-8 flex items-center justify-center">
-          <div className="flex w-full max-w-5xl">
-            <div className="w-1/2 p-8 text-white flex flex-col items-start justify-center">
-              <div
-                className="-mb-8 -mt-15 ml-10"
-                style={{ height: "250px", overflow: "hidden" }}
-              >
-                <img
-                  src="src/assets/logo.svg"
-                  className="w-full h-full object-contain"
-                  alt="CareerML Logo"
-                />
-              </div>
-              <p className="text-lg text-center -ml-25">
-                Discover your ideal career with AI-powered recommendations. Take
-                the assessment and start your journey today!
-              </p>
-            </div>
+    <div className="auth-container">
+      {/* Animated Background */}
+      <div className="auth-background">
+        <div className="auth-shape auth-shape-1"></div>
+        <div className="auth-shape auth-shape-2"></div>
+        <div className="auth-shape auth-shape-3"></div>
+      </div>
 
-            <div className="w-1/2 p-8 bg-white rounded-lg shadow-lg">
-              <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 mb-6">
-                Sign in to your account
-              </h1>
-              <form className="space-y-4" onSubmit={handleSubmit}>
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block mb-2 text-sm font-medium text-gray-900"
-                  >
-                    Your email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    placeholder="name@company.com"
-                    required
-                  />
+      {/* Main Content */}
+      <div className="auth-content-wrapper">
+        {/* Left Side - Branding */}
+        <div className="auth-info-section">
+          <div className="auth-logo-container">
+            <div className="auth-logo">
+              <img
+                src="src/assets/Career_logo.svg"
+                alt="Career Guidance Logo"
+              />
+            </div>
+          </div>
+
+          <div className="auth-info-content">
+            <h2 className="auth-info-title">
+              Welcome to AI Career Guidance System
+            </h2>
+            <p className="auth-info-description">
+              AI-Powered Career Guidance and Roadmap Generation System for CCS
+              Students at Gordon College. Complete our assessment, get
+              GroqAI-powered career suggestions, and access personalized
+              learning roadmaps for IT careers.
+            </p>
+
+            <div className="auth-info-features">
+              <div className="auth-feature-item">
+                <div className="auth-feature-icon">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
                 </div>
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block mb-2 text-sm font-medium text-gray-900"
-                  >
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    required
-                  />
+                <span className="auth-feature-text">
+                  GroqAI-Powered Career Recommendations
+                </span>
+              </div>
+              <div className="auth-feature-item">
+                <div className="auth-feature-icon">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
                 </div>
-                <button
-                  type="submit"
-                  className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                >
-                  Sign in
-                </button>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-light text-gray-500">
-                    Don’t have an account yet?{" "}
-                    <a
-                      href="/register"
-                      className="font-medium text-blue-600 hover:underline"
-                    >
-                      Sign up
-                    </a>
-                  </p>
+                <span className="auth-feature-text">
+                  Personalized Learning Roadmaps
+                </span>
+              </div>
+              <div className="auth-feature-item">
+                <div className="auth-feature-icon">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
                 </div>
-              </form>
-              {message && <p className="mt-4 text-sm text-center">{message}</p>}
+                <span className="auth-feature-text">Track Your Progress</span>
+              </div>
             </div>
           </div>
         </div>
-      </section>
+
+        {/* Right Side - Form */}
+        <div className="auth-form-section">
+          <div className="auth-form-header">
+            <h1 className="auth-form-title">Sign In</h1>
+            <p className="auth-form-subtitle">
+              Welcome back! Please login to your account.
+            </p>
+          </div>
+
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <div className="auth-form-group">
+              <label htmlFor="email" className="auth-form-label">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="auth-form-input"
+                placeholder="your.email@gordon.edu.ph"
+                required
+              />
+            </div>
+
+            <div className="auth-form-group">
+              <label htmlFor="password" className="auth-form-label">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="auth-form-input"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            <button type="submit" className="auth-submit-button">
+              Sign In
+            </button>
+          </form>
+
+          {message && (
+            <Alert
+              variant={isSuccess ? "success" : "destructive"}
+              className="fixed top-4 right-4 z-50 max-w-sm success-alert"
+            >
+              <CheckCircle2Icon className="h-4 w-4" />
+              <AlertTitle>{isSuccess ? "Success!" : "Error"}</AlertTitle>
+              <AlertDescription>{message}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="auth-form-footer">
+            <p className="auth-form-footer-text">
+              Don't have an account?{" "}
+              <a href="/register" className="auth-form-link">
+                Sign up here
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

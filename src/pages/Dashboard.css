@@ -543,29 +543,97 @@
   box-shadow: var(--dashboard-card-shadow);
 }
 
-/* === Responsive Design === */
-@media (max-width: 768px) {
+/* === Responsive Design - Comprehensive === */
+
+/* Large desktop (1200px+) */
+@media (min-width: 1200px) {
+  .careers-grid {
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  }
+}
+
+/* Desktop (992px - 1199px) */
+@media (max-width: 1199px) {
+  .dashboard-title {
+    font-size: 2.25rem;
+  }
+
+  .careers-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.75rem;
+  }
+}
+
+/* Tablet landscape (768px - 991px) */
+@media (max-width: 991px) {
+  .dashboard-container {
+    padding: 1.5rem;
+  }
+
+  .dashboard-header {
+    padding: 1.5rem 1rem;
+    margin-bottom: 2.5rem;
+  }
+
   .dashboard-title {
     font-size: 2rem;
   }
 
   .dashboard-subtitle {
+    font-size: 0.9375rem;
+  }
+
+  .careers-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .learning-resources {
+    padding: 2rem;
+  }
+
+  .resources-title {
+    font-size: 1.5rem;
+  }
+
+  .resources-description {
     font-size: 1rem;
+  }
+}
+
+/* Tablet portrait and large mobile (640px - 767px) */
+@media (max-width: 767px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .dashboard-header {
+    padding: 1.25rem 1rem;
+    margin-bottom: 2rem;
   }
 
   .dashboard-icon-wrapper {
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
   }
 
   .dashboard-icon {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .dashboard-title {
+    font-size: 1.875rem;
+  }
+
+  .dashboard-subtitle {
+    font-size: 0.9375rem;
   }
 
   .careers-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+    padding: 0;
   }
 
   .career-card {
@@ -576,16 +644,241 @@
     font-size: 1.25rem;
   }
 
+  .career-card-description {
+    font-size: 0.875rem;
+  }
+
+  .career-card-meta {
+    font-size: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .start-learning-btn {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.9375rem;
+  }
+
   .learning-resources {
     padding: 1.75rem;
   }
 
+  .resources-header {
+    gap: 0.75rem;
+  }
+
+  .resources-icon-wrapper {
+    width: 42px;
+    height: 42px;
+  }
+
+  .resources-icon {
+    width: 21px;
+    height: 21px;
+  }
+
   .resources-title {
-    font-size: 1.5rem;
+    font-size: 1.375rem;
+  }
+
+  .resources-description {
+    font-size: 1rem;
+    margin-bottom: 1.75rem;
   }
 
   .resources-grid {
     grid-template-columns: 1fr;
+  }
+
+  .resource-card {
+    padding: 1.5rem;
+  }
+}
+
+/* Mobile landscape and large phones (481px - 639px) */
+@media (max-width: 639px) {
+  .dashboard-title {
+    font-size: 1.75rem;
+  }
+
+  .career-card {
+    padding: 1.25rem;
+  }
+
+  .career-card-title {
+    font-size: 1.125rem;
+  }
+
+  .roadmap-badge {
+    padding: 0.4375rem 0.875rem;
+    font-size: 0.6875rem;
+  }
+
+  .learning-resources {
+    padding: 1.5rem;
+  }
+
+  .resources-title {
+    font-size: 1.25rem;
+  }
+
+  .resources-description {
+    font-size: 0.9375rem;
+  }
+
+  .resource-card-title {
+    font-size: 1rem;
+  }
+
+  .resource-card-description {
+    font-size: 0.8125rem;
+  }
+}
+
+/* Mobile portrait (max-width: 480px) */
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 0.75rem;
+  }
+
+  .dashboard-header {
+    padding: 1rem 0.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .dashboard-icon-wrapper {
+    width: 52px;
+    height: 52px;
+  }
+
+  .dashboard-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .dashboard-title {
+    font-size: 1.625rem;
+  }
+
+  .dashboard-subtitle {
+    font-size: 0.875rem;
+  }
+
+  .careers-grid {
+    gap: 1.25rem;
+  }
+
+  .career-card {
+    padding: 1.125rem;
+  }
+
+  .career-card-title {
+    font-size: 1.0625rem;
+  }
+
+  .career-card-description {
+    font-size: 0.8125rem;
+    margin-bottom: 1rem;
+  }
+
+  .career-card-meta {
+    font-size: 0.6875rem;
+    gap: 0.625rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .meta-icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  .roadmap-badge {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.625rem;
+  }
+
+  .start-learning-btn {
+    padding: 0.8125rem 1.125rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-arrow {
+    width: 16px;
+    height: 16px;
+  }
+
+  .empty-state {
+    padding: 3rem 1.5rem;
+  }
+
+  .empty-icon-wrapper {
+    width: 56px;
+    height: 56px;
+  }
+
+  .empty-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .empty-text {
+    font-size: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .action-button {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .learning-resources {
+    padding: 1.25rem;
+  }
+
+  .resources-header {
+    gap: 0.625rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .resources-icon-wrapper {
+    width: 38px;
+    height: 38px;
+  }
+
+  .resources-icon {
+    width: 19px;
+    height: 19px;
+  }
+
+  .resources-title {
+    font-size: 1.125rem;
+  }
+
+  .resources-description {
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .resources-grid {
+    gap: 1.25rem;
+  }
+
+  .resource-card {
+    padding: 1.25rem;
+  }
+
+  .resource-card-title {
+    font-size: 0.9375rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .resource-card-description {
+    font-size: 0.75rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .resource-card-link {
+    font-size: 0.8125rem;
   }
 
   .success-alert {
@@ -593,10 +886,73 @@
     right: 1rem;
     left: 1rem;
     max-width: none;
+    padding: 1rem;
   }
 }
 
-/* === Accessibility === */
+/* Ultra small mobile (max-width: 360px) */
+@media (max-width: 360px) {
+  .dashboard-title {
+    font-size: 1.5rem;
+  }
+
+  .dashboard-subtitle {
+    font-size: 0.8125rem;
+  }
+
+  .career-card {
+    padding: 1rem;
+  }
+
+  .career-card-title {
+    font-size: 1rem;
+  }
+
+  .career-card-description {
+    font-size: 0.75rem;
+  }
+
+  .resources-title {
+    font-size: 1rem;
+  }
+
+  .resource-card-title {
+    font-size: 0.875rem;
+  }
+}
+
+/* Landscape orientation */
+@media (max-height: 600px) and (orientation: landscape) {
+  .dashboard-header {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .dashboard-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 0.75rem;
+  }
+
+  .dashboard-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .dashboard-subtitle {
+    font-size: 0.875rem;
+  }
+
+  .careers-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .learning-resources {
+    padding: 1.25rem;
+  }
+}
+
+/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -620,7 +976,16 @@
   outline-offset: 2px;
 }
 
-/* === Print Styles === */
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .career-card,
+  .learning-resources,
+  .resource-card {
+    border-width: 2px;
+  }
+}
+
+/* Print Styles */
 @media print {
   .dashboard-container {
     background: white;

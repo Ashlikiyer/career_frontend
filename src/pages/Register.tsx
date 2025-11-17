@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/dataService";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CheckCircle2Icon } from "lucide-react";
+import "./Auth.css";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -8,153 +11,279 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [username, setUsername] = useState("");
   const [message, setMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setMessage(""); // Clear previous message
+    e.stopPropagation();
+    setMessage("");
+
     if (password !== confirmPassword) {
       setMessage("Passwords do not match!");
-      return;
+      setIsSuccess(false);
+      setTimeout(() => setMessage(""), 5000);
+      return false;
     }
+
     try {
       const response = await registerUser({ username, email, password });
-      setMessage(response.message || "Registration successful!");
-      // Redirect to login after successful registration
-      setTimeout(() => navigate("/login"), 2000); // Delay for user feedback
-    } catch (error) {
       setMessage(
-        error instanceof Error
-          ? error.message
-          : "Registration failed. Please try again."
+        response.message || "Registration successful! Redirecting to login..."
       );
+      setIsSuccess(true);
+      setTimeout(() => {
+        setMessage("");
+        navigate("/login");
+      }, 2500);
+    } catch (error: any) {
+      // Prevent any navigation/redirect on error
+      e.preventDefault();
+
+      let errorMessage = "Registration failed. Please try again.";
+
+      // Handle different error types
+      if (error.response?.status === 409 || error.response?.status === 400) {
+        errorMessage = "Email already exists. Please use a different email.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+
+      setMessage(errorMessage);
+      setIsSuccess(false);
+      setTimeout(() => setMessage(""), 5000);
     }
+
+    return false;
   };
 
   return (
-    <div>
-      <section className="bg-[#111827] min-h-screen flex items-center justify-center">
-        <div className="container mx-auto px-4 py-8 flex items-center justify-center">
-          <div className="flex w-full max-w-5xl">
-            {/* Left Side (Logo and Description) */}
-            <div className="w-1/2 p-8 text-white flex flex-col items-start justify-center">
-              <div
-                className="-mb-8 -mt-15 ml-10"
-                style={{ height: "250px", overflow: "hidden" }}
-              >
-                <img
-                  src="src/assets/logo.svg"
-                  className="w-full h-full object-contain"
-                  alt="CareerML Logo"
-                />
-              </div>
-              <p className="text-lg text-center -ml-25">
-                Discover your ideal career with ML-powered recommendations. Take
-                the assessment and start your journey today!
-              </p>
-            </div>
+    <div className="auth-container">
+      {/* Animated Background */}
+      <div className="auth-background">
+        <div className="auth-shape auth-shape-1"></div>
+        <div className="auth-shape auth-shape-2"></div>
+        <div className="auth-shape auth-shape-3"></div>
+      </div>
 
-            {/* Right Side (Register Form) */}
-            <div className="w-1/2 p-8 bg-white rounded-lg shadow-lg">
-              <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 mb-6">
-                Create your account
-              </h1>
-              <form className="space-y-4" onSubmit={handleSubmit}>
-                <div>
-                  <label
-                    htmlFor="username"
-                    className="block mb-2 text-sm font-medium text-gray-900"
-                  >
-                    Your username
-                  </label>
-                  <input
-                    type="text"
-                    name="username"
-                    id="username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    placeholder="Username"
-                    required
-                  />
+      {/* Main Content */}
+      <div className="auth-content-wrapper">
+        {/* Left Side - Branding */}
+        <div className="auth-info-section">
+          <div className="auth-logo-container">
+            <div className="auth-logo">
+              <img
+                src="src/assets/Career_logo.svg"
+                alt="Career Guidance Logo"
+              />
+            </div>
+          </div>
+
+          <div className="auth-info-content">
+            <h2 className="auth-info-title">Start Your Career Journey Today</h2>
+            <p className="auth-info-description">
+              AI-Powered Career Guidance and Roadmap Generation System for CCS
+              Students at Gordon College. Complete our assessment, get
+              GroqAI-powered career suggestions, and access personalized
+              learning roadmaps for IT careers.
+            </p>
+
+            <div className="auth-info-features">
+              <div className="auth-feature-item">
+                <div className="auth-feature-icon">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
                 </div>
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block mb-2 text-sm font-medium text-gray-900"
-                  >
-                    Your email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    placeholder="name@company.com"
-                    required
-                  />
+                <span className="auth-feature-text">
+                  Free Career Assessment
+                </span>
+              </div>
+              <div className="auth-feature-item">
+                <div className="auth-feature-icon">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
                 </div>
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block mb-2 text-sm font-medium text-gray-900"
-                  >
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    required
-                  />
+                <span className="auth-feature-text">AI-Generated Roadmaps</span>
+              </div>
+              <div className="auth-feature-item">
+                <div className="auth-feature-icon">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
                 </div>
-                <div>
-                  <label
-                    htmlFor="confirm-password"
-                    className="block mb-2 text-sm font-medium text-gray-900"
-                  >
-                    Confirm Password
-                  </label>
-                  <input
-                    type="password"
-                    name="confirm-password"
-                    id="confirm-password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                >
-                  Sign up
-                </button>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-light text-gray-500">
-                    Already have an account?{" "}
-                    <a
-                      href="/login"
-                      className="font-medium text-blue-600 hover:underline"
-                    >
-                      Sign in here
-                    </a>
-                  </p>
-                </div>
-              </form>
-              {message && <p className="mt-4 text-sm text-center">{message}</p>}
+                <span className="auth-feature-text">Progress Tracking</span>
+              </div>
             </div>
           </div>
         </div>
-      </section>
+
+        {/* Right Side - Form */}
+        <div className="auth-form-section">
+          <div className="auth-form-header">
+            <h1 className="auth-form-title">Create Account</h1>
+            <p className="auth-form-subtitle">
+              Join us and discover your perfect career path.
+            </p>
+          </div>
+
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <div className="auth-form-group">
+              <label htmlFor="username" className="auth-form-label">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+                Username
+              </label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="auth-form-input"
+                placeholder="Choose a username"
+                required
+              />
+            </div>
+
+            <div className="auth-form-group">
+              <label htmlFor="email" className="auth-form-label">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="auth-form-input"
+                placeholder="your.email@gordon.edu.ph"
+                required
+              />
+            </div>
+
+            <div className="auth-form-group">
+              <label htmlFor="password" className="auth-form-label">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="auth-form-input"
+                placeholder="Create a strong password"
+                required
+              />
+            </div>
+
+            <div className="auth-form-group">
+              <label htmlFor="confirm-password" className="auth-form-label">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="confirm-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="auth-form-input"
+                placeholder="Confirm your password"
+                required
+              />
+            </div>
+
+            <button type="submit" className="auth-submit-button">
+              Create Account
+            </button>
+          </form>
+
+          {message && (
+            <Alert
+              variant={isSuccess ? "success" : "destructive"}
+              className="fixed top-4 right-4 z-50 max-w-sm success-alert"
+            >
+              <CheckCircle2Icon className="h-4 w-4" />
+              <AlertTitle>{isSuccess ? "Success!" : "Error"}</AlertTitle>
+              <AlertDescription>{message}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="auth-form-footer">
+            <p className="auth-form-footer-text">
+              Already have an account?{" "}
+              <a href="/login" className="auth-form-link">
+                Sign in here
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

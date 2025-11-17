@@ -250,7 +250,7 @@ const Assessment = () => {
             setCurrentQuestion(data);
             setAssessmentId(data.assessment_id || null);
             setError(null);
-          } catch (retryErr) {
+          } catch {
             setError("Failed to start assessment. Please try again.");
           }
         } else {

@@ -31,7 +31,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
           const messages = JSON.parse(chatHistory);
           const lastVisitTime = new Date(lastVisit);
           const hasNewMessages = messages.some(
-            (msg: any) =>
+            (msg: { type: string; timestamp: string }) =>
               msg.type === "bot" && new Date(msg.timestamp) > lastVisitTime
           );
           setHasUnreadMessages(hasNewMessages && !isOpen);
@@ -84,12 +84,12 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
         <div
           className={`fixed z-50 ${
             position === "bottom-right"
-              ? "bottom-6 right-6"
+              ? "bottom-4 right-4 sm:bottom-6 sm:right-6"
               : position === "bottom-left"
-              ? "bottom-6 left-6"
+              ? "bottom-4 left-4 sm:bottom-6 sm:left-6"
               : position === "top-right"
-              ? "top-6 right-6"
-              : "top-6 left-6"
+              ? "top-4 right-4 sm:top-6 sm:right-6"
+              : "top-4 left-4 sm:top-6 sm:left-6"
           }`}
         >
           {customTriggerButton ? (
@@ -103,15 +103,15 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
             </div>
           ) : (
             <button
-              className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 border-none rounded-full cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 relative overflow-hidden"
+              className="flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-indigo-500 to-purple-600 border-none rounded-full cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 relative overflow-hidden"
               onClick={handleOpen}
               aria-label="Open IT Career Assistant"
               title="Need help with your IT career? Click to chat!"
             >
-              <span className="text-2xl transition-all duration-300 hover:scale-125">
+              <span className="text-xl sm:text-2xl transition-all duration-300 hover:scale-125">
                 🤖
               </span>
-              <span className="text-lg transition-all duration-300 hover:translate-x-0.5">
+              <span className="text-base sm:text-lg transition-all duration-300 hover:translate-x-0.5">
                 💬
               </span>
               {hasUnreadMessages && showUnreadIndicator && (
@@ -130,7 +130,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
       {/* Modal Overlay */}
       {isOpen && (
         <div
-          className={`fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex items-center justify-center animate-fade-in ${
+          className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fade-in ${
             theme === "dark" ? "bg-black/70" : ""
           }`}
           onClick={handleClose}
@@ -139,28 +139,29 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
           aria-labelledby="chatbot-title"
         >
           <div
-            className={`w-full max-w-lg max-h-[80vh] min-h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-slide-in ${
+            className={`w-full sm:w-[95vw] sm:max-w-md md:max-w-lg lg:max-w-xl h-[100vh] sm:h-auto sm:max-h-[85vh] sm:min-h-[500px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-slide-up sm:animate-slide-in ${
               isMinimized ? "max-h-12 overflow-hidden" : ""
-            } ${
-              position.includes("bottom") ? "fixed bottom-24" : "fixed top-4"
-            } ${position.includes("right") ? "right-6" : "left-6"}`}
+            }`}
             onClick={(e) => e.stopPropagation()}
             onKeyDown={handleKeyDown}
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 flex items-center justify-between relative border-b border-white/10">
-              <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-3 sm:p-4 flex items-center justify-between relative border-b border-white/10 flex-shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <div
-                  className="w-2.5 h-2.5 bg-green-400 rounded-full shadow-lg animate-pulse"
+                  className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-green-400 rounded-full shadow-lg animate-pulse"
                   title="Chatbot is online"
                 ></div>
-                <h3 id="chatbot-title" className="text-lg font-semibold">
+                <h3
+                  id="chatbot-title"
+                  className="text-base sm:text-lg font-semibold"
+                >
                   IT Career Assistant
                 </h3>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-1.5 sm:gap-2">
                 <button
-                  className="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-all duration-200 hover:scale-105"
+                  className="hidden sm:flex bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-lg items-center justify-center text-sm transition-all duration-200 hover:scale-105"
                   onClick={isMinimized ? handleMaximize : handleMinimize}
                   aria-label={isMinimized ? "Maximize chat" : "Minimize chat"}
                   title={isMinimized ? "Maximize" : "Minimize"}
@@ -197,7 +198,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
 
       {/* Keyboard shortcuts hint */}
       {isOpen && (
-        <div className="fixed bottom-2.5 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-full text-sm z-50 opacity-70 pointer-events-none">
+        <div className="hidden sm:block fixed bottom-2.5 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-full text-sm z-50 opacity-70 pointer-events-none">
           Press ESC to close chat
         </div>
       )}

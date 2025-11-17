@@ -1,8 +1,12 @@
 import axios, { AxiosRequestConfig, ResponseType } from "axios";
 import { Cookies } from "react-cookie";
 
+// API Configuration - Change this URL when deploying to production
+const API_URL = "https://career.careerapp.xyz"; // For production (remove trailing slash)
+// const API_URL = "http://localhost:5000"; // Uncomment for local development
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://career.careerapp.xyz/",
+  baseURL: API_URL,
   withCredentials: true, // REQUIRED for sessions
   timeout: 10000, // 10 second timeout
   headers: {
@@ -37,9 +41,13 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       cookies.remove("authToken", { path: "/" });
-      // Redirect to login if needed
+
+      // Only redirect to login if we're NOT already on the login or register page
       if (typeof window !== "undefined") {
-        window.location.href = "/login";
+        const currentPath = window.location.pathname;
+        if (currentPath !== "/login" && currentPath !== "/register") {
+          window.location.href = "/login";
+        }
       }
     }
     return Promise.reject(error);

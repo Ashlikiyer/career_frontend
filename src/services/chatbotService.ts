@@ -74,7 +74,10 @@ class ChatbotService {
   private retryDelay: number = 1000;
 
   constructor() {
-    this.apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    // API Configuration - Change this URL when deploying to production
+    const API_URL = "https://career.careerapp.xyz"; // For production (remove trailing slash)
+    // const API_URL = "http://localhost:5000"; // Uncomment for local development
+    this.apiBaseUrl = API_URL;
   }
 
   /**
@@ -91,7 +94,7 @@ class ChatbotService {
   private getCookieToken(): string | null {
     try {
       const cookies = document.cookie.split(';');
-      for (let cookie of cookies) {
+      for (const cookie of cookies) {
         const [name, value] = cookie.trim().split('=');
         if (name === 'authToken') {
           return value;

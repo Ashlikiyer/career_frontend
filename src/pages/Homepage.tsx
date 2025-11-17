@@ -79,17 +79,17 @@ const Homepage = () => {
             </div>
 
             <h1 className="hero-title">
-              Discover Your
-              <span className="hero-title-highlight"> Dream Career </span>
-              in Technology
+              AI-Powered{" "}
+              <span className="hero-title-highlight">Career Guidance</span> for
+              CCS Students
             </h1>
 
             <p className="hero-subtitle">
-              Unlock your potential with our AI-powered career assessment. Get
-              personalized recommendations tailored to your unique skills,
-              interests, and aspirations.
-              <strong> Join thousands of students</strong> who found their
-              perfect tech path.
+              A specialized career assessment system for Gordon College CCS
+              students. Using GroqAI technology, we analyze your responses to
+              recommend IT career paths and generate personalized learning
+              roadmaps.
+              <strong> Start your tech career journey today.</strong>
             </p>
 
             <div className="hero-cta-container">
@@ -148,16 +148,16 @@ const Homepage = () => {
             {/* Trust Indicators */}
             <div className="trust-indicators">
               <div className="trust-item">
-                <div className="trust-number">16+</div>
-                <div className="trust-label">Career Paths</div>
+                <div className="trust-number">IT</div>
+                <div className="trust-label">Focused Careers</div>
               </div>
               <div className="trust-item">
-                <div className="trust-number">1000+</div>
-                <div className="trust-label">Students Helped</div>
+                <div className="trust-number">CCS</div>
+                <div className="trust-label">Gordon College</div>
               </div>
               <div className="trust-item">
-                <div className="trust-number">4.8/5</div>
-                <div className="trust-label">Average Rating</div>
+                <div className="trust-number">GroqAI</div>
+                <div className="trust-label">Powered</div>
               </div>
             </div>
           </div>
@@ -204,12 +204,13 @@ const Homepage = () => {
               </div>
               <h3 className="step-title">Take Assessment</h3>
               <p className="step-description">
-                Answer 10 thoughtful questions about your interests, skills, and
-                career preferences to help us understand your unique profile.
+                Complete a comprehensive quiz-style assessment similar to NCAE
+                career evaluation. You must reach at least 90% completion before
+                receiving career recommendations.
               </p>
               <div className="step-feature-list">
-                <div className="step-feature">✓ 10 curated questions</div>
-                <div className="step-feature">✓ 5 minutes to complete</div>
+                <div className="step-feature">✓ 90% completion required</div>
+                <div className="step-feature">✓ 5-10 minutes to complete</div>
               </div>
             </div>
 
@@ -235,13 +236,13 @@ const Homepage = () => {
               </div>
               <h3 className="step-title">Get AI Recommendations</h3>
               <p className="step-description">
-                Our advanced AI analyzes your responses and provides 5
-                personalized career recommendations from 16+ tech
-                specializations.
+                GroqAI analyzes your assessment responses to recommend IT
+                careers such as Software Developer, Cybersecurity Analyst, UI/UX
+                Designer, Data Analyst, and more.
               </p>
               <div className="step-feature-list">
-                <div className="step-feature">✓ Top 5 matches</div>
-                <div className="step-feature">✓ Detailed insights</div>
+                <div className="step-feature">✓ GroqAI-powered analysis</div>
+                <div className="step-feature">✓ IT-focused careers only</div>
               </div>
             </div>
 
@@ -267,12 +268,13 @@ const Homepage = () => {
               </div>
               <h3 className="step-title">Build Your Path</h3>
               <p className="step-description">
-                Save your favorite careers and generate detailed 10-step
-                learning roadmaps with curated resources and timelines.
+                Save your chosen career and get an AI-generated roadmap
+                outlining skills, tools, and learning steps. Track your progress
+                with Done/Not Done markers and provide feedback.
               </p>
               <div className="step-feature-list">
-                <div className="step-feature">✓ Custom roadmaps</div>
-                <div className="step-feature">✓ Curated resources</div>
+                <div className="step-feature">✓ Auto-generated roadmaps</div>
+                <div className="step-feature">✓ Progress tracking included</div>
               </div>
             </div>
           </div>
@@ -315,10 +317,11 @@ const Homepage = () => {
                   />
                 </svg>
               </div>
-              <h3 className="feature-title">AI-Powered Matching</h3>
+              <h3 className="feature-title">GroqAI Analysis</h3>
               <p className="feature-description">
-                Advanced machine learning algorithms analyze your responses to
-                provide highly accurate career recommendations tailored to you.
+                GroqAI API analyzes your assessment responses to provide IT
+                career recommendations based on your skills, interests, and
+                tendencies. No traditional ML model training involved.
               </p>
             </div>
 
@@ -339,10 +342,11 @@ const Homepage = () => {
                   />
                 </svg>
               </div>
-              <h3 className="feature-title">16+ Career Paths</h3>
+              <h3 className="feature-title">IT Career Specializations</h3>
               <p className="feature-description">
-                Explore diverse tech specializations from Web Development to
-                Machine Learning, each with detailed insights and requirements.
+                Explore IT career paths including Software Developer,
+                Cybersecurity Analyst, UI/UX Designer, Data Analyst, and other
+                computing disciplines with detailed insights.
               </p>
             </div>
 
@@ -363,10 +367,11 @@ const Homepage = () => {
                   />
                 </svg>
               </div>
-              <h3 className="feature-title">Structured Roadmaps</h3>
+              <h3 className="feature-title">AI-Generated Roadmaps</h3>
               <p className="feature-description">
-                Get step-by-step learning paths with curated resources,
-                timelines, and milestones for your chosen career path.
+                Automatically generated learning roadmaps showing recommended
+                skills, tools, and steps needed to prepare for your chosen IT
+                career.
               </p>
             </div>
 
@@ -411,10 +416,11 @@ const Homepage = () => {
                   />
                 </svg>
               </div>
-              <h3 className="feature-title">100% Free</h3>
+              <h3 className="feature-title">100% Free & Guidance-Only</h3>
               <p className="feature-description">
-                Access all features completely free. No hidden costs, no credit
-                card required. Start your career journey today.
+                Access all features completely free. Remember: AI suggestions
+                serve as guidance to help you explore careers—final decisions
+                depend on your personal goals and experiences.
               </p>
             </div>
           </div>
@@ -702,10 +708,12 @@ const Homepage = () => {
         <div className="container mx-auto px-6 py-12">
           <div className="footer-content">
             <div className="footer-section">
-              <h3 className="footer-title">Career Path Finder</h3>
+              <h3 className="footer-title">
+                AI-Powered Career Guidance System
+              </h3>
               <p className="footer-text">
-                Empowering students to discover their perfect tech career
-                through AI-powered assessments.
+                AI-Powered Career Guidance and Roadmap Generation System for CCS
+                Students at Gordon College. Powered by GroqAI.
               </p>
             </div>
 

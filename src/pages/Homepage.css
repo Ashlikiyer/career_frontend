@@ -1101,28 +1101,112 @@
 }
 
 /* ========================================
-   RESPONSIVE DESIGN
+   RESPONSIVE DESIGN - COMPREHENSIVE
    ======================================== */
-@media (max-width: 768px) {
+
+/* Desktop large (1200px+) */
+@media (min-width: 1200px) {
+  .hero-title {
+    font-size: 4.5rem;
+  }
+
+  .section-title {
+    font-size: 3rem;
+  }
+}
+
+/* Laptop and small desktop (992px - 1199px) */
+@media (max-width: 1199px) {
+  .hero-section {
+    padding: 5rem 0 3.5rem;
+  }
+
+  .section-how-it-works,
+  .section-features,
+  .section-testimonials {
+    padding: 5rem 0;
+  }
+}
+
+/* Tablet landscape (768px - 991px) */
+@media (max-width: 991px) {
   .hero-section {
     padding: 4rem 0 3rem;
   }
 
   .hero-title {
-    font-size: 2.5rem;
+    font-size: 3rem;
   }
 
   .hero-subtitle {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
   }
 
   .trust-indicators {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .steps-container,
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .testimonials-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet portrait (640px - 767px) */
+@media (max-width: 767px) {
+  .hero-section {
+    padding: 3rem 0 2.5rem;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.05rem;
+    margin-bottom: 2rem;
+  }
+
+  .badge-animated {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+
+  .hero-cta-container {
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .cta-button {
+    padding: 0.875rem 1.75rem;
+    font-size: 1rem;
+  }
+
+  .trust-indicators {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .trust-item {
+    padding: 1.25rem;
   }
 
   .trust-number {
     font-size: 2rem;
+  }
+
+  .trust-label {
+    font-size: 0.8125rem;
   }
 
   .section-how-it-works,
@@ -1131,9 +1215,184 @@
     padding: 4rem 0;
   }
 
-  .steps-container,
+  .section-title {
+    font-size: 2.25rem;
+  }
+
+  .section-subtitle {
+    font-size: 1rem;
+  }
+
+  .section-badge {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.75rem;
+  }
+
+  .steps-container {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+
+  .step-card {
+    padding: 1.75rem;
+  }
+
+  .step-number-badge {
+    width: 45px;
+    height: 45px;
+    top: -12px;
+  }
+
+  .step-number {
+    font-size: 1.375rem;
+  }
+
+  .step-title {
+    font-size: 1.375rem;
+  }
+
+  .step-description {
+    font-size: 0.9375rem;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .feature-card {
+    padding: 1.5rem;
+  }
+
+  .feature-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .feature-title {
+    font-size: 1.25rem;
+  }
+
+  .feature-description {
+    font-size: 0.9375rem;
+  }
+
+  .testimonials-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-card {
+    padding: 1.75rem;
+  }
+
+  .stat-number {
+    font-size: 2.25rem;
+  }
+
+  .testimonial-cta {
+    padding: 2.5rem 2rem;
+  }
+
+  .testimonial-cta-title {
+    font-size: 1.75rem;
+  }
+
+  .testimonial-cta-text {
+    font-size: 1rem;
+  }
+
+  .cta-section {
+    padding: 4rem 0;
+  }
+
+  .cta-title {
+    font-size: 2.5rem;
+  }
+
+  .cta-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .footer-content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
+  }
+}
+
+/* Mobile landscape and large phones (481px - 639px) */
+@media (max-width: 639px) {
+  .hero-section {
+    padding: 2.5rem 0 2rem;
+  }
+
+  .hero-shape-1,
+  .hero-shape-2,
+  .hero-shape-3 {
+    width: 300px;
+    height: 300px;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .cta-button {
+    padding: 0.8125rem 1.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .hero-features {
+    gap: 1rem;
+  }
+
+  .hero-feature-item {
+    font-size: 0.875rem;
+  }
+
+  .trust-indicators {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .trust-item {
+    padding: 1rem;
+  }
+
+  .trust-number {
+    font-size: 1.875rem;
+  }
+
+  .section-how-it-works,
+  .section-features,
+  .section-testimonials {
+    padding: 3.5rem 0;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.9375rem;
+  }
+
   .features-grid {
     grid-template-columns: 1fr;
+  }
+
+  .feature-card {
+    padding: 1.25rem;
+  }
+
+  .feature-icon {
+    width: 52px;
+    height: 52px;
   }
 
   .testimonials-grid {
@@ -1143,6 +1402,18 @@
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1.5rem;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+
+  .testimonial-cta {
+    padding: 2rem 1.5rem;
   }
 
   .cta-section {
@@ -1155,6 +1426,11 @@
 
   .cta-subtitle {
     font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .cta-features-list {
+    gap: 1.5rem;
   }
 
   .footer-content {
@@ -1163,34 +1439,337 @@
   }
 }
 
+/* Mobile portrait (max-width: 480px) */
 @media (max-width: 480px) {
-  .hero-features {
-    flex-direction: column;
-    gap: 0.75rem;
+  .hero-section {
+    padding: 2rem 0 1.5rem;
+  }
+
+  .badge-animated {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.9375rem;
+    margin-bottom: 1.5rem;
   }
 
   .hero-cta-container {
     width: 100%;
+    gap: 1rem;
   }
 
   .cta-button {
     width: 100%;
     justify-content: center;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+  }
+
+  .hero-features {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .trust-indicators {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .trust-item {
+    padding: 1rem;
+  }
+
+  .trust-number {
+    font-size: 1.75rem;
+  }
+
+  .trust-label {
+    font-size: 0.75rem;
+  }
+
+  .section-how-it-works,
+  .section-features,
+  .section-testimonials {
+    padding: 3rem 0;
+  }
+
+  .section-badge {
+    padding: 0.5rem 1rem;
+    font-size: 0.6875rem;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.875rem;
+  }
+
+  .steps-container {
+    gap: 1.5rem;
+  }
+
+  .step-card {
+    padding: 1.5rem;
+  }
+
+  .step-number-badge {
+    width: 40px;
+    height: 40px;
+    top: -10px;
+    right: 20px;
+  }
+
+  .step-number {
+    font-size: 1.125rem;
+  }
+
+  .step-icon svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .step-title {
+    font-size: 1.25rem;
+  }
+
+  .step-description {
+    font-size: 0.875rem;
+  }
+
+  .step-feature {
+    font-size: 0.8125rem;
+  }
+
+  .features-grid {
+    gap: 1.25rem;
+  }
+
+  .feature-card {
+    padding: 1.25rem;
+  }
+
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .feature-title {
+    font-size: 1.125rem;
+  }
+
+  .feature-description {
+    font-size: 0.875rem;
   }
 
   .stats-grid {
     grid-template-columns: 1fr;
   }
 
+  .stat-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+
+  .stat-label {
+    font-size: 0.9375rem;
+  }
+
+  .testimonials-grid {
+    gap: 1rem;
+  }
+
+  .testimonial-card {
+    padding: 1rem;
+  }
+
+  .testimonial-name {
+    font-size: 0.8125rem;
+  }
+
+  .testimonial-role {
+    font-size: 0.6875rem;
+  }
+
+  .testimonial-text {
+    font-size: 0.75rem;
+  }
+
+  .testimonial-cta {
+    padding: 2rem 1.25rem;
+    border-radius: 20px;
+  }
+
+  .testimonial-cta-title {
+    font-size: 1.5rem;
+  }
+
+  .testimonial-cta-text {
+    font-size: 0.9375rem;
+  }
+
+  .cta-section {
+    padding: 2.5rem 0;
+  }
+
+  .cta-shape-1,
+  .cta-shape-2 {
+    width: 300px;
+    height: 300px;
+  }
+
+  .cta-title {
+    font-size: 1.75rem;
+  }
+
+  .cta-subtitle {
+    font-size: 0.9375rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .cta-buttons {
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-button {
+    font-size: 0.875rem;
+  }
+
   .cta-features-list {
     flex-direction: column;
     gap: 1rem;
   }
+
+  .cta-feature {
+    font-size: 0.875rem;
+  }
+
+  .footer {
+    padding: 2.5rem 1rem;
+  }
+
+  .footer-content {
+    gap: 1.75rem;
+  }
+
+  .footer-title {
+    font-size: 1.25rem;
+  }
+
+  .footer-text,
+  .footer-links a {
+    font-size: 0.875rem;
+  }
+
+  .footer-bottom {
+    padding-top: 1.5rem;
+  }
+
+  .footer-copyright {
+    font-size: 0.8125rem;
+  }
 }
 
-/* ========================================
-   ACCESSIBILITY
-   ======================================== */
+/* Ultra small mobile (max-width: 360px) */
+@media (max-width: 360px) {
+  .hero-title {
+    font-size: 1.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.875rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.8125rem;
+  }
+
+  .step-card {
+    padding: 1.25rem;
+  }
+
+  .step-title {
+    font-size: 1.125rem;
+  }
+
+  .feature-title {
+    font-size: 1rem;
+  }
+
+  .cta-title {
+    font-size: 1.5rem;
+  }
+
+  .trust-number {
+    font-size: 1.5rem;
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 600px) and (orientation: landscape) {
+  .hero-section {
+    padding: 2rem 0;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.9375rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-cta-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .trust-indicators {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+
+  .trust-item {
+    padding: 0.75rem;
+  }
+
+  .trust-number {
+    font-size: 1.5rem;
+  }
+
+  .section-how-it-works,
+  .section-features,
+  .section-testimonials {
+    padding: 2.5rem 0;
+  }
+
+  .testimonial-cta {
+    padding: 1.5rem;
+  }
+}
+
+/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1206,4 +1785,13 @@
 .footer-links a:focus-visible {
   outline: 3px solid var(--primary-blue);
   outline-offset: 3px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .step-card,
+  .feature-card,
+  .testimonial-card {
+    border-width: 2px;
+  }
 }
