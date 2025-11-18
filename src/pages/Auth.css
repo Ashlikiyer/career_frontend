@@ -277,6 +277,14 @@
   font-weight: 400;
 }
 
+.password-toggle-btn {
+  transition: opacity 0.15s ease;
+}
+
+.password-toggle-btn:hover {
+  opacity: 0.7;
+}
+
 .auth-submit-button {
   padding: 1rem 2rem;
   background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
@@ -658,6 +666,10 @@
 
   .auth-form {
     gap: 1rem;
+  }
+
+  .password-toggle-btn {
+    right: 0.5rem !important;
   }
 }
 

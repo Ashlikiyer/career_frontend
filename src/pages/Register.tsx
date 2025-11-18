@@ -171,7 +171,7 @@ const Register = () => {
                 </svg>
                 Password
               </label>
-              <div style={{ position: "relative" }}>
+              <div style={{ position: "relative", display: "block" }}>
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
@@ -180,14 +180,15 @@ const Register = () => {
                   className="auth-form-input"
                   placeholder="Create a strong password"
                   required
-                  style={{ paddingRight: "2.5rem" }}
+                  style={{ paddingRight: "3rem", width: "100%" }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  className="password-toggle-btn"
                   style={{
                     position: "absolute",
-                    right: "0.75rem",
+                    right: "12px",
                     top: "50%",
                     transform: "translateY(-50%)",
                     background: "none",
@@ -196,8 +197,10 @@ const Register = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    padding: "0.25rem",
+                    padding: "2px",
                     color: "#9ca3af",
+                    zIndex: 10,
+                    pointerEvents: "auto",
                   }}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
@@ -227,7 +230,7 @@ const Register = () => {
                 </svg>
                 Confirm Password
               </label>
-              <div style={{ position: "relative" }}>
+              <div style={{ position: "relative", display: "block" }}>
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   id="confirm-password"
@@ -236,14 +239,15 @@ const Register = () => {
                   className="auth-form-input"
                   placeholder="Confirm your password"
                   required
-                  style={{ paddingRight: "2.5rem" }}
+                  style={{ paddingRight: "3rem", width: "100%" }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="password-toggle-btn"
                   style={{
                     position: "absolute",
-                    right: "0.75rem",
+                    right: "12px",
                     top: "50%",
                     transform: "translateY(-50%)",
                     background: "none",
@@ -252,8 +256,10 @@ const Register = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    padding: "0.25rem",
+                    padding: "2px",
                     color: "#9ca3af",
+                    zIndex: 10,
+                    pointerEvents: "auto",
                   }}
                   aria-label={
                     showConfirmPassword ? "Hide password" : "Show password"

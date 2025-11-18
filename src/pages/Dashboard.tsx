@@ -66,30 +66,76 @@ const Dashboard = () => {
     careerName: string;
   } | null>(null);
 
+  const fetchCareers = async () => {
+    try {
+      setLoading(true);
+      const startTime = Date.now();
+      const data = await fetchSavedCareers();
+      console.log("Saved Careers Data:", JSON.stringify(data, null, 2));
+      const fetchedCareers = Array.isArray(data)
+        ? data
+        : [data].filter(Boolean);
+
+      // Fetch progress for each career
+      const careersWithProgress = await Promise.all(
+        fetchedCareers.map(async (career) => {
+          try {
+            const progressData = await getRoadmapProgress(
+              career.saved_career_id
+            );
+            return {
+              ...career,
+              progress: {
+                total_steps: progressData.total_steps || 0,
+                completed_steps: progressData.completed_steps || 0,
+                is_completed:
+                  progressData.completed_steps === progressData.total_steps &&
+                  progressData.total_steps > 0,
+              },
+            };
+          } catch (error) {
+            console.error(
+              `Failed to fetch progress for career ${career.saved_career_id}:`,
+              error
+            );
+            return career; // Return career without progress if fetch fails
+          }
+        })
+      );
+
+      setSavedCareers(careersWithProgress);
+
+      const elapsedTime = Date.now() - startTime;
+      const minimumLoadingTime = 2000;
+      const remainingTime = minimumLoadingTime - elapsedTime;
+
+      if (remainingTime > 0) {
+        await new Promise((resolve) => setTimeout(resolve, remainingTime));
+      }
+    } catch (err: unknown) {
+      setError((err as Error).message || "Failed to load saved careers.");
+      console.error("Fetch Careers Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!authToken) {
       navigate("/login");
       return;
     }
+    fetchCareers();
+  }, [authToken, navigate]);
 
-    const fetchCareers = async () => {
-      try {
-        setLoading(true);
-        const startTime = Date.now();
-        const data = await fetchSavedCareers();
-        console.log("Saved Careers Data:", JSON.stringify(data, null, 2));
-        const fetchedCareers = Array.isArray(data)
-          ? data
-          : [data].filter(Boolean);
-
-        // Fetch progress for each career
-        const careersWithProgress = await Promise.all(
-          fetchedCareers.map(async (career) => {
-            try {
-              const progressData = await getRoadmapProgress(
-                career.saved_career_id
-              );
-              return {
+  // Function to refresh progress for a specific career
+  const refreshCareerProgress = async (savedCareerId: number) => {
+    try {
+      const progressData = await getRoadmapProgress(savedCareerId);
+      setSavedCareers((prevCareers) =>
+        prevCareers.map((career) =>
+          career.saved_career_id === savedCareerId
+            ? {
                 ...career,
                 progress: {
                   total_steps: progressData.total_steps || 0,
@@ -98,35 +144,25 @@ const Dashboard = () => {
                     progressData.completed_steps === progressData.total_steps &&
                     progressData.total_steps > 0,
                 },
-              };
-            } catch (error) {
-              console.error(
-                `Failed to fetch progress for career ${career.saved_career_id}:`,
-                error
-              );
-              return career; // Return career without progress if fetch fails
-            }
-          })
-        );
+              }
+            : career
+        )
+      );
+    } catch (error) {
+      console.error(
+        `Failed to refresh progress for career ${savedCareerId}:`,
+        error
+      );
+    }
+  };
 
-        setSavedCareers(careersWithProgress);
-
-        const elapsedTime = Date.now() - startTime;
-        const minimumLoadingTime = 2000;
-        const remainingTime = minimumLoadingTime - elapsedTime;
-
-        if (remainingTime > 0) {
-          await new Promise((resolve) => setTimeout(resolve, remainingTime));
-        }
-      } catch (err: unknown) {
-        setError((err as Error).message || "Failed to load saved careers.");
-        console.error("Fetch Careers Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCareers();
-  }, [authToken, navigate]);
+  const handleBackFromRoadmap = () => {
+    // Refresh progress when coming back from roadmap
+    if (selectedCareer) {
+      refreshCareerProgress(selectedCareer.savedCareerId);
+    }
+    setSelectedCareer(null);
+  };
 
   const handleDeleteCareer = async () => {
     if (!careerToDelete) return;
@@ -261,7 +297,10 @@ const Dashboard = () => {
       <RoadmapPage
         savedCareerId={selectedCareer.savedCareerId}
         careerName={selectedCareer.careerName}
-        onBack={() => setSelectedCareer(null)}
+        onBack={handleBackFromRoadmap}
+        onProgressUpdate={() =>
+          refreshCareerProgress(selectedCareer.savedCareerId)
+        }
       />
     );
   }

@@ -1,0 +1,8 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Blue background -->
+  <rect width="32" height="32" rx="4" fill="#3B82F6"/>
+  
+  <!-- White career path icon -->
+  <path d="M16 8L12 12H14V18H12L16 22L20 18H18V12H20L16 8Z" fill="#FFFFFF"/>
+  <circle cx="16" cy="15" r="1.5" fill="#FFFFFF"/>
+</svg>

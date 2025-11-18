@@ -81,7 +81,7 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children }) => {
           <div className="flex items-center gap-3 animate-slideInLeft">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg">
               <img
-                src="/src/assets/Career_logo.svg"
+                src="/Career_logo.svg"
                 alt="CareerAI Logo"
                 className="h-6 w-6"
                 style={{ filter: "brightness(0) invert(1)" }}

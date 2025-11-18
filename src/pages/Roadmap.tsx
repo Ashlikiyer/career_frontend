@@ -35,12 +35,14 @@ interface RoadmapPageProps {
   savedCareerId: number;
   careerName: string;
   onBack: () => void;
+  onProgressUpdate?: () => void;
 }
 
 const RoadmapPage: React.FC<RoadmapPageProps> = ({
   savedCareerId,
   careerName,
   onBack,
+  onProgressUpdate,
 }) => {
   const [roadmap, setRoadmap] = useState<RoadmapStep[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,6 +108,11 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
           can_submit_feedback: canSubmitFeedback,
         };
       });
+
+      // Notify Dashboard to update progress
+      if (onProgressUpdate) {
+        onProgressUpdate();
+      }
     } catch (err: unknown) {
       setError((err as Error).message || "Failed to update step progress.");
       console.error("Update Step Progress Error:", err);
