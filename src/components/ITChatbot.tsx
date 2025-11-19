@@ -18,8 +18,9 @@ const ITChatbot: React.FC = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showHistory, setShowHistory] = useState(false);
-  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
+  // Temporarily disabled - uncomment when needed
+  // const [showHistory, setShowHistory] = useState(false);
+  // const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [currentSessionUuid, setCurrentSessionUuid] = useState<string | null>(
     null
   );
@@ -30,8 +31,8 @@ const ITChatbot: React.FC = () => {
   useEffect(() => {
     loadSuggestions();
 
-    // Load chat sessions from backend
-    loadChatSessionsList();
+    // Load chat sessions from backend - Temporarily disabled
+    // loadChatSessionsList();
 
     // Clear old localStorage data to prevent conflicts
     clearOldChatData();
@@ -66,6 +67,8 @@ const ITChatbot: React.FC = () => {
     }
   };
 
+  // Temporarily disabled functions - uncomment when needed
+  /*
   const loadChatSessionsList = async () => {
     try {
       const sessions = await loadChatSessions();
@@ -134,6 +137,7 @@ const ITChatbot: React.FC = () => {
       setError(null);
     }
   };
+  */
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
