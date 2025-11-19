@@ -169,7 +169,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
                   {isMinimized ? "⬆️" : "⬇️"}
                 </button>
                 <button
-                  className="bg-white/20 hover:bg-red-500/80 text-white w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-all duration-200 hover:scale-105"
+                  className="bg-white/20 hover:bg-white/40 text-white w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center text-xl sm:text-2xl font-bold transition-all duration-200 hover:scale-110 shadow-lg"
                   onClick={handleClose}
                   aria-label="Close chat"
                   title="Close chat"

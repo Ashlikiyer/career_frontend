@@ -29,17 +29,22 @@ const Homepage = () => {
   }, []); // No dependencies needed for this function
 
   useEffect(() => {
-    const authToken = cookies.get("authToken");
-    if (!authToken) {
-      navigate("/login");
-    } else if (!analytics && !isLoadingAnalytics) {
-      // Load analytics for homepage showcase only once and only if not already loaded
+    // Homepage is now public - no authentication required
+    if (!analytics && !isLoadingAnalytics) {
+      // Load analytics for homepage showcase
       loadAnalytics();
     }
-  }, [navigate, loadAnalytics, analytics, isLoadingAnalytics]); // Prevent loading if already have data
+  }, [loadAnalytics, analytics, isLoadingAnalytics]);
 
   const handleStartAssessment = () => {
-    navigate("/assessment");
+    // Check if user is logged in before accessing assessment
+    const authToken = cookies.get("authToken");
+    if (!authToken) {
+      // Redirect to login if not authenticated
+      navigate("/login");
+    } else {
+      navigate("/assessment");
+    }
   };
 
   const renderStars = (rating: number) => {

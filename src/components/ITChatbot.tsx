@@ -253,8 +253,8 @@ const ITChatbot: React.FC = () => {
 
   return (
     <div className="w-full h-full flex flex-col bg-white font-sans overflow-hidden">
-      {/* Top Action Bar */}
-      <div className="bg-gray-50 border-b border-gray-200 p-2 sm:p-3 flex items-center justify-between flex-shrink-0">
+      {/* Top Action Bar - Temporarily Hidden */}
+      {/* <div className="bg-gray-50 border-b border-gray-200 p-2 sm:p-3 flex items-center justify-between flex-shrink-0">
         <button
           className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
           onClick={() => setShowHistory(!showHistory)}
@@ -271,7 +271,7 @@ const ITChatbot: React.FC = () => {
           <span>➕</span>
           <span className="hidden sm:inline">New Chat</span>
         </button>
-      </div>
+      </div> */}
 
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between text-red-700 gap-2 flex-shrink-0">
@@ -287,7 +287,8 @@ const ITChatbot: React.FC = () => {
       )}
 
       <div className="flex flex-1 min-h-0 overflow-hidden">
-        {showHistory && (
+        {/* History sidebar - Temporarily Hidden */}
+        {/* {showHistory && (
           <div className="w-48 sm:w-56 md:w-64 bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden flex-shrink-0">
             <div className="p-2 sm:p-4 border-b border-gray-200">
               <button
@@ -333,7 +334,7 @@ const ITChatbot: React.FC = () => {
               )}
             </div>
           </div>
-        )}
+        )} */}
 
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           <div className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-5 bg-gradient-to-b from-gray-50 to-gray-100 scroll-smooth">
