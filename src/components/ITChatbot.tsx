@@ -4,12 +4,13 @@ import {
   createUserMessage,
   createBotMessage,
   trackChatbotEvent,
-  loadChatSessions,
-  loadChatSession,
-  createNewChatSession,
-  deleteChatSession,
+  // Temporarily disabled imports - uncomment when needed
+  // loadChatSessions,
+  // loadChatSession,
+  // createNewChatSession,
+  // deleteChatSession,
   type ChatbotMessage,
-  type ChatSession,
+  // type ChatSession,
 } from "../services/chatbotService";
 
 const ITChatbot: React.FC = () => {
@@ -210,7 +211,8 @@ const ITChatbot: React.FC = () => {
       // Update session UUID if a new session was created
       if (data.session_uuid && !currentSessionUuid) {
         setCurrentSessionUuid(data.session_uuid);
-        await loadChatSessionsList(); // Refresh sessions list
+        // Refresh sessions list - Temporarily disabled
+        // await loadChatSessionsList();
       }
 
       // Track response received
