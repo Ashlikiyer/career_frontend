@@ -530,6 +530,177 @@ export async function updateRoadmapStepProgress(
   }
 }
 
+// =============================================
+// TIME TRACKING FUNCTIONS
+// =============================================
+
+/**
+ * Start tracking time for a roadmap step
+ * Records when user begins working on a step
+ */
+export async function startRoadmapStep(stepId: number) {
+  try {
+    const response = await dataFetch(`roadmaps/step/${stepId}/start`, "POST");
+    console.log("⏱️ Step started:", response);
+    return response;
+    /*
+    Response format:
+    {
+      "message": "Step started",
+      "step_id": 1,
+      "started_at": "2026-01-16T10:30:00.000Z",
+      "is_first_start": true
+    }
+    */
+  } catch (error) {
+    console.error("Error starting step:", error);
+    throw error;
+  }
+}
+
+/**
+ * Record time spent on a roadmap step
+ * Updates the cumulative time spent
+ */
+export async function recordTimeOnStep(stepId: number, minutes: number) {
+  try {
+    const response = await dataFetch(`roadmaps/step/${stepId}/time`, "PUT", {
+      minutes,
+    });
+    console.log("⏱️ Time recorded:", response);
+    return response;
+    /*
+    Response format:
+    {
+      "message": "Time recorded",
+      "step_id": 1,
+      "minutes_added": 30,
+      "total_time_spent_minutes": 150,
+      "started_at": "2026-01-16T10:30:00.000Z"
+    }
+    */
+  } catch (error) {
+    console.error("Error recording time:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get time statistics for a specific step
+ */
+export async function getStepTimeStats(stepId: number) {
+  try {
+    const response = await dataFetch(
+      `roadmaps/step/${stepId}/time-stats`,
+      "GET"
+    );
+    console.log("📊 Step time stats:", response);
+    return response;
+    /*
+    Response format:
+    {
+      "step_id": 1,
+      "step_number": 1,
+      "title": "Master Programming Fundamentals",
+      "difficulty_level": "beginner",
+      "estimated_duration": "3-4 months",
+      "started_at": "2026-01-10T08:00:00.000Z",
+      "completed_at": "2026-01-15T16:30:00.000Z",
+      "is_done": true,
+      "time_spent_minutes": 480,
+      "time_spent_formatted": "8h",
+      "calendar_days": 5,
+      "status": "completed"
+    }
+    */
+  } catch (error) {
+    console.error("Error getting step time stats:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get time statistics for entire roadmap
+ */
+export async function getRoadmapTimeStats(savedCareerId: number) {
+  try {
+    const response = await dataFetch(
+      `roadmaps/${savedCareerId}/time-stats`,
+      "GET"
+    );
+    console.log("📊 Roadmap time stats:", response);
+    return response;
+    /*
+    Response format:
+    {
+      "roadmap_id": 1,
+      "career_name": "Software Engineer",
+      "total_steps": 10,
+      "steps_not_started": 5,
+      "steps_in_progress": 2,
+      "steps_completed": 3,
+      "total_time_minutes": 2400,
+      "total_time_formatted": "40h",
+      "time_by_difficulty": {
+        "beginner": { "minutes": 900, "formatted": "15h" },
+        "intermediate": { "minutes": 1000, "formatted": "16h 40m" },
+        "advanced": { "minutes": 500, "formatted": "8h 20m" }
+      },
+      "average_time_per_step_minutes": 800,
+      "average_time_per_step_formatted": "13h 20m",
+      "first_start_date": "2026-01-01T08:00:00.000Z",
+      "last_completion_date": "2026-01-15T16:30:00.000Z",
+      "total_calendar_days": 15,
+      "completion_percentage": 30,
+      "steps": [...]
+    }
+    */
+  } catch (error) {
+    console.error("Error getting roadmap time stats:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get time statistics by difficulty level
+ */
+export async function getDifficultyTimeStats(savedCareerId: number) {
+  try {
+    const response = await dataFetch(
+      `roadmaps/${savedCareerId}/difficulty-stats`,
+      "GET"
+    );
+    console.log("📊 Difficulty time stats:", response);
+    return response;
+    /*
+    Response format:
+    {
+      "career_name": "Software Engineer",
+      "difficulty_breakdown": {
+        "beginner": {
+          "total_steps": 3,
+          "completed": 2,
+          "in_progress": 1,
+          "not_started": 0,
+          "total_minutes": 900,
+          "avg_minutes": 450,
+          "total_formatted": "15h",
+          "avg_formatted": "7h 30m"
+        },
+        ...
+      }
+    }
+    */
+  } catch (error) {
+    console.error("Error getting difficulty time stats:", error);
+    throw error;
+  }
+}
+
+// =============================================
+// END TIME TRACKING FUNCTIONS
+// =============================================
+
 export async function deleteRoadmapStep(roadmapId: number) {
   try {
     const response = await dataFetch(`roadmaps/${roadmapId}`, "DELETE");

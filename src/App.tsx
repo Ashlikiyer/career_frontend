@@ -1,10 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
-import Homepage from "./pages/Homepage";
+import HomepageNew from "./pages/HomepageNew";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Assessment from "./pages/Assessment";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import StudentProgress from "./pages/StudentProgress";
 import SidebarLayout from "./components/SidebarLayout";
 
 // Protected Route Component
@@ -23,15 +25,8 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public route - Homepage */}
-        <Route
-          path="/"
-          element={
-            <SidebarLayout>
-              <Homepage />
-            </SidebarLayout>
-          }
-        />
+        {/* Public route - Homepage (no sidebar, has its own navbar) */}
+        <Route path="/" element={<HomepageNew />} />
 
         {/* Auth routes */}
         <Route path="/login" element={<Login />} />
@@ -54,6 +49,26 @@ const App = () => {
             <ProtectedRoute>
               <SidebarLayout>
                 <Dashboard />
+              </SidebarLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <SidebarLayout>
+                <AdminDashboard />
+              </SidebarLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/progress"
+          element={
+            <ProtectedRoute>
+              <SidebarLayout>
+                <StudentProgress />
               </SidebarLayout>
             </ProtectedRoute>
           }

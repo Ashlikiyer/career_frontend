@@ -1,7 +1,16 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
-import { Home, FileText, LogOut, LayoutDashboard, X, Menu } from "lucide-react";
+import {
+  Home,
+  FileText,
+  LogOut,
+  LayoutDashboard,
+  X,
+  Menu,
+  BarChart3,
+  TrendingUp,
+} from "lucide-react";
 import { Cookies } from "react-cookie";
 import {
   AlertDialog,
@@ -42,9 +51,19 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children }) => {
       icon: LayoutDashboard,
     },
     {
+      title: "My Progress",
+      url: "/progress",
+      icon: TrendingUp,
+    },
+    {
       title: "Assessment",
       url: "/assessment",
       icon: FileText,
+    },
+    {
+      title: "Analytics (Admin)",
+      url: "/admin",
+      icon: BarChart3,
     },
   ];
 
