@@ -71,10 +71,10 @@ const Login = () => {
           </div>
 
           <div className="auth-info-content">
-            <h2 className="auth-info-title">AI Career Guidance System</h2>
+            <h2 className="auth-info-title">PathFinder</h2>
             <p className="auth-info-description">
-              Get AI-powered career suggestions and personalized learning
-              roadmaps.
+              Navigate your tech career with intelligent guidance and
+              personalized learning roadmaps.
             </p>
           </div>
         </div>

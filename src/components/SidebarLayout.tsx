@@ -101,17 +101,17 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children }) => {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg">
               <img
                 src="/Career_logo.svg"
-                alt="CareerAI Logo"
+                alt="PathFinder Logo"
                 className="h-6 w-6"
                 style={{ filter: "brightness(0) invert(1)" }}
               />
             </div>
             <div className="flex flex-col">
               <span className="text-base font-bold text-gray-900 tracking-tight">
-                CareerAI
+                PathFinder
               </span>
               <span className="text-xs text-blue-600 font-medium">
-                AI-Powered
+                Career Navigator
               </span>
             </div>
           </div>
@@ -211,7 +211,7 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children }) => {
           <div className="flex items-center gap-2">
             <h1 className="text-lg font-semibold text-gray-900">
               {menuItems.find((item) => item.url === location.pathname)
-                ?.title || "CareerAI"}
+                ?.title || "PathFinder"}
             </h1>
           </div>
         </header>

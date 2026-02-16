@@ -57,7 +57,9 @@ const Navbar = () => {
                   style={{ filter: "brightness(0) saturate(100%)" }}
                 />
               </div>
-              <span className="text-xl font-bold text-gray-900">CareerAI</span>
+              <span className="text-xl font-bold text-gray-900">
+                PathFinder
+              </span>
             </Link>
           </div>
 
@@ -79,8 +81,8 @@ const Navbar = () => {
                 !isAuthenticated
                   ? "pointer-events-none opacity-40 text-gray-400"
                   : isActiveLink("/assessment")
-                  ? "text-blue-600 bg-blue-50"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "text-blue-600 bg-blue-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
               }`}
               onClick={(e) => !isAuthenticated && e.preventDefault()}
             >
@@ -92,8 +94,8 @@ const Navbar = () => {
                 !isAuthenticated
                   ? "pointer-events-none opacity-40 text-gray-400"
                   : isActiveLink("/dashboard")
-                  ? "text-blue-600 bg-blue-50"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "text-blue-600 bg-blue-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
               }`}
               onClick={(e) => !isAuthenticated && e.preventDefault()}
             >

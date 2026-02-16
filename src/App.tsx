@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
-import HomepageNew from "./pages/HomepageNew";
+import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Assessment from "./pages/Assessment";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/DashboardNew";
 import AdminDashboard from "./pages/AdminDashboard";
 import StudentProgress from "./pages/StudentProgress";
 import SidebarLayout from "./components/SidebarLayout";
@@ -26,7 +26,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         {/* Public route - Homepage (no sidebar, has its own navbar) */}
-        <Route path="/" element={<HomepageNew />} />
+        <Route path="/" element={<Homepage />} />
 
         {/* Auth routes */}
         <Route path="/login" element={<Login />} />

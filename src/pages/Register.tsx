@@ -31,7 +31,7 @@ const Register = () => {
     try {
       const response = await registerUser({ username, email, password });
       setMessage(
-        response.message || "Registration successful! Redirecting to login..."
+        response.message || "Registration successful! Redirecting to login...",
       );
       setIsSuccess(true);
       setTimeout(() => {
@@ -83,7 +83,7 @@ const Register = () => {
           <div className="auth-info-content">
             <h2 className="auth-info-title">Start Your Career Journey</h2>
             <p className="auth-info-description">
-              Discover your perfect career path with AI-powered guidance.
+              Discover your perfect career path with intelligent guidance.
             </p>
           </div>
         </div>

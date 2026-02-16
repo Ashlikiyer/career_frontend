@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, ResponseType } from "axios";
 import { Cookies } from "react-cookie";
 
 // API Configuration - Change this URL when deploying to production
-const API_URL = "https://career.careerapp.xyz"; // For production (remove trailing slash)
+const API_URL = "http://localhost:5000"; // For production (remove trailing slash)
 // const API_URL = "http://localhost:5000"; // Uncomment for local development
 
 const api = axios.create({
