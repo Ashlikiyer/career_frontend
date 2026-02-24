@@ -221,8 +221,6 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   const [liveElapsedSeconds, setLiveElapsedSeconds] = useState<number>(0); // Live counter for display
   const [pausedElapsedSeconds, setPausedElapsedSeconds] = useState<number>(0); // Preserved time when paused
   const [isPaused, setIsPaused] = useState(false); // Pause state
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const timeTrackingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const liveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Format minutes to human-readable string
@@ -408,7 +406,6 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   }, [activeStepId, sessionStartTime, isPaused, pausedElapsedSeconds]);
 
   // Cancel tracking without saving (for switching steps or closing)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleCancelTracking = useCallback(() => {
     setActiveStepId(null);
     setSessionStartTime(null);
@@ -417,6 +414,9 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
     setIsPaused(false);
     console.log(`❌ Tracking cancelled (time not saved).`);
   }, []);
+
+  // Suppress unused variable warning - keeping for potential future use
+  void handleCancelTracking;
 
   // Live timer update (every second) - includes paused elapsed time
   useEffect(() => {

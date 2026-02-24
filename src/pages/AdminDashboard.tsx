@@ -5,7 +5,7 @@
  * All data is anonymized for research purposes.
  */
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
 import {
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
   };
 
   // Tab navigation with SVG icons
-  const tabIcons: { [key: string]: JSX.Element } = {
+  const tabIcons: { [key: string]: React.ReactNode } = {
     overview: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
         <rect x="3" y="3" width="7" height="7"/>
@@ -632,7 +632,7 @@ const AdminDashboard = () => {
                 label={{ value: 'Minutes', angle: -90, position: 'insideLeft', fill: '#6b7280', fontSize: 12 }}
               />
               <Tooltip
-                formatter={(value: number) => [`${value} min`, "Avg Time"]}
+                formatter={(value: number | undefined) => [`${value ?? 0} min`, "Avg Time"]}
                 contentStyle={{ 
                   background: '#fff', 
                   border: '1px solid #e5e7eb', 
@@ -676,7 +676,7 @@ const AdminDashboard = () => {
                   label={{ value: 'Minutes', angle: -90, position: 'insideLeft', fill: '#6b7280', fontSize: 12 }}
                 />
                 <Tooltip
-                  formatter={(value: number) => [`${value} min`, "Avg Time"]}
+                  formatter={(value: number | undefined) => [`${value ?? 0} min`, "Avg Time"]}
                   contentStyle={{ 
                     background: '#fff', 
                     border: '1px solid #e5e7eb', 
@@ -1135,7 +1135,7 @@ const AdminDashboard = () => {
               />
               <Tooltip 
                 cursor={{ strokeDasharray: '3 3' }}
-                formatter={(value: number) => [`${value}%`, "Dropoff Rate"]}
+                formatter={(value: number | undefined) => [`${value ?? 0}%`, "Dropoff Rate"]}
                 contentStyle={{ 
                   background: '#fff', 
                   border: '1px solid #e5e7eb', 
@@ -1179,7 +1179,7 @@ const AdminDashboard = () => {
                   label={{ value: 'Users', angle: -90, position: 'insideLeft', fill: '#6b7280', fontSize: 12 }}
                 />
                 <Tooltip 
-                  formatter={(value: number) => [value, "Users"]}
+                  formatter={(value: number | undefined) => [value ?? 0, "Users"]}
                   contentStyle={{ 
                     background: '#fff', 
                     border: '1px solid #e5e7eb', 
@@ -1308,7 +1308,7 @@ const AdminDashboard = () => {
                 label={{ value: 'Completion Rate %', angle: -90, position: 'insideLeft', fill: '#6b7280', fontSize: 12 }}
               />
               <Tooltip
-                formatter={(value: number) => [`${value}%`, "Completion Rate"]}
+                formatter={(value: number | undefined) => [`${value ?? 0}%`, "Completion Rate"]}
                 contentStyle={{ 
                   background: '#fff', 
                   border: '1px solid #e5e7eb', 
@@ -1555,7 +1555,7 @@ const AdminDashboard = () => {
                 tick={{ fill: '#6b7280', fontSize: 12 }}
               />
               <Tooltip 
-                formatter={(value: number) => [value, "Users"]}
+                formatter={(value: number | undefined) => [value ?? 0, "Users"]}
                 contentStyle={{ 
                   background: '#fff', 
                   border: '1px solid #e5e7eb', 
