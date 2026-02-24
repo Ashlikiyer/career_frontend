@@ -123,21 +123,6 @@ const validateTooltipData = (questionData: Question): boolean => {
   }
 };
 
-// Helper function to generate progress messages
-const getProgressMessage = (
-  confidence: number,
-  questionsAnswered: number
-): string => {
-  if (confidence >= 90) return "Assessment complete! High confidence achieved.";
-  if (confidence >= 70)
-    return "Almost there! A few more questions should do it.";
-  if (confidence >= 50)
-    return "Making good progress! Keep answering consistently.";
-  if (questionsAnswered > 10)
-    return "Taking time to find the right fit - that's okay!";
-  return "Building your career profile...";
-};
-
 const Assessment = () => {
   const navigate = useNavigate();
   const cookies = new Cookies();
@@ -155,15 +140,16 @@ const Assessment = () => {
   const [assessmentId, setAssessmentId] = useState<number | null>(null);
   // New state for enhanced assessment system
   const [confidence, setConfidence] = useState<number>(0);
-  const [currentCareer, setCurrentCareer] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_currentCareer, setCurrentCareer] = useState<string | null>(null);
   const [questionsAnswered, setQuestionsAnswered] = useState<number>(0);
   const [isLongAssessment, setIsLongAssessment] = useState<boolean>(false);
   const isLoadingRef = useRef(false);
 
-  // New state for tooltip functionality
-  const [hoveredOption, setHoveredOption] = useState<string | null>(null);
+  // State for selected option visual feedback
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
+  
+  // State for expanded option description (click info icon to expand)
   const [expandedOption, setExpandedOption] = useState<string | null>(null);
 
   useEffect(() => {
@@ -171,13 +157,6 @@ const Assessment = () => {
       navigate("/login");
       return;
     }
-
-    // Check if mobile device
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
 
     const checkExistingAssessment = async () => {
       // Prevent duplicate calls
@@ -262,10 +241,6 @@ const Assessment = () => {
       }
     };
     checkExistingAssessment();
-
-    return () => {
-      window.removeEventListener("resize", checkMobile);
-    };
   }, [authToken, navigate]);
 
   const handleAnswerSelect = async (optionIndex: number) => {
@@ -385,8 +360,7 @@ const Assessment = () => {
               JSON.stringify(nextQuestion, null, 2)
             );
             setCurrentQuestion(nextQuestion);
-            // Reset tooltip states when moving to new question
-            setHoveredOption(null);
+            // Reset state when moving to new question
             setSelectedOption(null);
             setExpandedOption(null);
           } else {
@@ -441,15 +415,12 @@ const Assessment = () => {
       setAnswers({});
       setFeedbackMessage(null);
       setAssessmentId(restartData.assessment_id || null);
-      // Reset new state variables
+      // Reset state variables
       setConfidence(0);
       setCurrentCareer(null);
       setQuestionsAnswered(0);
       setIsLongAssessment(false);
-      // Reset tooltip states
-      setHoveredOption(null);
       setSelectedOption(null);
-      setExpandedOption(null);
 
       const questionData: Question = await startAssessment();
       if (typeof questionData.options_answer === "string") {
@@ -480,45 +451,30 @@ const Assessment = () => {
 
   if (completed && !showResults) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="flex-grow p-8 flex items-center justify-center">
-          <div className="max-w-2xl mx-auto bg-white rounded-2xl p-8 shadow-xl text-center border border-gray-100">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg
-                className="w-10 h-10 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <h2 className="text-3xl font-bold mb-4 text-gray-900">
-              Assessment Complete!
-            </h2>
-            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-              {feedbackMessage ||
-                "Great job! Your personalized career recommendations are ready to explore."}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => setShowResults(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
-              >
-                View My Results
-              </button>
-              <button
-                onClick={handleRestart}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-8 rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-300"
-              >
-                Retake Assessment
-              </button>
-            </div>
+      <div className="h-screen bg-gray-50 flex items-center justify-center px-4 overflow-hidden">
+        <div className="max-w-lg w-full bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
+          <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">Assessment Complete!</h2>
+          <p className="text-gray-500 mb-8">
+            {feedbackMessage || "Great job! Your personalized career recommendations are ready to explore."}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={() => setShowResults(true)}
+              className="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 px-8 rounded-xl transition-colors"
+            >
+              View My Results
+            </button>
+            <button
+              onClick={handleRestart}
+              className="text-gray-600 hover:text-gray-900 font-medium py-3 px-6 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+            >
+              Retake Assessment
+            </button>
           </div>
         </div>
       </div>
@@ -527,12 +483,10 @@ const Assessment = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="flex-grow p-8 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-lg text-gray-600">Loading your assessment...</p>
-          </div>
+      <div className="h-screen bg-gray-50 flex items-center justify-center overflow-hidden">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-slate-800 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your assessment...</p>
         </div>
       </div>
     );
@@ -540,448 +494,312 @@ const Assessment = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="flex-grow p-8 flex items-center justify-center">
-          <div className="max-w-md mx-auto bg-white rounded-2xl p-8 shadow-xl text-center border border-gray-100">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-4">
-              Oops! Something went wrong
-            </h3>
-            <p className="text-gray-600 mb-6">{error}</p>
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={() => handleAnswerSelect(0)}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300"
-              >
-                Try Again
-              </button>
-              <button
-                onClick={handleRestart}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg border border-gray-200 transition-all duration-300"
-              >
-                Start Over
-              </button>
-            </div>
+      <div className="h-screen bg-gray-50 flex items-center justify-center px-4 overflow-hidden">
+        <div className="max-w-md w-full bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
+          <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Something went wrong</h3>
+          <p className="text-gray-500 mb-6 text-sm">{error}</p>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => handleAnswerSelect(0)}
+              className="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-xl transition-colors"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={handleRestart}
+              className="text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors"
+            >
+              Start Over
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
+  // Calculate total questions estimate based on confidence progress
+  const totalQuestionsEstimate = confidence >= 90 ? questionsAnswered : 15;
+  const currentQuestionNumber = questionsAnswered + 1;
+
+  // Circular progress component - smaller size for compact layout
+  const CircularProgress = ({ value, size = 120 }: { value: number; size?: number }) => {
+    const strokeWidth = 6;
+    const radius = (size - strokeWidth) / 2;
+    const circumference = radius * 2 * Math.PI;
+    const offset = circumference - (value / 100) * circumference;
+    
+    return (
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg className="transform -rotate-90" width={size} height={size}>
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="#e5e7eb"
+            strokeWidth={strokeWidth}
+            fill="none"
+          />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="url(#gradient)"
+            strokeWidth={strokeWidth}
+            fill="none"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            className="transition-all duration-700 ease-out"
+          />
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#3b82f6" />
+              <stop offset="100%" stopColor="#1e40af" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-2xl font-bold text-gray-900">{value}%</span>
+          <span className="text-[10px] text-gray-500 uppercase tracking-wide">Target: 90%</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className="flex-grow p-6">
-        <div className="max-w-4xl mx-auto">
-          {/* Header Section */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-4">
-              📋 Career Assessment
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Question {questionsAnswered + 1}
-              {confidence < 90 && (
-                <span className="text-lg font-normal text-gray-600 ml-2">
-                  (Continue until 90% confidence)
+    <div className="min-h-screen lg:h-screen bg-gray-50 flex flex-col lg:overflow-hidden">
+      {/* Main Content Area */}
+      <div className="flex-1 flex items-start lg:items-center justify-center px-3 sm:px-4 py-3 sm:py-4 lg:px-6 overflow-auto lg:overflow-hidden">
+        <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-3 sm:gap-4 lg:gap-6">
+          
+          {/* Main Content - Left Side */}
+          <div className="flex-1 order-1">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 lg:p-6">
+              {/* Question Number Badge */}
+              <div className="mb-2 sm:mb-3">
+                <span className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-red-500 text-white uppercase tracking-wide">
+                  Question {currentQuestionNumber} of {totalQuestionsEstimate}
                 </span>
+              </div>
+
+              {/* Question Text */}
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-1 sm:mb-2 leading-tight">
+                {currentQuestion?.question_text}
+              </h1>
+              
+              {/* Subtitle */}
+              <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
+                Select the option that best resonates with your natural strengths.
+              </p>
+
+              {/* Encouraging Message for Long Assessments - Compact */}
+              {isLongAssessment && (
+                <div className="mb-2 sm:mb-3">
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-2 sm:p-2.5 flex items-center gap-2">
+                    <span className="text-sm">🎯</span>
+                    <span className="text-[10px] sm:text-xs text-purple-700">Taking your time to find the perfect match!</span>
+                  </div>
+                </div>
               )}
-            </h1>
-            <p className="text-gray-600">
-              Discover your perfect tech career path with our AI-powered
-              assessment
-            </p>
-          </div>
 
-          {/* Confidence Progress Bar */}
-          <div className="max-w-2xl mx-auto mb-8">
-            <div className="flex justify-between text-sm text-gray-500 mb-2">
-              <span>Confidence Level</span>
-              <span>
-                {confidence}% confidence in {currentCareer || "career path"}
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
-              <div
-                className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500 ease-out"
-                style={{
-                  width: `${confidence}%`,
-                }}
-              ></div>
-            </div>
-            <div className="flex justify-between items-center mt-2">
-              <span className="text-xs text-gray-400">
-                Questions answered: {questionsAnswered}
-              </span>
-              <div className="flex items-center text-xs text-gray-500">
-                <span className="mr-1">Target:</span>
-                <div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
-                <span>90%</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Question Card */}
-          <div className="max-w-3xl mx-auto bg-white rounded-2xl p-8 shadow-xl border border-gray-100 mb-6">
-            {/* Dynamic Progress Message */}
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
-                {getProgressMessage(confidence, questionsAnswered)}
-              </div>
-            </div>
-
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center leading-relaxed">
-              {currentQuestion?.question_text}
-            </h2>
-
-            {/* Encouraging Message for Long Assessments */}
-            {isLongAssessment && (
-              <div className="mb-6">
-                <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
-                  <div className="flex items-start">
-                    <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      🎯
-                    </div>
-                    <div>
-                      <h3 className="text-base font-semibold text-purple-800 mb-1">
-                        Taking your time to find the perfect career match!
-                      </h3>
-                      <p className="text-sm text-purple-700">
-                        Your thoroughness will lead to better recommendations.
-                        The assessment continues until we reach 90% confidence.
-                      </p>
-                    </div>
+              {/* Feedback Message - Compact */}
+              {feedbackMessage && (
+                <div className="mb-2 sm:mb-3">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-2 sm:p-2.5 flex items-center gap-2">
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-[10px] sm:text-xs text-green-700">{feedbackMessage}</span>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Feedback Message - Always visible between question and choices */}
-            {feedbackMessage && (
-              <div className="mb-8">
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                  <div className="flex items-start">
-                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <svg
-                        className="w-3 h-3 text-green-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="text-base font-semibold text-green-800 mb-1">
-                        Great choice!
-                      </h3>
-                      <p className="text-sm text-green-700">
-                        {feedbackMessage}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Help Section */}
-            {currentQuestion?.options_descriptions &&
-            Object.keys(currentQuestion.options_descriptions).length > 0 ? (
-              <div className="mb-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                  <div className="flex items-center justify-center gap-2 text-blue-700">
-                    <div className="text-lg">💡</div>
-                    <span className="text-sm font-medium">
-                      {isMobile
-                        ? "Tap any option to see detailed explanations, tap again to select"
-                        : "Hover over options to see detailed explanations"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="mb-6">
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                  <div className="flex items-center justify-center gap-2 text-gray-600">
-                    <div className="text-lg">📝</div>
-                    <span className="text-sm font-medium">
-                      Choose the option that best describes your preferences
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Answer Options with Tooltips */}
-            <div className="space-y-4">
-              {currentQuestion?.options?.map(
-                (option: string, index: number) => {
+              {/* Answer Options */}
+              <div className="space-y-2">
+                {currentQuestion?.options?.map((option: string, index: number) => {
                   const trimmedOption = option.trim();
-                  const hasDescription =
-                    currentQuestion?.options_descriptions?.[trimmedOption];
+                  const hasDescription = currentQuestion?.options_descriptions?.[trimmedOption];
+                  const isSelected = answers[currentQuestion?.question_id] === option || selectedOption === trimmedOption;
                   const isExpanded = expandedOption === trimmedOption;
-                  const isSelected = selectedOption === trimmedOption;
-                  const isHovered = hoveredOption === trimmedOption;
-
-                  const handleOptionClick = () => {
-                    if (isMobile && hasDescription) {
-                      if (isExpanded) {
-                        // Second tap - select the option
-                        setSelectedOption(trimmedOption);
-                        setTimeout(() => handleAnswerSelect(index), 300);
-                      } else {
-                        // First tap - show description
-                        setExpandedOption(trimmedOption);
-                      }
-                    } else {
-                      // Desktop or no description - direct selection
-                      handleAnswerSelect(index);
-                    }
-                  };
 
                   return (
                     <div key={index} className="relative">
                       <button
-                        onClick={handleOptionClick}
-                        onMouseEnter={() =>
-                          !isMobile && setHoveredOption(trimmedOption)
-                        }
-                        onMouseLeave={() => !isMobile && setHoveredOption(null)}
-                        onFocus={() => setHoveredOption(trimmedOption)}
-                        onBlur={() => setHoveredOption(null)}
+                        onClick={() => handleAnswerSelect(index)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" || e.key === " ") {
                             e.preventDefault();
-                            handleOptionClick();
-                          }
-                          if (e.key === "Escape") {
-                            setHoveredOption(null);
-                            setExpandedOption(null);
+                            handleAnswerSelect(index);
                           }
                         }}
-                        aria-describedby={
-                          hasDescription ? `tooltip-${index}` : undefined
-                        }
-                        aria-expanded={isMobile ? isExpanded : undefined}
                         role="option"
                         tabIndex={0}
-                        className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-300 hover:shadow-md relative ${
-                          answers[currentQuestion?.question_id] === option ||
+                        className={`w-full text-left p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border-2 transition-all duration-200 ${
                           isSelected
-                            ? "border-blue-500 bg-blue-50 shadow-lg transform scale-[1.02]"
-                            : isHovered || isExpanded
-                            ? "border-blue-300 bg-blue-50/50 shadow-md"
-                            : "border-gray-200 hover:border-blue-300 hover:bg-blue-50/50"
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-gray-200 hover:border-blue-200 hover:bg-gray-50 active:bg-gray-100"
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center flex-1">
-                            <div
-                              className={`w-6 h-6 rounded-full border-2 mr-4 flex items-center justify-center flex-shrink-0 ${
-                                answers[currentQuestion?.question_id] ===
-                                  option || isSelected
-                                  ? "border-blue-500 bg-blue-500"
-                                  : "border-gray-300"
-                              }`}
-                            >
-                              {(answers[currentQuestion?.question_id] ===
-                                option ||
-                                isSelected) && (
-                                <svg
-                                  className="w-3 h-3 text-white"
-                                  fill="currentColor"
-                                  viewBox="0 0 20 20"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                              )}
-                            </div>
-                            <span className="text-lg text-gray-700 font-medium">
-                              {trimmedOption}
-                            </span>
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          {/* Radio Button */}
+                          <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                            isSelected
+                              ? "border-blue-500 bg-blue-500"
+                              : "border-gray-300"
+                          }`}>
+                            {isSelected && (
+                              <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-white"></div>
+                            )}
                           </div>
 
-                          {/* Tooltip Icon */}
+                          {/* Option Text */}
+                          <span className="text-sm sm:text-base font-semibold text-gray-900 flex-1">
+                            {trimmedOption}
+                          </span>
+
+                          {/* Info Icon - Bottom Right */}
                           {hasDescription && (
-                            <div className="ml-4 flex-shrink-0">
-                              <div
-                                className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
-                                  isHovered || isExpanded
-                                    ? "text-blue-600 bg-blue-100"
-                                    : "text-gray-400 bg-gray-100"
-                                }`}
-                              >
-                                <svg
-                                  width="12"
-                                  height="12"
-                                  viewBox="0 0 24 24"
-                                  fill="currentColor"
-                                >
-                                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" />
-                                </svg>
-                              </div>
-                              {isMobile && (
-                                <div className="text-xs text-gray-500 mt-1">
-                                  {isExpanded ? "▼" : "▶️"}
-                                </div>
-                              )}
-                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedOption(isExpanded ? null : trimmedOption);
+                              }}
+                              className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center transition-colors flex-shrink-0 self-end ${
+                                isExpanded 
+                                  ? "bg-blue-500 text-white" 
+                                  : "bg-gray-200 text-gray-500 hover:bg-gray-300"
+                              }`}
+                              aria-label={isExpanded ? "Hide description" : "Show description"}
+                            >
+                              <span className="text-xs sm:text-sm font-bold">i</span>
+                            </button>
                           )}
                         </div>
-
-                        {/* Mobile Expanded Description */}
-                        {isMobile && isExpanded && hasDescription && (
-                          <div className="mt-4 pt-4 border-t border-gray-200">
-                            <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-700 leading-relaxed">
-                              <div className="font-semibold text-blue-700 mb-2">
-                                {trimmedOption}
-                              </div>
-                              <div>
-                                {
-                                  currentQuestion.options_descriptions![
-                                    trimmedOption
-                                  ]
-                                }
-                              </div>
-                              <div className="mt-3 text-center">
-                                <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
-                                  👆 Tap again to select this option
-                                </span>
-                              </div>
-                            </div>
+                        {/* Description - Only show when expanded */}
+                        {hasDescription && isExpanded && (
+                          <div className="mt-2 ml-8 sm:ml-10 pr-8 sm:pr-10 animate-fade-in">
+                            <span className="text-xs sm:text-sm text-gray-500 leading-relaxed">
+                              {currentQuestion.options_descriptions![trimmedOption]}
+                            </span>
                           </div>
                         )}
                       </button>
-
-                      {/* Desktop Tooltip */}
-                      {!isMobile && hasDescription && isHovered && (
-                        <div
-                          id={`tooltip-${index}`}
-                          role="tooltip"
-                          aria-hidden={!isHovered}
-                          className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 z-50 opacity-100 transition-opacity duration-300"
-                        >
-                          <div className="bg-gray-900 text-white p-4 rounded-xl shadow-2xl max-w-80 text-sm">
-                            <div className="font-semibold text-blue-300 mb-2">
-                              {trimmedOption}
-                            </div>
-                            <div className="text-gray-200 leading-relaxed">
-                              {
-                                currentQuestion.options_descriptions![
-                                  trimmedOption
-                                ]
-                              }
-                            </div>
-                          </div>
-                          <div className="absolute top-full left-1/2 transform -translate-x-1/2">
-                            <div className="w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-gray-900"></div>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   );
-                }
-              )}
+                })}
+              </div>
+
+              {/* Navigation - Back Button Only */}
+              <div className="flex items-center mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-100">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="flex items-center gap-1.5 sm:gap-2 text-gray-600 hover:text-gray-900 font-medium text-xs sm:text-sm transition-colors"
+                >
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Back
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Bottom Stats and Information */}
-          <div className="max-w-3xl mx-auto text-center space-y-4">
-            <div className="inline-flex items-center px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200">
-              <span className="text-sm text-gray-600">
-                <span className="font-semibold text-blue-600">
-                  {questionsAnswered}
-                </span>{" "}
-                questions answered •{" "}
-                <span className="font-semibold text-purple-600">
-                  {confidence}%
-                </span>{" "}
-                confidence
-              </span>
+          {/* Sidebar - Right Side (Shows below on mobile) */}
+          <div className="w-full lg:w-72 flex flex-col sm:flex-row lg:flex-col gap-3 sm:gap-4 flex-shrink-0 order-2">
+            {/* AI Confidence Card */}
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-3 sm:p-4 flex-1 sm:flex-none lg:flex-none">
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <h3 className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wide">AI Confidence</h3>
+                <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-blue-50 flex items-center justify-center">
+                  <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              
+              <div className="flex justify-center mb-2 sm:mb-3">
+                <CircularProgress value={confidence} size={100} />
+              </div>
+
+              {/* Stats */}
+              <div className="border-t border-gray-100 pt-2 sm:pt-3">
+                <h4 className="text-[9px] sm:text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1 sm:mb-2">Stats</h4>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] sm:text-xs text-gray-600">Questions answered</span>
+                  <span className="text-sm sm:text-base font-bold text-gray-900">{questionsAnswered}</span>
+                </div>
+              </div>
             </div>
 
-            {/* Enhanced Assessment Information with Tooltip Help */}
-            <div className="bg-gray-50 rounded-xl p-4 text-left">
-              <h4 className="text-sm font-semibold text-gray-800 mb-2">
-                💡 Assessment Guide:
-              </h4>
-              <ul className="text-xs text-gray-600 space-y-1">
-                <li>
-                  • {isMobile ? "Tap" : "Hover over"} options with info icons to
-                  see detailed explanations
+            {/* Assessment Guide Card - Hidden on mobile, visible on tablet+ */}
+            <div className="hidden sm:block bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-3 sm:p-4 flex-1 lg:flex-none">
+              <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-slate-800 flex items-center justify-center">
+                  <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                </div>
+                <h3 className="text-[10px] sm:text-xs font-semibold text-gray-900 uppercase tracking-wide">Assessment Guide</h3>
+              </div>
+              
+              <ul className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-xs text-gray-600">
+                <li className="flex items-start gap-1 sm:gap-1.5">
+                  <span className="text-gray-400">•</span>
+                  <span>Read descriptions under each option for details</span>
                 </li>
-                <li>• Answer questions to build confidence in career paths</li>
-                <li>• Assessment completes when you reach 90% confidence</li>
-                <li>
-                  • Consistent answers = faster completion (5-6 questions)
+                <li className="flex items-start gap-1 sm:gap-1.5">
+                  <span className="text-gray-400">•</span>
+                  <span>Answer to build confidence</span>
                 </li>
-                <li>
-                  • Mixed answers = more questions for accurate results (10-20
-                  questions)
+                <li className="flex items-start gap-1 sm:gap-1.5">
+                  <span className="text-gray-400">•</span>
+                  <span>Completes at 90%</span>
+                </li>
+                <li className="flex items-start gap-1 sm:gap-1.5">
+                  <span className="text-gray-400">•</span>
+                  <span>Consistent answers = faster completion (5-6 questions)</span>
+                </li>
+                <li className="flex items-start gap-1 sm:gap-1.5">
+                  <span className="text-gray-400">•</span>
+                  <span>Mixed answers = more questions (10-20)</span>
                 </li>
               </ul>
 
-              {/* Tooltip Status Indicator */}
+              {/* Description Status Indicator */}
               {currentQuestion?.options_descriptions &&
               Object.keys(currentQuestion.options_descriptions).length > 0 ? (
-                <div className="mt-3 pt-3 border-t border-gray-200">
-                  <div className="flex items-center text-xs text-green-600 font-medium">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
+                <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 py-1 sm:py-1.5 bg-green-50 rounded-lg">
+                    <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    Educational tooltips active - hover for explanations!
+                    <span className="text-[9px] sm:text-[10px] font-semibold text-green-700 uppercase tracking-wide">Option Details Visible</span>
                   </div>
                 </div>
               ) : (
-                <div className="mt-3 pt-3 border-t border-gray-200">
-                  <div className="flex items-center text-xs text-gray-500 font-medium">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                        clipRule="evenodd"
-                      />
+                <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 py-1 sm:py-1.5 bg-gray-50 rounded-lg">
+                    <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                     </svg>
-                    Basic assessment mode - answer based on your preferences
+                    <span className="text-[9px] sm:text-[10px] font-semibold text-gray-600 uppercase tracking-wide">Basic Mode</span>
                   </div>
                 </div>
               )}
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Footer - Compact */}
+      <div className="text-center py-2 text-[10px] sm:text-xs text-gray-400 flex-shrink-0">
+        Powered by CareerDiscovery AI • © {new Date().getFullYear()}
       </div>
 
       {/* Floating Chatbot */}

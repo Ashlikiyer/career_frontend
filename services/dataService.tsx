@@ -171,6 +171,15 @@ export async function loginUser(credentials: {
     if (response.token) {
       setAuth(response.token);
       console.log("Token set:", cookies.get("authToken"));
+      // Store user role in cookie for admin access control
+      if (response.role) {
+        cookies.set("userRole", response.role, {
+          path: "/",
+          secure: false,
+          sameSite: "lax",
+          domain: window.location.hostname === "localhost" ? "localhost" : undefined,
+        });
+      }
     } else {
       console.error("No token in login response:", response);
     }
@@ -182,6 +191,8 @@ export async function loginUser(credentials: {
 
 export async function logoutUser() {
   setAuth(null);
+  // Clear user role on logout
+  cookies.remove("userRole", { path: "/" });
 }
 
 // Check for existing assessment session
@@ -199,7 +210,7 @@ export async function checkAssessmentStatus() {
       message: "Active assessment found"
     }
     */
-  } catch (error) {
+  } catch {
     return { hasActiveAssessment: false };
   }
 }
@@ -737,7 +748,7 @@ export async function ensureValidSession() {
   try {
     const response = await dataFetch("../health", "GET"); // Remove /api prefix for health endpoint
     return response.session === "active";
-  } catch (error) {
+  } catch {
     return false;
   }
 }

@@ -94,6 +94,36 @@
   .animate-slide-up {
     animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
+  
+  /* Page transition animations */
+  .animate-page-enter {
+    animation: pageEnter 0.5s ease-out forwards;
+  }
+  
+  .animate-stagger-1 { animation-delay: 0.05s; }
+  .animate-stagger-2 { animation-delay: 0.1s; }
+  .animate-stagger-3 { animation-delay: 0.15s; }
+  .animate-stagger-4 { animation-delay: 0.2s; }
+  .animate-stagger-5 { animation-delay: 0.25s; }
+  .animate-stagger-6 { animation-delay: 0.3s; }
+  
+  /* Card enter animation */
+  .animate-card-enter {
+    animation: cardEnter 0.4s ease-out forwards;
+    opacity: 0;
+  }
+  
+  /* Scale up animation */
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out forwards;
+  }
+  
+  /* Skeleton shimmer */
+  .animate-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
 }
 
 @keyframes fadeIn {
@@ -127,4 +157,71 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Toast animations */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out forwards;
+}
+
+.animate-shrink {
+  animation: shrink linear forwards;
 }

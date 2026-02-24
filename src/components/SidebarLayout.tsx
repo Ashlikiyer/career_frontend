@@ -33,9 +33,14 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children }) => {
   const location = useLocation();
   const cookies = new Cookies();
   const [menuOpen, setMenuOpen] = React.useState(false);
+  
+  // Check if user is admin
+  const userRole = cookies.get("userRole");
+  const isAdmin = userRole === "admin";
 
   const handleLogout = () => {
     cookies.remove("authToken");
+    cookies.remove("userRole");
     navigate("/login");
   };
 
@@ -60,11 +65,12 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children }) => {
       url: "/assessment",
       icon: FileText,
     },
-    {
+    // Only show Analytics for admin users
+    ...(isAdmin ? [{
       title: "Analytics (Admin)",
       url: "/admin",
       icon: BarChart3,
-    },
+    }] : []),
   ];
 
   const handleMenuClick = (url: string) => {

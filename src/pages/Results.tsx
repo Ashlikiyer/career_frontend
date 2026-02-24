@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import FloatingChatbot from "../components/FloatingChatbot";
 import FeedbackModal from "../components/ui/FeedbackModal";
 import { saveCareer } from "../../services/dataService";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle2Icon } from "lucide-react";
-import "./Results.css";
+import { useToast } from "@/components/ui/Toast";
+import { BookOpen, Play, Code, Users, CheckCircle2 } from "lucide-react";
 
 interface CareerSuggestion {
   career: string;
@@ -35,53 +34,87 @@ interface ResultsProps {
   assessmentId?: number | null;
 }
 
+// Career images mapping
+const careerImages: { [key: string]: string } = {
+  "UX/UI Designer": "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=600&h=400&fit=crop",
+  "Frontend Developer": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=400&fit=crop",
+  "Backend Developer": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=400&fit=crop",
+  "Full Stack Developer": "https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?w=600&h=400&fit=crop",
+  "Data Scientist": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop",
+  "Product Manager": "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600&h=400&fit=crop",
+  "Game Developer": "https://images.unsplash.com/photo-1556438064-2d7646166914?w=600&h=400&fit=crop",
+  "Mobile Developer": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=400&fit=crop",
+  "DevOps Engineer": "https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=600&h=400&fit=crop",
+  "QA Engineer": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop",
+  "default": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop"
+};
+
+// Get skills based on career
+const getCareerSkills = (careerName: string): string[] => {
+  const skillsMap: { [key: string]: string[] } = {
+    "UX/UI Designer": ["Wireframing", "Prototyping", "Figma Mastery", "User Research"],
+    "Frontend Developer": ["React/Vue", "TypeScript", "CSS/Tailwind", "Responsive Design"],
+    "Backend Developer": ["Node.js/Python", "Databases", "API Design", "Server Management"],
+    "Full Stack Developer": ["Frontend", "Backend", "DevOps", "System Design"],
+    "Data Scientist": ["Python", "Machine Learning", "Statistics", "Data Visualization"],
+    "Product Manager": ["Strategy", "User Stories", "Analytics", "Communication"],
+    "Game Developer": ["Unity/Unreal", "C#/C++", "3D Math", "Game Design"],
+    "Mobile Developer": ["React Native", "Swift/Kotlin", "UI/UX", "App Store"],
+    "DevOps Engineer": ["CI/CD", "Docker/K8s", "Cloud", "Monitoring"],
+    "QA Engineer": ["Testing", "Automation", "Performance", "Documentation"]
+  };
+  return skillsMap[careerName] || ["Problem Solving", "Communication", "Learning", "Teamwork"];
+};
+
+// Get career icon color
+const getCareerIconColor = (index: number): string => {
+  const colors = ["text-blue-500", "text-red-500", "text-cyan-500", "text-purple-500", "text-green-500"];
+  return colors[index % colors.length];
+};
+
+const getCareerBgColor = (index: number): string => {
+  const colors = ["bg-blue-100", "bg-red-100", "bg-cyan-100", "bg-purple-100", "bg-green-100"];
+  return colors[index % colors.length];
+};
+
 const Results = ({
   initialRecommendations,
   onRestart,
   assessmentId,
 }: ResultsProps) => {
   const navigate = useNavigate();
+  const toast = useToast();
   const [recommendations, setRecommendations] = useState<Recommendations>(
     initialRecommendations
   );
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [selectedCareers, setSelectedCareers] = useState<string[]>([]);
-  const [showAllCareers, setShowAllCareers] = useState(false);
   const [savingCareers, setSavingCareers] = useState<Set<string>>(new Set());
 
   // Feedback modal state
-  const [showFeedbackModal, setShowFeedbackModal] = useState(true); // Auto-show after assessment
-  const [feedbackSuccess, setFeedbackSuccess] = useState<string | null>(null);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(true);
 
   useEffect(() => {
     setRecommendations(initialRecommendations);
   }, [initialRecommendations]);
 
   const handleSaveCareer = async (careerName: string, score: number) => {
-    // Add to saving state
     setSavingCareers((prev) => new Set([...prev, careerName]));
 
     try {
-      setError(null);
       const response = await saveCareer(careerName, score);
       setSelectedCareers([...selectedCareers, careerName]);
 
-      // Enhanced success message with roadmap info
       if (response.roadmapGenerated && response.roadmapSteps) {
-        setSuccess(
-          `✅ ${careerName} saved! 🗺️ ${response.roadmapSteps} learning steps ready to explore. Your roadmap is ready!`
+        toast.success(
+          `${careerName} saved! ${response.roadmapSteps} learning steps ready to explore.`
         );
       } else {
-        setSuccess(`✅ ${careerName} saved successfully!`);
+        toast.success(`${careerName} saved successfully!`);
       }
-
-      setTimeout(() => setSuccess(null), 5000);
     } catch (err: unknown) {
       const error = err as any;
       let errorMessage = "Failed to save career. Please try again.";
 
-      // Enhanced error handling
       if (
         error.response?.status === 400 &&
         error.response?.data?.message?.includes("already saved")
@@ -93,11 +126,9 @@ const Results = ({
         errorMessage = error.message;
       }
 
-      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Save Career Error:", err);
-      setTimeout(() => setError(null), 5000);
     } finally {
-      // Remove from saving state
       setSavingCareers((prev) => {
         const newSet = new Set(prev);
         newSet.delete(careerName);
@@ -106,141 +137,131 @@ const Results = ({
     }
   };
 
-  // Feedback handling functions
   const handleFeedbackSuccess = () => {
-    setFeedbackSuccess(
-      "Thank you for your feedback! Your input helps us improve our assessment experience."
-    );
-    setTimeout(() => setFeedbackSuccess(null), 5000);
+    toast.success("Thank you for your feedback! Your input helps us improve.");
+  };
+
+  const getCareerImage = (careerName: string) => {
+    return careerImages[careerName] || careerImages["default"];
   };
 
   if (!recommendations.careers.length) {
     return (
-      <div className="results-container">
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="bg-white rounded-xl shadow-lg p-8 border-2 border-red-200 max-w-md">
-            <p className="text-red-600 text-center text-lg font-medium">
-              No recommendations available.
-            </p>
-          </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-lg p-8 border border-red-200 max-w-md text-center">
+          <p className="text-red-600 text-lg font-medium">
+            No recommendations available.
+          </p>
+          <button
+            onClick={onRestart}
+            className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Retake Assessment
+          </button>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="results-container">
-      <div className="max-w-6xl mx-auto">
-        {error && (
-          <Alert
-            variant="destructive"
-            className="fixed top-4 right-4 z-50 max-w-sm success-alert"
-          >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        {success && (
-          <Alert
-            variant="success"
-            className="fixed top-4 right-4 z-50 max-w-sm success-alert"
-          >
-            <CheckCircle2Icon className="h-4 w-4" />
-            <AlertTitle>Success!</AlertTitle>
-            <AlertDescription>{success}</AlertDescription>
-          </Alert>
-        )}
-        {feedbackSuccess && (
-          <Alert
-            variant="success"
-            className="fixed top-4 right-4 z-50 max-w-sm success-alert"
-          >
-            <CheckCircle2Icon className="h-4 w-4" />
-            <AlertTitle>Success!</AlertTitle>
-            <AlertDescription>{feedbackSuccess}</AlertDescription>
-          </Alert>
-        )}
+  const primaryCareer = recommendations.careers[0];
+  const otherCareers = recommendations.careers.slice(1, 4);
 
-        {/* Header Section */}
-        <div className="results-header">
-          <div className="results-icon-wrapper">
-            <svg
-              className="results-icon"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <h2 className="results-title">Your Career Assessment Results</h2>
-          <p className="results-subtitle">
-            Based on your assessment, we've identified career paths that align
-            perfectly with your skills, interests, and aspirations.
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* Header */}
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+            Your Career Assessment Results
+          </h1>
+          <p className="text-sm sm:text-base text-gray-500 max-w-2xl mx-auto">
+            We've analyzed your skills, interests, and personality profile. Here are the
+            career paths where you're most likely to thrive.
           </p>
         </div>
 
-        {/* Primary Career */}
-        {recommendations.careers.length > 0 && (
-          <div className="primary-career-section">
-            <h3 className="section-title">🎯 Your Best Match</h3>
-            <div className="primary-career-card">
-              <div className="career-card-header">
-                <h4 className="career-name">
-                  {recommendations.careers[0].career_name}
-                </h4>
-                <div className="match-badge">
-                  {recommendations.careers[0].score}% Match
+        {/* Best Match Hero Card */}
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg overflow-hidden mb-8 sm:mb-12">
+          <div className="flex flex-col lg:flex-row">
+            {/* Left - Image */}
+            <div className="lg:w-2/5 relative">
+              <img
+                src={getCareerImage(primaryCareer.career_name)}
+                alt={primaryCareer.career_name}
+                className="w-full h-48 sm:h-64 lg:h-full object-cover"
+              />
+              <div className="absolute top-4 left-4">
+                <span className="bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
+                  Best Match
+                </span>
+              </div>
+            </div>
+
+            {/* Right - Content */}
+            <div className="lg:w-3/5 p-5 sm:p-8">
+              <div className="flex items-start justify-between mb-4">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+                  {primaryCareer.career_name}
+                </h2>
+                <div className="text-right">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-500">
+                    {primaryCareer.score}%
+                  </div>
+                  <div className="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wide">
+                    Match Score
+                  </div>
                 </div>
               </div>
-              {recommendations.careers[0].reason && (
-                <p className="career-reason">
-                  {recommendations.careers[0].reason}
+
+              {primaryCareer.reason && (
+                <p className="text-sm sm:text-base text-gray-600 mb-5 leading-relaxed">
+                  {primaryCareer.reason}
                 </p>
               )}
-              <div className="career-actions">
+
+              {/* Core Skills */}
+              <div className="mb-6">
+                <h4 className="text-xs uppercase tracking-wide text-gray-400 font-semibold mb-2">
+                  Core Skills Required
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {getCareerSkills(primaryCareer.career_name).map((skill, idx) => (
+                    <span
+                      key={idx}
+                      className="px-3 py-1 bg-gray-100 text-gray-700 text-xs sm:text-sm rounded-full"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <div>
                 <button
                   onClick={() =>
-                    handleSaveCareer(
-                      recommendations.careers[0].career_name,
-                      recommendations.careers[0].score
-                    )
+                    handleSaveCareer(primaryCareer.career_name, primaryCareer.score)
                   }
                   disabled={
-                    selectedCareers.includes(
-                      recommendations.careers[0].career_name
-                    ) ||
-                    savingCareers.has(recommendations.careers[0].career_name)
+                    selectedCareers.includes(primaryCareer.career_name) ||
+                    savingCareers.has(primaryCareer.career_name)
                   }
-                  className="save-career-btn"
+                  className={`flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors text-sm ${
+                    selectedCareers.includes(primaryCareer.career_name)
+                      ? "bg-green-500 text-white"
+                      : "bg-blue-500 text-white hover:bg-blue-600"
+                  }`}
                 >
-                  {savingCareers.has(recommendations.careers[0].career_name) ? (
+                  {savingCareers.has(primaryCareer.career_name) ? (
                     <>
-                      <div className="loading-spinner"></div>
-                      Saving & Generating Roadmap...
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Saving...
                     </>
-                  ) : selectedCareers.includes(
-                      recommendations.careers[0].career_name
-                    ) ? (
-                    "✓ Saved"
+                  ) : selectedCareers.includes(primaryCareer.career_name) ? (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      Saved
+                    </>
                   ) : (
                     "Save This Career"
                   )}
@@ -248,230 +269,162 @@ const Results = ({
               </div>
             </div>
           </div>
-        )}
-
-        {/* Additional Careers */}
-        {recommendations.careers.length > 1 && (
-          <div className="additional-careers-section">
-            <div className="section-header">
-              <h3 className="section-title">🔍 Other Great Matches</h3>
-              {!showAllCareers && (
-                <button
-                  onClick={() => setShowAllCareers(true)}
-                  className="show-all-btn"
-                >
-                  Show All {recommendations.careers.length - 1} Options
-                </button>
-              )}
-            </div>
-
-            {showAllCareers && (
-              <div className="careers-grid">
-                {recommendations.careers.slice(1).map((career, index) => (
-                  <div key={index + 1} className="career-card">
-                    <div className="career-card-header">
-                      <h4 className="career-name">{career.career_name}</h4>
-                      <div className="match-badge secondary">
-                        {career.score}% Match
-                      </div>
-                    </div>
-                    {career.reason && (
-                      <p className="career-reason">{career.reason}</p>
-                    )}
-                    <button
-                      onClick={() =>
-                        handleSaveCareer(career.career_name, career.score)
-                      }
-                      disabled={
-                        selectedCareers.includes(career.career_name) ||
-                        savingCareers.has(career.career_name)
-                      }
-                      className="save-career-btn secondary"
-                    >
-                      {savingCareers.has(career.career_name) ? (
-                        <>
-                          <div className="loading-spinner"></div>
-                          Saving...
-                        </>
-                      ) : selectedCareers.includes(career.career_name) ? (
-                        "✓ Saved"
-                      ) : (
-                        "Save This Career"
-                      )}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="main-actions">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="primary-action-btn"
-          >
-            View My Saved Careers ({selectedCareers.length})
-          </button>
-          <button onClick={onRestart} className="secondary-action-btn">
-            Retake Assessment
-          </button>
         </div>
 
-        {/* Learning Resources */}
-        <div className="learning-resources">
-          <div className="resources-header">
-            <div className="resources-icon-wrapper">
-              <svg
-                className="resources-icon"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
-            </div>
-            <h3 className="resources-title">Where to Learn?</h3>
-          </div>
-          <p className="resources-description">
-            Kickstart your career journey with these FREE learning platforms
-            designed to help you master new skills:
-          </p>
-          <div className="resources-grid">
-            <div className="resource-card">
-              <div className="resource-card-header">
-                <div className="resource-icon-badge">💻</div>
-                <h4 className="resource-name">freeCodeCamp</h4>
-                <span className="resource-tag">FREE</span>
-              </div>
-              <p className="resource-description">
-                Master web development, data science, and more with interactive
-                coding challenges and certifications.
-              </p>
-            </div>
+        {/* Other Great Matches */}
+        {otherCareers.length > 0 && (
+          <div className="mb-8 sm:mb-12">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-5">
+              Other Great Matches
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {otherCareers.map((career, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-xl sm:rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                >
+                  {/* Icon and Match */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={`w-10 h-10 rounded-xl ${getCareerBgColor(index)} flex items-center justify-center`}>
+                      <Code className={`w-5 h-5 ${getCareerIconColor(index)}`} />
+                    </div>
+                    <div className={`text-sm font-bold ${getCareerIconColor(index)}`}>
+                      {career.score}% Match
+                    </div>
+                  </div>
 
-            <div className="resource-card">
-              <div className="resource-card-header">
-                <div className="resource-icon-badge">🎓</div>
-                <h4 className="resource-name">Codecademy</h4>
-                <span className="resource-tag">FREE</span>
-              </div>
-              <p className="resource-description">
-                Learn programming languages through hands-on interactive lessons
-                in Python, JavaScript, SQL, and more.
-              </p>
-            </div>
+                  {/* Career Name */}
+                  <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-2">
+                    {career.career_name}
+                  </h4>
 
-            <div className="resource-card">
-              <div className="resource-card-header">
-                <div className="resource-icon-badge">📚</div>
-                <h4 className="resource-name">Coursera</h4>
-                <span className="resource-tag">FREE</span>
-              </div>
-              <p className="resource-description">
-                Access university-level courses from top institutions. Audit
-                courses for free or pay for certificates.
-              </p>
-            </div>
+                  {/* Reason */}
+                  {career.reason && (
+                    <p className="text-xs sm:text-sm text-gray-500 mb-4 line-clamp-2">
+                      {career.reason}
+                    </p>
+                  )}
 
-            <div className="resource-card">
-              <div className="resource-card-header">
-                <div className="resource-icon-badge">🚀</div>
-                <h4 className="resource-name">The Odin Project</h4>
-                <span className="resource-tag">FREE</span>
-              </div>
-              <p className="resource-description">
-                Complete full-stack web development curriculum with real
-                projects and supportive community.
-              </p>
-            </div>
-
-            <div className="resource-card">
-              <div className="resource-card-header">
-                <div className="resource-icon-badge">🌟</div>
-                <h4 className="resource-name">Khan Academy</h4>
-                <span className="resource-tag">FREE</span>
-              </div>
-              <p className="resource-description">
-                Build foundational skills in math, computer science, and more
-                with personalized learning paths.
-              </p>
-            </div>
-
-            <div className="resource-card">
-              <div className="resource-card-header">
-                <div className="resource-icon-badge">📖</div>
-                <h4 className="resource-name">MDN Web Docs</h4>
-                <span className="resource-tag">FREE</span>
-              </div>
-              <p className="resource-description">
-                Comprehensive documentation and tutorials for web technologies
-                from Mozilla Developer Network.
-              </p>
-            </div>
-
-            <div className="resource-card">
-              <div className="resource-card-header">
-                <div className="resource-icon-badge">☁️</div>
-                <h4 className="resource-name">AWS Skill Builder</h4>
-                <span className="resource-tag">FREE</span>
-              </div>
-              <p className="resource-description">
-                Learn cloud computing with Amazon Web Services through free
-                training courses and hands-on labs.
-              </p>
-            </div>
-
-            <div className="resource-card">
-              <div className="resource-card-header">
-                <div className="resource-icon-badge">🐍</div>
-                <h4 className="resource-name">Python.org</h4>
-                <span className="resource-tag">FREE</span>
-              </div>
-              <p className="resource-description">
-                Official Python documentation with beginner guides, tutorials,
-                and comprehensive references.
-              </p>
-            </div>
-
-            <div className="resource-card">
-              <div className="resource-card-header">
-                <div className="resource-icon-badge">🎯</div>
-                <h4 className="resource-name">Google Digital Garage</h4>
-                <span className="resource-tag">FREE</span>
-              </div>
-              <p className="resource-description">
-                Free courses on digital marketing, data analytics, career
-                development, and more from Google.
-              </p>
+                  {/* Save Button */}
+                  <button
+                    onClick={() => handleSaveCareer(career.career_name, career.score)}
+                    disabled={
+                      selectedCareers.includes(career.career_name) ||
+                      savingCareers.has(career.career_name)
+                    }
+                    className={`w-full py-2 px-4 rounded-lg font-medium text-sm transition-colors ${
+                      selectedCareers.includes(career.career_name)
+                        ? "bg-green-50 text-green-600 border border-green-200"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {savingCareers.has(career.career_name) ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+                        Saving...
+                      </span>
+                    ) : selectedCareers.includes(career.career_name) ? (
+                      "✓ Saved"
+                    ) : (
+                      "Save This Career"
+                    )}
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
+        )}
+
+        {/* Where to Learn */}
+        <div className="bg-gray-100 rounded-2xl sm:rounded-3xl p-5 sm:p-8 mb-8 sm:mb-12">
+          <div className="text-center mb-6">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
+              Where to Learn
+            </h3>
+            <p className="text-sm text-gray-500">
+              Curated resources to help you master the skills for your best match.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            {/* Coursera */}
+            <a
+              href="https://www.coursera.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-xl p-4 text-center hover:shadow-md transition-shadow"
+            >
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <BookOpen className="w-5 h-5 text-blue-600" />
+              </div>
+              <h4 className="font-bold text-gray-900 text-sm">Coursera</h4>
+              <p className="text-[10px] sm:text-xs text-gray-400">Professional Certs</p>
+            </a>
+
+            {/* freeCodeCamp */}
+            <a
+              href="https://www.freecodecamp.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-xl p-4 text-center hover:shadow-md transition-shadow"
+            >
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <Code className="w-5 h-5 text-green-600" />
+              </div>
+              <h4 className="font-bold text-gray-900 text-sm">freeCodeCamp</h4>
+              <p className="text-[10px] sm:text-xs text-gray-400">Interactive Coding</p>
+            </a>
+
+            {/* Udemy */}
+            <a
+              href="https://www.udemy.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-xl p-4 text-center hover:shadow-md transition-shadow"
+            >
+              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <Play className="w-5 h-5 text-purple-600" />
+              </div>
+              <h4 className="font-bold text-gray-900 text-sm">Udemy</h4>
+              <p className="text-[10px] sm:text-xs text-gray-400">Practical Skills</p>
+            </a>
+
+            {/* UX Collective */}
+            <a
+              href="https://uxdesign.cc"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-xl p-4 text-center hover:shadow-md transition-shadow"
+            >
+              <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <Users className="w-5 h-5 text-orange-600" />
+              </div>
+              <h4 className="font-bold text-gray-900 text-sm">UX Collective</h4>
+              <p className="text-[10px] sm:text-xs text-gray-400">Thought Leadership</p>
+            </a>
+          </div>
+        </div>
+
+        {/* Secondary Actions */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+          <button
+            onClick={onRestart}
+            className="text-gray-500 hover:text-gray-700 font-medium text-sm"
+          >
+            Retake Assessment
+          </button>
+          <span className="hidden sm:block text-gray-300">|</span>
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="text-blue-500 hover:text-blue-600 font-medium text-sm"
+          >
+            View Saved Careers ({selectedCareers.length})
+          </button>
         </div>
       </div>
 
       {/* Floating Chatbot */}
       <FloatingChatbot position="bottom-right" />
-
-      {/* Feedback Success Alert */}
-      {feedbackSuccess && (
-        <div className="fixed top-4 right-4 z-50">
-          <Alert className="bg-green-50 border-green-200">
-            <CheckCircle2Icon className="h-4 w-4 text-green-600" />
-            <AlertTitle className="text-green-800">
-              Feedback Submitted!
-            </AlertTitle>
-            <AlertDescription className="text-green-700">
-              {feedbackSuccess}
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
 
       {/* Feedback Modal */}
       <FeedbackModal

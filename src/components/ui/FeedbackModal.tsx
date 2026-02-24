@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { submitUserFeedback } from "../../../services/dataService";
+import { useToast } from "./Toast";
 import "./FeedbackModal.css";
 
 interface FeedbackModalProps {
@@ -15,6 +16,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
   onSuccess,
   isOpen,
 }) => {
+  const toast = useToast();
   const [rating, setRating] = useState(5);
   const [feedbackText, setFeedbackText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,7 +34,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
       onClose();
     } catch (error) {
       console.error("Feedback submission error:", error);
-      alert("Failed to submit feedback. Please try again.");
+      toast.error("Failed to submit feedback. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

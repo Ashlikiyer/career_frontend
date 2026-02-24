@@ -8,6 +8,7 @@ import Dashboard from "./pages/DashboardNew";
 import AdminDashboard from "./pages/AdminDashboard";
 import StudentProgress from "./pages/StudentProgress";
 import SidebarLayout from "./components/SidebarLayout";
+import { ToastProvider } from "./components/ui/Toast";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -23,7 +24,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const App = () => {
   return (
-    <BrowserRouter>
+    <ToastProvider>
+      <BrowserRouter>
       <Routes>
         {/* Public route - Homepage (no sidebar, has its own navbar) */}
         <Route path="/" element={<Homepage />} />
@@ -75,6 +77,7 @@ const App = () => {
         />
       </Routes>
     </BrowserRouter>
+    </ToastProvider>
   );
 };
 
