@@ -2,7 +2,6 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import {
-  Home,
   FileText,
   LogOut,
   LayoutDashboard,
@@ -45,11 +44,6 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children }) => {
   };
 
   const menuItems = [
-    {
-      title: "Home",
-      url: "/",
-      icon: Home,
-    },
     {
       title: "Dashboard",
       url: "/dashboard",
