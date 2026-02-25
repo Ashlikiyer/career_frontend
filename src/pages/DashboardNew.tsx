@@ -27,7 +27,6 @@ import {
   GraduationCap, 
   Linkedin, 
   Play, 
-  Trash2, 
   LayoutGrid, 
   Calendar, 
   ChevronRight, 
