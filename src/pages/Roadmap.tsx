@@ -86,7 +86,7 @@ const DIFFICULTY_INFO: Record<DifficultyLevel, DifficultyInfo> = {
     color: "#16a34a",
     bgColor: "#dcfce7",
     borderColor: "#86efac",
-    icon: "🌱",
+    icon: "",
     description: "Foundational skills and introductory concepts",
     expectedEffort: "Comfortable learning pace",
     prerequisites: "No prior experience required",
@@ -97,7 +97,7 @@ const DIFFICULTY_INFO: Record<DifficultyLevel, DifficultyInfo> = {
     color: "#ca8a04",
     bgColor: "#fef9c3",
     borderColor: "#fde047",
-    icon: "📚",
+    icon: "",
     description: "Applied knowledge and problem-solving skills",
     expectedEffort: "Moderate effort required",
     prerequisites: "Complete all Beginner steps first",
@@ -108,7 +108,7 @@ const DIFFICULTY_INFO: Record<DifficultyLevel, DifficultyInfo> = {
     color: "#dc2626",
     bgColor: "#fee2e2",
     borderColor: "#fca5a5",
-    icon: "🚀",
+    icon: "",
     description: "Industry-level and career-ready competencies",
     expectedEffort: "Significant time investment",
     prerequisites: "Complete all Intermediate steps first",
@@ -871,23 +871,23 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
 
   return (
     <div className="roadmap-container">
-      <div className="flex-grow p-8">
-        <div className="max-w-5xl mx-auto">
+      <div className="flex-grow p-4 sm:p-8">
+        <div className="max-w-5xl mx-auto px-1 sm:px-0">
           <div className="roadmap-header">
             {/* Modern Header with Icon and Progress Card */}
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
               {/* Left: Icon and Title */}
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <BookOpen className="w-7 h-7 text-white" />
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                  <BookOpen className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
+                <div className="min-w-0">
+                  <h1 className="text-lg sm:text-2xl font-bold text-gray-900 leading-tight truncate">
                     {roadmapData?.career_name || careerName} Learning Path
                   </h1>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-50 text-indigo-700">
-                      <Target className="w-4 h-4 mr-1" />
+                    <span className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium bg-indigo-50 text-indigo-700">
+                      <Target className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                       {roadmapData?.total_steps || roadmap.length} steps
                     </span>
                   </div>
@@ -895,10 +895,10 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
               </div>
 
               {/* Right: Progress Card */}
-              <div className="bg-white rounded-xl border border-gray-200 p-4 min-w-[200px] shadow-sm">
+              <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 sm:min-w-[200px] shadow-sm">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-500">Overall Progress</span>
-                  <span className="text-lg font-bold text-indigo-600">
+                  <span className="text-xs sm:text-sm text-gray-500">Overall Progress</span>
+                  <span className="text-base sm:text-lg font-bold text-indigo-600">
                     {roadmapData?.total_steps
                       ? Math.round((roadmapData.completed_steps / roadmapData.total_steps) * 100)
                       : 0}%
@@ -1045,14 +1045,14 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                       >
                         {/* Clickable Header Row */}
                         <div
-                          className="step-card-header cursor-pointer hover:bg-gray-50 transition-colors p-4"
+                          className="step-card-header cursor-pointer hover:bg-gray-50 transition-colors p-3 sm:p-4"
                           onClick={() => toggleStepExpansion(step.step_id)}
                         >
-                          <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-start justify-between gap-2 sm:gap-4">
                             <div className="flex-1 min-w-0">
                               {/* Title Row with Status */}
-                              <div className="flex items-center gap-3 flex-wrap">
-                                <h2 className="text-lg font-semibold text-gray-900">{step.title}</h2>
+                              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                                <h2 className="text-base sm:text-lg font-semibold text-gray-900 leading-tight">{step.title}</h2>
                                 {step.is_done && (
                                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
                                     <CheckCircle className="w-3.5 h-3.5" />
@@ -1074,10 +1074,10 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                               </div>
                               
                               {/* Description Preview */}
-                              <p className="text-sm text-gray-500 mt-1 line-clamp-2">{step.description}</p>
+                              <p className="text-xs sm:text-sm text-gray-500 mt-1 line-clamp-2">{step.description}</p>
                               
                               {/* Badges Row */}
-                              <div className="flex items-center gap-3 mt-3 flex-wrap">
+                              <div className="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-3 flex-wrap">
                                 {/* Difficulty Badge */}
                                 {(() => {
                                   const difficulty = step.difficulty_level || "beginner";
@@ -1131,13 +1131,13 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                         
                         {/* Expandable Content */}
                         {expandedSteps.has(step.step_id) && (
-                          <div className="border-t border-gray-100 p-4 bg-gray-50/50">
+                          <div className="border-t border-gray-100 p-3 sm:p-4 bg-gray-50/50">
 
                             {/* Time Tracking Controls */}
                             {!step.is_done && !step.started_at && (
                               <div className="mb-4">
                                 <button
-                                  className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors w-full sm:w-auto text-sm sm:text-base"
                                   onClick={() => handleStartStep(step)}
                                 >
                                   <PlayCircle className="w-4 h-4" />
@@ -1149,7 +1149,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                             {!step.is_done && step.started_at && activeStepId !== step.step_id && (
                               <div className="mb-4">
                                 <button
-                                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full sm:w-auto text-sm sm:text-base"
                                   onClick={() => handleStartStep(step)}
                                 >
                                   <PlayCircle className="w-4 h-4" />
@@ -1159,28 +1159,28 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                             )}
 
                             {activeStepId === step.step_id && !step.is_done && (
-                              <div className="mb-4 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                                <div className="flex items-center justify-between flex-wrap gap-3">
-                                  <div className="flex items-center gap-2">
+                              <div className="mb-4 p-2.5 sm:p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+                                  <div className="flex items-center gap-2 flex-wrap">
                                     <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                                    <span className="text-emerald-700 font-medium">Currently Learning</span>
-                                    <span className="text-emerald-600 font-mono">
+                                    <span className="text-emerald-700 font-medium text-sm">Currently Learning</span>
+                                    <span className="text-emerald-600 font-mono text-sm">
                                       {formatLiveTime(liveElapsedSeconds)}
                                     </span>
                                   </div>
                                   {!isPaused ? (
                                     <button
-                                      className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-100 text-amber-700 rounded-md hover:bg-amber-200 transition-colors text-sm"
+                                      className="inline-flex items-center justify-center gap-2 px-3 py-1.5 bg-amber-100 text-amber-700 rounded-md hover:bg-amber-200 transition-colors text-sm w-full sm:w-auto"
                                       onClick={handlePauseTracking}
                                     >
-                                      ⏸ Pause
+                                      Pause
                                     </button>
                                   ) : (
                                     <button
-                                      className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-md hover:bg-emerald-200 transition-colors text-sm"
+                                      className="inline-flex items-center justify-center gap-2 px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-md hover:bg-emerald-200 transition-colors text-sm w-full sm:w-auto"
                                       onClick={() => handleStartStep(step)}
                                     >
-                                      ▶ Resume
+                                      Resume
                                     </button>
                                   )}
                                 </div>
@@ -1194,28 +1194,28 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                               );
 
                               return (
-                                <div className="mb-4 p-3 rounded-lg border bg-white">
+                                <div className="mb-4 p-2.5 sm:p-3 rounded-lg border bg-white">
                                   {stepAssessmentInfo?.is_locked ? (
-                                    <div className="flex items-center gap-3 text-gray-500">
-                                      <Lock className="w-5 h-5" />
-                                      <div>
-                                        <p className="font-medium">Step Locked</p>
-                                        <p className="text-sm">Complete Step {step.step_number - 1} first</p>
+                                    <div className="flex items-center gap-2 sm:gap-3 text-gray-500">
+                                      <Lock className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                                      <div className="min-w-0">
+                                        <p className="font-medium text-sm sm:text-base">Step Locked</p>
+                                        <p className="text-xs sm:text-sm">Complete Step {step.step_number - 1} first</p>
                                       </div>
                                     </div>
                                   ) : stepAssessmentInfo?.is_completed && stepAssessmentInfo?.assessment_passed ? (
-                                    <div className="flex items-center justify-between flex-wrap gap-3">
-                                      <div className="flex items-center gap-3 text-emerald-600">
-                                        <CheckCircle className="w-5 h-5" />
-                                        <div>
-                                          <p className="font-medium">Assessment Passed</p>
-                                          <p className="text-sm text-gray-500">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+                                      <div className="flex items-center gap-2 sm:gap-3 text-emerald-600">
+                                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                                        <div className="min-w-0">
+                                          <p className="font-medium text-sm sm:text-base">Assessment Passed</p>
+                                          <p className="text-xs sm:text-sm text-gray-500">
                                             Completed {stepAssessmentInfo.completed_at ? new Date(stepAssessmentInfo.completed_at).toLocaleDateString() : ""}
                                           </p>
                                         </div>
                                       </div>
                                       <button
-                                        className="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                                        className="px-3 py-1.5 text-xs sm:text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors w-full sm:w-auto"
                                         onClick={() => handleTakeAssessment(step.step_number)}
                                       >
                                         Retake
@@ -1223,7 +1223,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                                     </div>
                                   ) : (
                                     <button
-                                      className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors w-full sm:w-auto text-sm sm:text-base"
                                       onClick={() => handleTakeAssessment(step.step_number)}
                                     >
                                       <Target className="w-4 h-4" />
@@ -1267,7 +1267,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                                           : "Week"}
                                       </span>
                                       <span className="week-hours">
-                                        ⏱️ {week.estimatedHours}
+                                        {week.estimatedHours}
                                       </span>
                                     </div>
                                     <h4 className="week-topic">{week.topic}</h4>
@@ -1406,7 +1406,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                                                   </div>
                                                   {resourceDuration && (
                                                     <div className="resource-duration">
-                                                      ⏱️ {resourceDuration}
+                                                      {resourceDuration}
                                                     </div>
                                                   )}
                                                 </div>
@@ -1445,7 +1445,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                                                   className="practice-item"
                                                 >
                                                   <span className="practice-bullet">
-                                                    📝
+                                                    •
                                                   </span>
                                                   {exercise}
                                                 </li>
@@ -1466,11 +1466,11 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                                 <div className="milestone-section">
                                   <div className="milestone-header">
                                     <h3 className="milestone-title">
-                                      <span className="milestone-icon">🎯</span>
+                                      <span className="milestone-icon">*</span>
                                       Milestone Project
                                     </h3>
                                     <span className="milestone-time">
-                                      ⏱️ {step.milestone_project.estimatedTime}
+                                      {step.milestone_project.estimatedTime}
                                     </span>
                                   </div>
                                   <h4 className="milestone-project-title">
@@ -1602,7 +1602,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                           </button>
                           {!step.is_done && !hasPassedAssessment && (
                             <p className="assessment-required-hint">
-                              📝 Pass the assessment to unlock manual marking
+                              Pass the assessment to unlock manual marking
                             </p>
                           )}
                         </div>
@@ -1682,7 +1682,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                     
                     <div className="flex-1">
                       <h2 className="text-xl font-bold mb-1">
-                        {assessmentResult.passed ? "🎉 Congratulations!" : "📚 Keep Learning!"}
+                        {assessmentResult.passed ? "Congratulations!" : "Keep Learning!"}
                       </h2>
                       <p className="text-white/80 text-sm">{assessmentResult.message}</p>
                       
@@ -2009,7 +2009,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                   />
                 </svg>
               </div>
-              <h2 className="modal-title">🎉 Congratulations!</h2>
+              <h2 className="modal-title">Congratulations!</h2>
               <p className="modal-description">
                 You've completed the{" "}
                 <span className="modal-career-name">

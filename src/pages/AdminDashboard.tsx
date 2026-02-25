@@ -192,7 +192,7 @@ const AdminDashboard = () => {
     return (
       <div className="admin-dashboard">
         <div className="admin-error">
-          <h2>⚠️ Access Error</h2>
+          <h2>Access Error</h2>
           <p>{error}</p>
           <button onClick={() => navigate("/dashboard")} className="back-btn">
             Back to Dashboard
@@ -1657,7 +1657,7 @@ const AdminDashboard = () => {
             ← Back to Dashboard
           </button>
           <div className="header-title">
-            <span className="title-icon">📊</span>
+            <span className="title-icon"></span>
             <h1>Analytics Dashboard</h1>
             <span className="admin-badge">ADMIN</span>
           </div>

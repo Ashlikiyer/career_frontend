@@ -601,7 +601,7 @@ const Assessment = () => {
               {isLongAssessment && (
                 <div className="mb-2 sm:mb-3">
                   <div className="bg-purple-50 border border-purple-200 rounded-lg p-2 sm:p-2.5 flex items-center gap-2">
-                    <span className="text-sm">🎯</span>
+                    <span className="text-sm">*</span>
                     <span className="text-[10px] sm:text-xs text-purple-700">Taking your time to find the perfect match!</span>
                   </div>
                 </div>

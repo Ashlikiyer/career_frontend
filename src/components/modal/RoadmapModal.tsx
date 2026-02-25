@@ -34,7 +34,7 @@ const RoadmapModal: React.FC<RoadmapModalProps> = ({
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            Roadmaps Auto-Generated! 🎉
+            Roadmaps Auto-Generated!
           </h2>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <p className="text-blue-800 text-sm leading-relaxed">

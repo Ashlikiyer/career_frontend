@@ -19,8 +19,27 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Bookmark, Puzzle, CheckCircle, Code, GraduationCap, Linkedin, Play } from "lucide-react";
+import { 
+  Bookmark, 
+  Puzzle, 
+  CheckCircle, 
+  Code, 
+  GraduationCap, 
+  Linkedin, 
+  Play, 
+  Trash2, 
+  LayoutGrid, 
+  Calendar, 
+  ChevronRight, 
+  MoreVertical,
+  TrendingUp,
+  Palette,
+  Database,
+  Briefcase,
+  Clock
+} from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
+import "./DashboardNew.css";
 
 interface SavedCareer {
   saved_career_id: number;
@@ -335,214 +354,223 @@ const DashboardNew = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="dashboard-stats-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
           {/* Total Saved Careers */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-1">
+          <div className="dashboard-stat-card bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-1">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Total Saved Careers</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{totalCareers}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-500">Total Saved Careers</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{totalCareers}</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Bookmark className="w-6 h-6 text-blue-600" />
+              <div className="dashboard-stat-icon w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Bookmark className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
             </div>
           </div>
 
           {/* In Progress */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-2">
+          <div className="dashboard-stat-card bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-2">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">In Progress</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{inProgressCareers}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-500">In Progress</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{inProgressCareers}</p>
               </div>
-              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                <Puzzle className="w-6 h-6 text-amber-600" />
+              <div className="dashboard-stat-icon w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                <Puzzle className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
               </div>
             </div>
           </div>
 
           {/* Completed Assessments */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-3">
+          <div className="dashboard-stat-card bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Completed Assessments</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{completedCareers}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-500">Completed Assessments</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{completedCareers}</p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+              <div className="dashboard-stat-icon w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Career Collection Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-8 animate-card-enter animate-stagger-4">
-          <div className="p-6 border-b border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-900">Your Career Collection</h2>
-            <p className="text-sm text-gray-500 mt-1">Explore your saved careers with automatically generated learning roadmaps</p>
+{/* Career Collection - Redesigned */}
+        <div className="career-collection-section mb-8 animate-card-enter animate-stagger-4">
+          {/* Header */}
+          <div className="career-collection-header">
+            <div className="career-collection-header-left">
+              <div className="career-collection-icon-box">
+                <LayoutGrid />
+              </div>
+              <div className="career-collection-title-group">
+                <h2 className="career-collection-title">Your Career Collection</h2>
+                <p className="career-collection-subtitle">Explore your saved careers with automatically generated learning roadmaps</p>
+              </div>
+            </div>
+            {savedCareers.length > 0 && (
+              <div className="career-count-badge">
+                {savedCareers.length} Career{savedCareers.length !== 1 ? 's' : ''} Saved
+              </div>
+            )}
           </div>
+          
+          {/* Divider */}
+          <div className="career-collection-divider" />
 
           {savedCareers.length === 0 ? (
-            <div className="p-12 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Bookmark className="w-8 h-8 text-gray-400" />
+            <div className="career-empty-state">
+              <div className="career-empty-icon">
+                <Bookmark />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No saved careers yet</h3>
-              <p className="text-gray-500 mb-6">Take the assessment to discover your career path!</p>
-              <button
-                onClick={handleStartAssessment}
-                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors"
-              >
+              <h3 className="career-empty-title">No saved careers yet</h3>
+              <p className="career-empty-text">Take the assessment to discover your career path!</p>
+              <button onClick={handleStartAssessment} className="career-empty-btn">
                 Start Assessment
               </button>
             </div>
           ) : (
-            <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Career Path</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Category</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Progress</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Saved Date</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {savedCareers.map((career) => {
-                    const status = getStatus(career);
-                    const progressPercent = career.progress
-                      ? Math.round(
-                          (career.progress.completed_steps /
-                            career.progress.total_steps) *
-                            100,
-                        ) || 0
-                      : 0;
+            <div className="career-cards-grid">
+              {savedCareers.map((career) => {
+                const status = getStatus(career);
+                const progressPercent = career.progress
+                  ? Math.round(
+                      (career.progress.completed_steps /
+                        career.progress.total_steps) *
+                        100,
+                    ) || 0
+                  : 0;
+                const totalSteps = career.progress?.total_steps || 10;
+                const completedSteps = career.progress?.completed_steps || 0;
+                const category = careerCategories[career.career_name] || "Technology";
+                
+                // Determine icon type based on category
+                const getIconType = () => {
+                  if (category.includes("Design") || category.includes("Creative")) return "design";
+                  if (category.includes("Data")) return "data";
+                  if (category.includes("Business")) return "business";
+                  return "tech";
+                };
+                const iconType = getIconType();
 
-                    return (
-                      <tr key={career.saved_career_id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4">
-                          <span className="font-medium text-gray-900">{career.career_name}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="text-gray-600">{careerCategories[career.career_name] || "Technology"}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                            status === "completed" 
-                              ? "bg-green-100 text-green-700" 
-                              : status === "in-progress" 
-                                ? "bg-amber-100 text-amber-700" 
-                                : "bg-gray-100 text-gray-600"
-                          }`}>
-                            {status === "completed" && <CheckCircle className="w-3.5 h-3.5" />}
-                            {status === "in-progress" && <Puzzle className="w-3.5 h-3.5" />}
+                return (
+                  <div 
+                    key={career.saved_career_id} 
+                    className={`career-card-new status-${status === "completed" ? "completed" : status === "in-progress" ? "in-progress" : "not-started"}`}
+                  >
+                    {/* Header Row */}
+                    <div className="career-card-header-row">
+                      <div className={`career-card-icon type-${iconType}`}>
+                        {iconType === "design" && <Palette />}
+                        {iconType === "data" && <Database />}
+                        {iconType === "business" && <Briefcase />}
+                        {iconType === "tech" && <TrendingUp />}
+                      </div>
+                      <div className="career-card-info">
+                        <div className="career-card-name">{career.career_name}</div>
+                        <div className="career-card-meta">
+                          <span className="career-card-category">{category}</span>
+                          <span className="career-card-dot" />
+                          <span className={`career-status-badge ${status === "completed" ? "completed" : status === "in-progress" ? "in-progress" : "not-started"}`}>
+                            {status === "completed" && <CheckCircle />}
+                            {status === "in-progress" && <Clock />}
                             {getStatusLabel(status)}
                           </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden max-w-[120px]">
-                              <div
-                                className={`h-full rounded-full transition-all ${
-                                  status === "completed" 
-                                    ? "bg-green-500" 
-                                    : status === "in-progress" 
-                                      ? "bg-amber-500" 
-                                      : "bg-gray-400"
-                                }`}
-                                style={{ width: `${progressPercent}%` }}
-                              />
-                            </div>
-                            <span className="text-sm text-gray-600 whitespace-nowrap">{progressPercent}%</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="text-gray-600">{new Date(career.saved_at).toLocaleDateString()}</span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() =>
-                                handleViewRoadmap(
-                                  career.saved_career_id,
-                                  career.career_name,
-                                )
-                              }
-                              className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                                status === "in-progress" || status === "completed"
-                                  ? "bg-indigo-600 hover:bg-indigo-700 text-white"
-                                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                              }`}
-                            >
-                              {status === "in-progress" || status === "completed" ? "Continue Learning" : "View Roadmap"}
-                            </button>
-
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <button
-                                  onClick={() =>
-                                    setCareerToDelete({
-                                      savedCareerId: career.saved_career_id,
-                                      careerName: career.career_name,
-                                    })
-                                  }
-                                  className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                  title="Delete career"
-                                >
-                                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                  </svg>
-                                </button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent className="bg-white border-gray-200">
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle className="text-gray-900">Delete Career?</AlertDialogTitle>
-                                  <AlertDialogDescription className="text-gray-600">
-                                    This will permanently delete "{careerToDelete?.careerName}" and all your learning progress. This action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel className="bg-gray-100 text-gray-800 hover:bg-gray-200 border-gray-300">Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={handleDeleteCareer} className="bg-red-600 hover:bg-red-700 text-white">Delete</AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                        </div>
+                      </div>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button
+                            onClick={() =>
+                              setCareerToDelete({
+                                savedCareerId: career.saved_career_id,
+                                careerName: career.career_name,
+                              })
+                            }
+                            className="career-card-menu-btn"
+                            title="Options"
+                          >
+                            <MoreVertical className="w-5 h-5" />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-white border-gray-200">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="text-gray-900">Delete Career?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-gray-600">
+                              This will permanently delete "{careerToDelete?.careerName}" and all your learning progress. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="bg-gray-100 text-gray-800 hover:bg-gray-200 border-gray-300">Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDeleteCareer} className="bg-red-600 hover:bg-red-700 text-white">Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                    
+                    {/* Progress Section */}
+                    <div className="career-card-progress-section">
+                      <div className="career-card-progress-header">
+                        <span className="career-card-progress-label">Progress</span>
+                        <span className="career-card-progress-value">{completedSteps}/{totalSteps} • {progressPercent}%</span>
+                      </div>
+                      <div className="career-card-progress-bar">
+                        <div 
+                          className={`career-card-progress-fill ${status === "completed" ? "completed" : status === "in-progress" ? "in-progress" : "not-started"}`}
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Footer */}
+                    <div className="career-card-footer">
+                      <div className="career-card-date">
+                        <Calendar />
+                        {new Date(career.saved_at).toLocaleDateString()}
+                      </div>
+                      <button
+                        onClick={() =>
+                          handleViewRoadmap(
+                            career.saved_career_id,
+                            career.career_name,
+                          )
+                        }
+                        className="career-card-view-btn"
+                      >
+                        View Roadmap
+                        <ChevronRight />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
 
         {/* Where to Learn Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
-          <div className="p-6 border-b border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-900">Where to Learn?</h2>
-            <p className="text-sm text-gray-500 mt-1">Start learning today with these top-rated platforms</p>
+        <div className="learn-section bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
+          <div className="learn-section-header p-4 sm:p-6 border-b border-gray-100">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Where to Learn?</h2>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">Start learning today with these top-rated platforms</p>
           </div>
           
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-4 sm:p-6">
+            <div className="learn-platforms-grid grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {/* freeCodeCamp */}
               <a 
                 href="https://www.freecodecamp.org" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="group flex flex-col items-center p-6 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
+                className="learn-platform-card group flex flex-col items-center p-4 sm:p-6 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
               >
-                <div className="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center mb-4 group-hover:shadow-md transition-shadow">
-                  <Code className="w-7 h-7 text-green-600" />
+                <div className="learn-platform-icon w-10 h-10 sm:w-14 sm:h-14 bg-white rounded-xl shadow-sm flex items-center justify-center mb-3 sm:mb-4 group-hover:shadow-md transition-shadow">
+                  <Code className="w-5 h-5 sm:w-7 sm:h-7 text-green-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">freeCodeCamp</h3>
-                <p className="text-sm text-gray-500 text-center mb-3">Free coding certifications</p>
-                <span className="text-sm font-medium text-indigo-600 group-hover:text-indigo-700">Start Learning →</span>
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 text-center">freeCodeCamp</h3>
+                <p className="text-xs sm:text-sm text-gray-500 text-center mb-2 sm:mb-3 hidden sm:block">Free coding certifications</p>
+                <span className="text-xs sm:text-sm font-medium text-indigo-600 group-hover:text-indigo-700">Learn →</span>
               </a>
 
               {/* Coursera */}
@@ -550,14 +578,14 @@ const DashboardNew = () => {
                 href="https://www.coursera.org" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="group flex flex-col items-center p-6 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
+                className="learn-platform-card group flex flex-col items-center p-4 sm:p-6 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
               >
-                <div className="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center mb-4 group-hover:shadow-md transition-shadow">
-                  <GraduationCap className="w-7 h-7 text-blue-600" />
+                <div className="learn-platform-icon w-10 h-10 sm:w-14 sm:h-14 bg-white rounded-xl shadow-sm flex items-center justify-center mb-3 sm:mb-4 group-hover:shadow-md transition-shadow">
+                  <GraduationCap className="w-5 h-5 sm:w-7 sm:h-7 text-blue-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">Coursera</h3>
-                <p className="text-sm text-gray-500 text-center mb-3">University courses online</p>
-                <span className="text-sm font-medium text-indigo-600 group-hover:text-indigo-700">Start Learning →</span>
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 text-center">Coursera</h3>
+                <p className="text-xs sm:text-sm text-gray-500 text-center mb-2 sm:mb-3 hidden sm:block">University courses online</p>
+                <span className="text-xs sm:text-sm font-medium text-indigo-600 group-hover:text-indigo-700">Learn →</span>
               </a>
 
               {/* LinkedIn Learning */}
@@ -565,14 +593,14 @@ const DashboardNew = () => {
                 href="https://www.linkedin.com/learning" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="group flex flex-col items-center p-6 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
+                className="learn-platform-card group flex flex-col items-center p-4 sm:p-6 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
               >
-                <div className="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center mb-4 group-hover:shadow-md transition-shadow">
-                  <Linkedin className="w-7 h-7 text-blue-700" />
+                <div className="learn-platform-icon w-10 h-10 sm:w-14 sm:h-14 bg-white rounded-xl shadow-sm flex items-center justify-center mb-3 sm:mb-4 group-hover:shadow-md transition-shadow">
+                  <Linkedin className="w-5 h-5 sm:w-7 sm:h-7 text-blue-700" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">LinkedIn Learning</h3>
-                <p className="text-sm text-gray-500 text-center mb-3">Professional skill courses</p>
-                <span className="text-sm font-medium text-indigo-600 group-hover:text-indigo-700">Start Learning →</span>
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 text-center">LinkedIn</h3>
+                <p className="text-xs sm:text-sm text-gray-500 text-center mb-2 sm:mb-3 hidden sm:block">Professional skill courses</p>
+                <span className="text-xs sm:text-sm font-medium text-indigo-600 group-hover:text-indigo-700">Learn →</span>
               </a>
 
               {/* YouTube Edu */}
@@ -580,27 +608,27 @@ const DashboardNew = () => {
                 href="https://www.youtube.com/education" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="group flex flex-col items-center p-6 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
+                className="learn-platform-card group flex flex-col items-center p-4 sm:p-6 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
               >
-                <div className="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center mb-4 group-hover:shadow-md transition-shadow">
-                  <Play className="w-7 h-7 text-red-600" />
+                <div className="learn-platform-icon w-10 h-10 sm:w-14 sm:h-14 bg-white rounded-xl shadow-sm flex items-center justify-center mb-3 sm:mb-4 group-hover:shadow-md transition-shadow">
+                  <Play className="w-5 h-5 sm:w-7 sm:h-7 text-red-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">YouTube Edu</h3>
-                <p className="text-sm text-gray-500 text-center mb-3">Free video tutorials</p>
-                <span className="text-sm font-medium text-indigo-600 group-hover:text-indigo-700">Start Learning →</span>
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 text-center">YouTube</h3>
+                <p className="text-xs sm:text-sm text-gray-500 text-center mb-2 sm:mb-3 hidden sm:block">Free video tutorials</p>
+                <span className="text-xs sm:text-sm font-medium text-indigo-600 group-hover:text-indigo-700">Learn →</span>
               </a>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-gray-200 pt-8 pb-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-500">© 2025 CareerAI. All rights reserved.</p>
-            <div className="flex items-center gap-6">
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-700 transition-colors">Privacy Policy</a>
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-700 transition-colors">Terms of Service</a>
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-700 transition-colors">Help Center</a>
+        <footer className="dashboard-footer border-t border-gray-200 pt-6 sm:pt-8 pb-4">
+          <div className="flex flex-col items-center gap-3 sm:gap-4 text-center sm:text-left sm:flex-row sm:justify-between">
+            <p className="text-xs sm:text-sm text-gray-500">© 2025 CareerAI. All rights reserved.</p>
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+              <a href="#" className="text-xs sm:text-sm text-gray-500 hover:text-gray-700 transition-colors">Privacy Policy</a>
+              <a href="#" className="text-xs sm:text-sm text-gray-500 hover:text-gray-700 transition-colors">Terms of Service</a>
+              <a href="#" className="text-xs sm:text-sm text-gray-500 hover:text-gray-700 transition-colors">Help Center</a>
             </div>
           </div>
         </footer>

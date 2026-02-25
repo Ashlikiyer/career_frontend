@@ -69,7 +69,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
               />
             </svg>
           </div>
-          <h2 className="modal-title">🎉 Assessment Complete!</h2>
+          <h2 className="modal-title">Assessment Complete!</h2>
           <p className="modal-description">Rate Your Assessment Experience</p>
           <p className="modal-subdescription">
             Your feedback helps us improve our career assessment tools

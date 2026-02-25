@@ -281,13 +281,13 @@ const ITChatbot: React.FC = () => {
 
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between text-red-700 gap-2 flex-shrink-0">
-          <span className="text-xs sm:text-sm">⚠️ {error}</span>
+          <span className="text-xs sm:text-sm">{error}</span>
           <button
             onClick={retry}
             disabled={isLoading}
             className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white px-3 py-1 rounded text-xs transition-colors duration-200 whitespace-nowrap"
           >
-            {isLoading ? "🔄 Retrying..." : "🔄 Retry"}
+            {isLoading ? "Retrying..." : "Retry"}
           </button>
         </div>
       )}
@@ -346,7 +346,7 @@ const ITChatbot: React.FC = () => {
           <div className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-5 bg-gradient-to-b from-gray-50 to-gray-100 scroll-smooth">
             {messages.length === 0 && (
               <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-3 sm:p-5 rounded-lg sm:rounded-xl mb-3 sm:mb-4 border-l-4 border-blue-500">
-                <div className="text-2xl sm:text-3xl mb-2 text-center">👋</div>
+                <div className="text-2xl sm:text-3xl mb-2 text-center">Hi!</div>
                 <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3 text-center">
                   Hi! I'm your IT career assistant
                 </h4>
@@ -355,23 +355,23 @@ const ITChatbot: React.FC = () => {
                 </p>
                 <ul className="space-y-1.5 mb-2 sm:mb-3">
                   <li className="flex items-start gap-2 bg-white/60 p-2 rounded-lg text-[11px] sm:text-xs text-gray-700">
-                    <span className="flex-shrink-0">🏢</span>
+                    <span className="flex-shrink-0">•</span>
                     <span>Career information and guidance</span>
                   </li>
                   <li className="flex items-start gap-2 bg-white/60 p-2 rounded-lg text-[11px] sm:text-xs text-gray-700">
-                    <span className="flex-shrink-0">🛠️</span>
+                    <span className="flex-shrink-0">•</span>
                     <span>Technology skills and learning paths</span>
                   </li>
                   <li className="flex items-start gap-2 bg-white/60 p-2 rounded-lg text-[11px] sm:text-xs text-gray-700">
-                    <span className="flex-shrink-0">💻</span>
+                    <span className="flex-shrink-0">•</span>
                     <span>Programming and development questions</span>
                   </li>
                   <li className="flex items-start gap-2 bg-white/60 p-2 rounded-lg text-[11px] sm:text-xs text-gray-700">
-                    <span className="flex-shrink-0">📈</span>
+                    <span className="flex-shrink-0">•</span>
                     <span>Industry trends and opportunities</span>
                   </li>
                   <li className="flex items-start gap-2 bg-white/60 p-2 rounded-lg text-[11px] sm:text-xs text-gray-700">
-                    <span className="flex-shrink-0">💰</span>
+                    <span className="flex-shrink-0">•</span>
                     <span>Salary information and growth</span>
                   </li>
                 </ul>
@@ -399,13 +399,13 @@ const ITChatbot: React.FC = () => {
                     message.response_type === "career_info" &&
                     message.career && (
                       <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-semibold mb-2 sm:mb-3 inline-block">
-                        💼 {message.career}
+                        {message.career}
                       </div>
                     )}
                   {message.message_type === "bot" &&
                     message.response_type === "scope_limitation" && (
                       <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-semibold mb-2 sm:mb-3 inline-block">
-                        🎯 IT Career Focus
+                        IT Career Focus
                       </div>
                     )}
                   <pre className="whitespace-pre-wrap font-sans text-xs sm:text-sm leading-relaxed m-0">
@@ -481,7 +481,7 @@ const ITChatbot: React.FC = () => {
           {messages.length === 0 && suggestions.length > 0 && (
             <div className="p-2 sm:p-4 md:p-6 bg-gradient-to-br from-gray-50 to-gray-100 border-t border-gray-200 flex-shrink-0 overflow-y-auto max-h-36 sm:max-h-56">
               <h4 className="text-xs sm:text-sm font-semibold text-gray-800 mb-2 sm:mb-3 flex items-center gap-2">
-                💡 Suggested Questions:
+                Suggested Questions:
               </h4>
               <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {suggestions.map((suggestion, index) => (

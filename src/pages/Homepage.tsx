@@ -107,9 +107,9 @@ const Homepage = () => {
     );
   };
 
-  // Homepage content component
-  const HomepageContent = () => (
-    <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 ${isLoggedIn ? "" : ""}`}>
+  // Homepage content 
+  const homepageContent = (
+    <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30`}>
       {/* Header/Navbar - Only show for anonymous users */}
       {!isLoggedIn && (
         <>
@@ -674,7 +674,7 @@ const Homepage = () => {
           {/* Bottom */}
           <div className="border-t border-slate-800 pt-6 text-center">
             <p className="text-slate-400 text-sm">
-              © 2025 PathFinder. All Rights Reserved. Made with <span className="text-red-400">❤</span> for students.
+              © 2025 PathFinder. All Rights Reserved. Made with love for students.
             </p>
           </div>
         </div>
@@ -689,13 +689,13 @@ const Homepage = () => {
   if (isLoggedIn) {
     return (
       <SidebarLayout>
-        <HomepageContent />
+        {homepageContent}
       </SidebarLayout>
     );
   }
 
   // For anonymous users, show homepage without sidebar
-  return <HomepageContent />;
+  return homepageContent;
 };
 
 export default Homepage;

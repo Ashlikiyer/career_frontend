@@ -19,6 +19,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
   const [isOpen, setIsOpen] = useState(initiallyOpen);
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isOpening, setIsOpening] = useState(false); // Prevent immediate close
 
   useEffect(() => {
     // Check for unread messages in chat history
@@ -49,14 +50,26 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
     }
   }, [isOpen, showUnreadIndicator]);
 
-  const handleOpen = () => {
+  const handleOpen = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsOpening(true);
     setIsOpen(true);
     setHasUnreadMessages(false);
     // Mark visit time
     localStorage.setItem("chatbot-last-visit", new Date().toISOString());
+    // Reset isOpening after a short delay to allow normal close behavior
+    setTimeout(() => setIsOpening(false), 300);
   };
 
-  const handleClose = () => {
+  const handleClose = (e?: React.MouseEvent) => {
+    // Prevent immediate close after opening
+    if (isOpening) {
+      return;
+    }
+    if (e) {
+      e.stopPropagation();
+    }
     setIsOpen(false);
     setIsMinimized(false);
     // Mark visit time
@@ -72,7 +85,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") {
+    if (e.key === "Escape" && !isOpening) {
       handleClose();
     }
   };
@@ -97,7 +110,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
               onClick={handleOpen}
               role="button"
               tabIndex={0}
-              onKeyDown={handleKeyDown}
+              onKeyDown={(e) => e.key === "Enter" && handleOpen(e as unknown as React.MouseEvent)}
             >
               {customTriggerButton}
             </div>
@@ -166,7 +179,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
                   aria-label={isMinimized ? "Maximize chat" : "Minimize chat"}
                   title={isMinimized ? "Maximize" : "Minimize"}
                 >
-                  {isMinimized ? "⬆️" : "⬇️"}
+                  {isMinimized ? "+" : "-"}
                 </button>
                 <button
                   className="bg-white/20 hover:bg-white/40 text-white w-10 h-10 sm:w-11 sm:h-11 rounded-lg flex items-center justify-center text-xl sm:text-2xl font-bold transition-all duration-200 hover:scale-110 shadow-lg"
@@ -174,7 +187,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
                   aria-label="Close chat"
                   title="Close chat"
                 >
-                  ✕
+                  x
                 </button>
               </div>
             </div>
@@ -189,7 +202,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
             {/* Minimized State */}
             {isMinimized && (
               <div className="p-3 text-center text-gray-600 text-sm bg-gray-50">
-                <p>💬 Chat minimized - click ⬆️ to expand</p>
+                <p>Chat minimized - click + to expand</p>
               </div>
             )}
           </div>
