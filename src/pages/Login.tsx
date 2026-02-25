@@ -19,7 +19,7 @@ const Login = () => {
       const response = await loginUser({ email, password });
       toast.success(response.message || "Login successful!");
       setTimeout(() => {
-        navigate("/");
+        navigate("/dashboard");
       }, 2000);
     } catch (error: any) {
       e.preventDefault();
