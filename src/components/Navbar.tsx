@@ -48,13 +48,12 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-1">
-              <div className="w-14 h-14 flex items-center justify-center">
+            <Link to="/" className="flex items-center space-x-2">
+              <div className="w-12 h-12 flex items-center justify-center">
                 <img
-                  src="/src/assets/Career_logo.svg"
-                  alt="Career Logo"
-                  className="w-12 h-12 object-contain"
-                  style={{ filter: "brightness(0) saturate(100%)" }}
+                  src="/pathfinder-logo.png"
+                  alt="PathFinder Logo"
+                  className="w-10 h-10 object-contain"
                 />
               </div>
               <span className="text-xl font-bold text-gray-900">

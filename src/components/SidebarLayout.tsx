@@ -98,12 +98,11 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children }) => {
         {/* Header - animated */}
         <div className="flex items-center justify-between p-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white flex-shrink-0">
           <div className="flex items-center gap-3 animate-slideInLeft">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg">
+            <div className="flex h-12 w-12 items-center justify-center">
               <img
-                src="/Career_logo.svg"
+                src="/pathfinder-logo.png"
                 alt="PathFinder Logo"
-                className="h-6 w-6"
-                style={{ filter: "brightness(0) invert(1)" }}
+                className="h-12 w-12 object-contain"
               />
             </div>
             <div className="flex flex-col">

@@ -117,9 +117,11 @@ const Homepage = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-between h-16">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                    <Target className="w-5 h-5 text-white" />
-                  </div>
+                  <img 
+                    src="/pathfinder-logo.png" 
+                    alt="PathFinder Logo" 
+                    className="w-10 h-10 object-contain"
+                  />
                   <span className="text-lg sm:text-xl font-bold text-gray-900">PathFinder</span>
                 </div>
 
@@ -635,9 +637,11 @@ const Homepage = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8 mb-8">
             {/* Brand */}
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <Target className="w-6 h-6 text-white" />
-              </div>
+              <img 
+                src="/pathfinder-logo.png" 
+                alt="PathFinder Logo" 
+                className="w-12 h-12 object-contain"
+              />
               <div>
                 <span className="text-xl font-bold">PathFinder</span>
                 <p className="text-slate-400 text-sm">Career Guidance for CCS Students</p>

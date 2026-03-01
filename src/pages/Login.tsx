@@ -3,17 +3,23 @@ import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../../services/dataService";
 import { useToast } from "@/components/ui/Toast";
 import { Eye, EyeOff, Mail, Lock, Sparkles, Map, Target, ArrowRight } from "lucide-react";
+import EmailVerificationModal from "@/components/EmailVerificationModal";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
+    setIsSubmitting(true);
 
     try {
       const response = await loginUser({ email, password });
@@ -22,9 +28,16 @@ const Login = () => {
         navigate("/dashboard");
       }, 2000);
     } catch (error: any) {
-      e.preventDefault();
-
       let errorMessage = "Login failed. Please try again.";
+
+      // Check if email verification is required
+      if (error.response?.status === 403 && error.response?.data?.requiresVerification) {
+        setVerificationEmail(error.response?.data?.email || email);
+        setShowVerificationModal(true);
+        toast.info("Please verify your email to continue");
+        setIsSubmitting(false);
+        return;
+      }
 
       if (error.response?.status === 401) {
         errorMessage = "Invalid email or password. Account does not exist.";
@@ -34,12 +47,21 @@ const Login = () => {
         errorMessage = error.message;
       } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
       }
 
       toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
 
     return false;
+  };
+
+  const handleVerified = () => {
+    toast.success("Email verified! Welcome to PathFinder!");
+    navigate("/dashboard");
   };
 
   return (
@@ -176,10 +198,23 @@ const Login = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25"
+                disabled={isSubmitting}
+                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Sign In
-                <ArrowRight className="w-5 h-5" />
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Signing In...
+                  </>
+                ) : (
+                  <>
+                    Sign In
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
               </button>
             </form>
 
@@ -213,6 +248,14 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* Email Verification Modal */}
+      <EmailVerificationModal
+        isOpen={showVerificationModal}
+        email={verificationEmail}
+        onClose={() => setShowVerificationModal(false)}
+        onVerified={handleVerified}
+      />
     </div>
   );
 };

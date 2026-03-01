@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, ResponseType } from "axios";
 import { Cookies } from "react-cookie";
 
 // API Configuration - Change this URL when deploying to production
-const API_URL = "https://career.careerapp.xyz"; // For production (remove trailing slash)
+const API_URL = "http://localhost:5000"; // For production (remove trailing slash)
 // const API_URL = "http://localhost:5000"; // Uncomment for local development
 
 const api = axios.create({
@@ -156,7 +156,37 @@ export async function registerUser(userData: {
 }) {
   try {
     const response = await dataFetch("users/register", "POST", userData);
-    return response; // { message: "User registered", userId: 1 }
+    return response; // { message: "...", userId: 1, requiresVerification: true }
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function verifyEmail(data: { email: string; code: string }) {
+  try {
+    const response = await dataFetch("users/verify-email", "POST", data);
+    if (response.token) {
+      setAuth(response.token);
+      console.log("Token set after verification:", cookies.get("authToken"));
+      if (response.role) {
+        cookies.set("userRole", response.role, {
+          path: "/",
+          secure: false,
+          sameSite: "lax",
+          domain: window.location.hostname === "localhost" ? "localhost" : undefined,
+        });
+      }
+    }
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function resendVerificationCode(email: string) {
+  try {
+    const response = await dataFetch("users/resend-verification", "POST", { email });
+    return response;
   } catch (error) {
     throw error;
   }
