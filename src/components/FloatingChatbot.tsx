@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { MessageCircle, Bot } from "lucide-react";
+import { Bot } from "lucide-react";
 import ITChatbot from "./ITChatbot";
 
 interface FloatingChatbotProps {
