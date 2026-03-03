@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { MessageCircle, Bot } from "lucide-react";
 import ITChatbot from "./ITChatbot";
 
 interface FloatingChatbotProps {
@@ -121,12 +122,7 @@ const FloatingChatbot: React.FC<FloatingChatbotProps> = ({
               aria-label="Open IT Career Assistant"
               title="Need help with your IT career? Click to chat!"
             >
-              <span className="text-xl sm:text-2xl transition-all duration-300 hover:scale-125">
-                🤖
-              </span>
-              <span className="text-base sm:text-lg transition-all duration-300 hover:translate-x-0.5">
-                💬
-              </span>
+              <Bot className="w-6 h-6 sm:w-7 sm:h-7 text-white transition-all duration-300" />
               {hasUnreadMessages && showUnreadIndicator && (
                 <span
                   className="absolute top-2 right-2 w-3 h-3 bg-red-500 border-2 border-white rounded-full text-xs animate-pulse"

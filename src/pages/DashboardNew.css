@@ -61,8 +61,8 @@
 }
 
 .career-collection-title::before {
-  content: '📚';
-  font-size: 1.25rem;
+  content: '';
+  display: none;
 }
 
 .career-collection-subtitle {
@@ -599,7 +599,9 @@
 @media (max-width: 480px) {
   .career-collection-section {
     padding: 0.875rem;
-    margin: 0 -0.5rem;
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    margin-bottom: 1.5rem;
     border-radius: 12px;
   }
   
@@ -658,25 +660,18 @@
 /* === Dashboard Stats Cards Mobile === */
 @media (max-width: 640px) {
   .dashboard-stats-grid {
-    grid-template-columns: 1fr !important;
-    gap: 0.75rem;
+    /* Allow 3-column layout on mobile */
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem;
   }
   
   .dashboard-stat-card {
-    padding: 1rem !important;
-  }
-  
-  .dashboard-stat-card h3 {
-    font-size: 0.8125rem;
-  }
-  
-  .dashboard-stat-card p {
-    font-size: 1.5rem !important;
+    padding: 0.75rem !important;
   }
   
   .dashboard-stat-icon {
-    width: 2.5rem !important;
-    height: 2.5rem !important;
+    width: 2.25rem !important;
+    height: 2.25rem !important;
   }
 }
 
@@ -712,7 +707,9 @@
 
 @media (max-width: 480px) {
   .learn-section {
-    margin: 0 -0.25rem;
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
+    margin-bottom: 1.5rem;
   }
   
   .learn-platforms-grid {

@@ -852,8 +852,8 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   if (error) {
     return (
       <div className="roadmap-container">
-        <div className="flex-grow p-8 flex items-center justify-center">
-          <div className="max-w-md w-full">
+        <div className="flex-grow p-4 sm:p-8 flex items-center justify-center">
+          <div className="max-w-md w-full px-4">
             <Alert variant="destructive">
               <AlertTitle>Error Loading Roadmap</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
@@ -921,41 +921,41 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
               {/* Learning Time Card */}
-              <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-blue-500" />
+              <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500" />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Learning Time</p>
-                  <p className="text-xl font-bold text-gray-900">
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-gray-500">Learning Time</p>
+                  <p className="text-lg sm:text-xl font-bold text-gray-900 truncate">
                     {roadmapData?.total_time_formatted || formatTime(roadmapData?.total_time_minutes || 0)}
                   </p>
                 </div>
               </div>
 
               {/* Steps In Progress Card */}
-              <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4">
-                <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-amber-500" />
+              <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Steps In Progress</p>
-                  <p className="text-xl font-bold text-gray-900">
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-gray-500">Steps In Progress</p>
+                  <p className="text-lg sm:text-xl font-bold text-gray-900">
                     {roadmapData?.steps_in_progress || 0}
                   </p>
                 </div>
               </div>
 
               {/* Completed Card */}
-              <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4">
-                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-emerald-500" />
+              <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500" />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Completed</p>
-                  <p className="text-xl font-bold text-gray-900">
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-gray-500">Completed</p>
+                  <p className="text-lg sm:text-xl font-bold text-gray-900">
                     {roadmapData?.completed_steps || 0}
                   </p>
                 </div>
@@ -963,9 +963,9 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
             </div>
 
             {/* Difficulty Level Legend - Collapsible */}
-            <details className="mb-6">
-              <summary className="cursor-pointer text-sm text-gray-500 flex items-center gap-2 hover:text-gray-700">
-                <Zap className="w-4 h-4" />
+            <details className="mb-4 sm:mb-6">
+              <summary className="cursor-pointer text-xs sm:text-sm text-gray-500 flex items-center gap-2 hover:text-gray-700">
+                <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span>View Difficulty Levels Guide</span>
               </summary>
               <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">

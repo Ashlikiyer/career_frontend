@@ -154,10 +154,10 @@ const StudentProgress = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
           {/* Header Skeleton */}
-          <div className="flex items-start justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 sm:mb-8">
             <div className="space-y-2">
               <div className="h-9 w-40 bg-gray-200 rounded-lg animate-shimmer" />
               <div className="h-5 w-80 bg-gray-200 rounded animate-shimmer" />
@@ -166,7 +166,7 @@ const StudentProgress = () => {
           </div>
           
           {/* Stats Cards Skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
             {[1, 2, 3, 4].map((i) => (
               <div 
                 key={i} 
@@ -243,8 +243,8 @@ const StudentProgress = () => {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-xl shadow-sm p-8 text-center max-w-md">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="bg-white rounded-xl shadow-sm p-6 sm:p-8 text-center max-w-md w-full">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Target className="w-8 h-8 text-red-600" />
           </div>
@@ -264,8 +264,8 @@ const StudentProgress = () => {
   // Empty state
   if (!progressData || !progressData.hasProgress) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-xl shadow-sm p-8 text-center max-w-md">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="bg-white rounded-xl shadow-sm p-6 sm:p-8 text-center max-w-md w-full">
           <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Target className="w-8 h-8 text-indigo-600" />
           </div>
@@ -286,12 +286,12 @@ const StudentProgress = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-page-enter">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8 animate-page-enter">
         {/* Header */}
-        <div className="flex items-start justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">My Progress</h1>
-            <p className="text-gray-500 mt-1">Track your learning journey and skill development across recommended career paths.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Progress</h1>
+            <p className="text-sm sm:text-base text-gray-500 mt-1">Track your learning journey and skill development across recommended career paths.</p>
           </div>
           <button
             onClick={loadProgress}
@@ -304,76 +304,76 @@ const StudentProgress = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {/* Learning Paths */}
-          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 animate-card-enter animate-stagger-1">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-blue-600" />
+          <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100 animate-card-enter animate-stagger-1">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
               </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Learning Paths</p>
-                <p className="text-2xl font-bold text-gray-900">{progressData.summary.totalCareers} Active</p>
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wide">Learning Paths</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{progressData.summary.totalCareers} Active</p>
               </div>
             </div>
           </div>
 
           {/* Steps Completed */}
-          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 animate-card-enter animate-stagger-2">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+          <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100 animate-card-enter animate-stagger-2">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
               </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Steps Completed</p>
-                <p className="text-2xl font-bold text-gray-900">{progressData.summary.completedSteps} / {progressData.summary.totalSteps}</p>
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wide">Completed</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{progressData.summary.completedSteps} / {progressData.summary.totalSteps}</p>
               </div>
             </div>
           </div>
 
           {/* Total Time */}
-          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 animate-card-enter animate-stagger-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-5 h-5 text-amber-600" />
+          <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100 animate-card-enter animate-stagger-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
               </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Time</p>
-                <p className="text-2xl font-bold text-gray-900">{progressData.summary.totalTimeFormatted || "0m"}</p>
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wide">Total Time</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{progressData.summary.totalTimeFormatted || "0m"}</p>
               </div>
             </div>
           </div>
 
           {/* Overall Progress */}
-          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 animate-card-enter animate-stagger-4">
+          <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100 animate-card-enter animate-stagger-4">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Overall Progress</p>
-                <p className="text-2xl font-bold text-gray-900">{progressData.summary.overallProgress}%</p>
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wide">Progress</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{progressData.summary.overallProgress}%</p>
               </div>
-              <ProgressRing percent={progressData.summary.overallProgress} size={60} />
+              <ProgressRing percent={progressData.summary.overallProgress} size={50} />
             </div>
           </div>
         </div>
 
         {/* Current Path Focus Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div className="flex items-center gap-2">
-              <Target className="w-5 h-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Current Path Focus</h2>
+              <Target className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900">Current Path Focus</h2>
             </div>
-            <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full uppercase">Active Journey</span>
+            <span className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-700 text-[10px] sm:text-xs font-semibold rounded-full uppercase">Active Journey</span>
           </div>
 
           {/* Career Selector Tabs (if multiple careers) */}
           {progressData.careers.length > 1 && (
-            <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+            <div className="flex gap-2 mb-3 sm:mb-4 overflow-x-auto pb-2 -mx-1 px-1">
               {progressData.careers.map((career) => (
                 <button
                   key={career.saved_career_id}
                   onClick={() => setSelectedCareer(career)}
-                  className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-colors ${
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium text-xs sm:text-sm whitespace-nowrap transition-colors ${
                     selectedCareer?.saved_career_id === career.saved_career_id
                       ? "bg-indigo-600 text-white"
                       : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
@@ -386,17 +386,17 @@ const StudentProgress = () => {
           )}
 
           {selectedCareer && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* Left Column - Hero Card + Learning Roadmap */}
-              <div className="lg:col-span-2 space-y-4">
+              <div className="lg:col-span-2 space-y-3 sm:space-y-4">
                 {/* Hero Card */}
-                <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 text-white p-6">
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 text-white p-4 sm:p-6">
                   <div className="absolute inset-0 opacity-10">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400 rounded-full blur-3xl" />
                   </div>
                   <div className="relative z-10">
-                    <h3 className="text-2xl font-bold mb-2">{selectedCareer.career_name}</h3>
-                    <p className="text-slate-300 text-sm">
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2">{selectedCareer.career_name}</h3>
+                    <p className="text-slate-300 text-xs sm:text-sm">
                       {selectedCareer.is_completed
                         ? "Congratulations! You have completed this learning path!"
                         : "Master the core competencies of modern software development."}

@@ -340,9 +340,9 @@ const DashboardNew = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-page-enter">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 animate-page-enter">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
           <button
             onClick={handleStartAssessment}
@@ -352,50 +352,50 @@ const DashboardNew = () => {
           </button>
         </div>
 
-        {/* Stats Cards */}
-        <div className="dashboard-stats-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
+        {/* Stats Cards - Compact horizontal row */}
+        <div className="dashboard-stats-grid grid grid-cols-3 gap-2 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
           {/* Total Saved Careers */}
-          <div className="dashboard-stat-card bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-1">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-500">Total Saved Careers</p>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{totalCareers}</p>
+          <div className="dashboard-stat-card bg-white rounded-xl p-3 sm:p-4 lg:p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-1">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="dashboard-stat-icon w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Bookmark className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600" />
               </div>
-              <div className="dashboard-stat-icon w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Bookmark className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-gray-500 truncate">Saved</p>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{totalCareers}</p>
               </div>
             </div>
           </div>
 
           {/* In Progress */}
-          <div className="dashboard-stat-card bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-500">In Progress</p>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{inProgressCareers}</p>
+          <div className="dashboard-stat-card bg-white rounded-xl p-3 sm:p-4 lg:p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-2">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="dashboard-stat-icon w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Puzzle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-amber-600" />
               </div>
-              <div className="dashboard-stat-icon w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                <Puzzle className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-gray-500 truncate">Active</p>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{inProgressCareers}</p>
               </div>
             </div>
           </div>
 
           {/* Completed Assessments */}
-          <div className="dashboard-stat-card bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-500">Completed Assessments</p>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{completedCareers}</p>
+          <div className="dashboard-stat-card bg-white rounded-xl p-3 sm:p-4 lg:p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="dashboard-stat-icon w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-green-600" />
               </div>
-              <div className="dashboard-stat-icon w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+              <div className="min-w-0">
+                <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-gray-500 truncate">Done</p>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{completedCareers}</p>
               </div>
             </div>
           </div>
         </div>
 
 {/* Career Collection - Redesigned */}
-        <div className="career-collection-section mb-8 animate-card-enter animate-stagger-4">
+        <div className="career-collection-section mb-6 sm:mb-8 animate-card-enter animate-stagger-4">
           {/* Header */}
           <div className="career-collection-header">
             <div className="career-collection-header-left">
@@ -549,14 +549,14 @@ const DashboardNew = () => {
         </div>
 
         {/* Where to Learn Section */}
-        <div className="learn-section bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
-          <div className="learn-section-header p-4 sm:p-6 border-b border-gray-100">
+        <div className="learn-section bg-white rounded-xl shadow-sm border border-gray-100 mb-6 sm:mb-8">
+          <div className="learn-section-header p-3 sm:p-4 lg:p-6 border-b border-gray-100">
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Where to Learn?</h2>
             <p className="text-xs sm:text-sm text-gray-500 mt-1">Start learning today with these top-rated platforms</p>
           </div>
           
-          <div className="p-4 sm:p-6">
-            <div className="learn-platforms-grid grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="p-3 sm:p-4 lg:p-6">
+            <div className="learn-platforms-grid grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
               {/* freeCodeCamp */}
               <a 
                 href="https://www.freecodecamp.org" 

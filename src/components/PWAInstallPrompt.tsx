@@ -60,10 +60,11 @@ export function PWAInstallPrompt() {
       setTimeout(() => setShowInstallPrompt(true), 2000);
     }
 
-    // For testing in development - show banner after delay
-    const isDev = import.meta.env.DEV;
-    if (isDev && !localStorage.getItem('pwa-install-dismissed')) {
-      setTimeout(() => setShowInstallPrompt(true), 1000);
+    // Show install prompt after delay for all platforms if not dismissed and not already installed
+    // This ensures desktop users see the banner even if beforeinstallprompt hasn't fired yet
+    const dismissed = localStorage.getItem('pwa-install-dismissed');
+    if (!dismissed && !window.matchMedia('(display-mode: standalone)').matches) {
+      setTimeout(() => setShowInstallPrompt(true), 1500);
     }
 
     return () => {
@@ -77,7 +78,15 @@ export function PWAInstallPrompt() {
       setShowIOSInstructions(true);
       return;
     }
-    // Show custom install modal
+    
+    // If we have a deferred prompt (browser supports PWA install), show modal
+    if (deferredPrompt) {
+      setShowInstallModal(true);
+      return;
+    }
+    
+    // For browsers that support PWA but haven't fired beforeinstallprompt yet,
+    // or for non-supporting browsers, show install instructions
     setShowInstallModal(true);
   };
 
@@ -95,8 +104,12 @@ export function PWAInstallPrompt() {
       }
       setDeferredPrompt(null);
     } else {
-      // Dev mode simulation - show success after delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // No native prompt available - provide manual instructions
+      // For Chrome/Edge: Ctrl+Shift+I -> Application -> Install
+      // Or use browser menu -> Install App
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // Show a helpful message instead of silently dismissing
+      alert("To install this app:\n\n• Chrome/Edge: Click the install icon (⊕) in the address bar\n• Or use browser menu → 'Install CareerAI'\n\nIf you don't see these options, try refreshing the page.");
       setShowInstallModal(false);
       setShowInstallPrompt(false);
       localStorage.setItem('pwa-install-dismissed', 'true');
