@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { 
   Bookmark, 
-  Puzzle, 
-  CheckCircle, 
+  Activity, 
+  BadgeCheck, 
   Code, 
   GraduationCap, 
   Linkedin, 
@@ -35,7 +35,8 @@ import {
   Palette,
   Database,
   Briefcase,
-  Clock
+  Clock,
+  CheckCircle
 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import "./DashboardNew.css";
@@ -357,7 +358,7 @@ const DashboardNew = () => {
           {/* Total Saved Careers */}
           <div className="dashboard-stat-card bg-white rounded-xl p-3 sm:p-4 lg:p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-1">
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="dashboard-stat-icon w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="dashboard-stat-icon w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
                 <Bookmark className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600" />
               </div>
               <div className="min-w-0">
@@ -370,8 +371,8 @@ const DashboardNew = () => {
           {/* In Progress */}
           <div className="dashboard-stat-card bg-white rounded-xl p-3 sm:p-4 lg:p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-2">
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="dashboard-stat-icon w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Puzzle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-amber-600" />
+              <div className="dashboard-stat-icon w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-orange-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Activity className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-orange-600" />
               </div>
               <div className="min-w-0">
                 <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-gray-500 truncate">Active</p>
@@ -383,8 +384,8 @@ const DashboardNew = () => {
           {/* Completed Assessments */}
           <div className="dashboard-stat-card bg-white rounded-xl p-3 sm:p-4 lg:p-6 shadow-sm border border-gray-100 animate-card-enter animate-stagger-3">
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="dashboard-stat-icon w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-green-600" />
+              <div className="dashboard-stat-icon w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                <BadgeCheck className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-green-600" />
               </div>
               <div className="min-w-0">
                 <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-gray-500 truncate">Done</p>
