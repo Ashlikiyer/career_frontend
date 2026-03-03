@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Cookies } from "react-cookie";
 import FloatingChatbot from "../components/FloatingChatbot";
@@ -30,7 +30,7 @@ import {
 
 const Homepage = () => {
   const navigate = useNavigate();
-  const cookies = new Cookies();
+  const cookies = useMemo(() => new Cookies(), []);
 
   // Check if user is logged in
   const authToken = cookies.get("authToken");
@@ -41,8 +41,15 @@ const Homepage = () => {
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Ref to prevent duplicate fetches
+  const hasFetchedRef = useRef(false);
 
   const loadAnalytics = useCallback(async () => {
+    // Prevent duplicate fetches
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+    
     try {
       setIsLoadingAnalytics(true);
       const response = await getFeedbackAnalytics("30d");
@@ -57,10 +64,8 @@ const Homepage = () => {
   }, []);
 
   useEffect(() => {
-    if (!analytics && !isLoadingAnalytics) {
-      loadAnalytics();
-    }
-  }, [loadAnalytics, analytics, isLoadingAnalytics]);
+    loadAnalytics();
+  }, [loadAnalytics]);
 
   const handleStartAssessment = () => {
     const authToken = cookies.get("authToken");
@@ -71,28 +76,32 @@ const Homepage = () => {
     }
   };
 
-  // Testimonials navigation
-  const testimonials = analytics?.recentFeedback?.slice(0, 6) || [];
+  // Testimonials navigation - memoize to avoid recalculating on every render
+  const testimonials = useMemo(() => 
+    analytics?.recentFeedback?.slice(0, 6) || [], 
+    [analytics?.recentFeedback]
+  );
+  const testimonialsLength = testimonials.length;
 
-  const nextTestimonial = () => {
+  const nextTestimonial = useCallback(() => {
     setCurrentTestimonial((prev) =>
-      prev === testimonials.length - 1 ? 0 : prev + 1,
+      prev === testimonialsLength - 1 ? 0 : prev + 1,
     );
-  };
+  }, [testimonialsLength]);
 
-  const prevTestimonial = () => {
+  const prevTestimonial = useCallback(() => {
     setCurrentTestimonial((prev) =>
-      prev === 0 ? testimonials.length - 1 : prev - 1,
+      prev === 0 ? testimonialsLength - 1 : prev - 1,
     );
-  };
+  }, [testimonialsLength]);
 
   // Auto-rotate testimonials
   useEffect(() => {
-    if (testimonials.length > 1) {
+    if (testimonialsLength > 1) {
       const interval = setInterval(nextTestimonial, 5000);
       return () => clearInterval(interval);
     }
-  }, [testimonials.length]);
+  }, [testimonialsLength, nextTestimonial]);
 
   const renderStars = (rating: number) => {
     return (
