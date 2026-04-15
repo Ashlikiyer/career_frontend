@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../../services/dataService";
 import { useToast } from "@/components/ui/Toast";
@@ -64,8 +64,25 @@ const Login = () => {
     navigate("/dashboard");
   };
 
+  useEffect(() => {
+    const applyOverflow = () => {
+      const shouldLock = window.innerWidth >= 1024;
+      document.body.style.overflow = shouldLock ? "hidden" : "";
+      document.documentElement.style.overflow = shouldLock ? "hidden" : "";
+    };
+
+    applyOverflow();
+    window.addEventListener("resize", applyOverflow);
+
+    return () => {
+      window.removeEventListener("resize", applyOverflow);
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen lg:h-[100dvh] overflow-y-auto lg:overflow-hidden flex">
       {/* Left Side - Gradient Background with Info */}
       <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 p-8 xl:p-12 flex-col justify-between relative overflow-hidden">
         {/* Background Pattern */}
@@ -134,21 +151,21 @@ const Login = () => {
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-6 sm:p-8 bg-gray-50">
+      <div className="w-full lg:w-1/2 xl:w-[45%] min-h-screen lg:min-h-0 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-gray-50 overflow-y-auto lg:overflow-hidden">
         <div className="w-full max-w-md">
           {/* Form Card */}
-          <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-10">
+          <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-8 lg:p-9 overflow-hidden">
             {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-              <p className="text-gray-500">Sign in to continue your learning journey</p>
+            <div className="mb-5 sm:mb-6">
+              <h1 className="text-2xl sm:text-3xl lg:text-[2rem] font-bold text-gray-900 mb-2 leading-tight">Welcome Back</h1>
+              <p className="text-gray-500 text-sm lg:text-[0.95rem]">Sign in to continue your learning journey</p>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email Field */}
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                   Email Address
                 </label>
                 <div className="relative">
@@ -160,7 +177,7 @@ const Login = () => {
                     id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
                     placeholder="your.email@gordon.edu.ph"
                     required
                   />
@@ -169,7 +186,7 @@ const Login = () => {
 
               {/* Password Field */}
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="password" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -181,7 +198,7 @@ const Login = () => {
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                    className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
                     placeholder="Enter your password"
                     required
                   />
@@ -199,7 +216,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
@@ -219,7 +236,7 @@ const Login = () => {
             </form>
 
             {/* Divider */}
-            <div className="relative my-8">
+              <div className="relative my-5 sm:my-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200"></div>
               </div>
@@ -239,7 +256,7 @@ const Login = () => {
             </div>
 
             {/* Terms */}
-            <p className="text-center text-xs text-gray-400 mt-8">
+              <p className="text-center text-[11px] sm:text-xs text-gray-400 mt-5 sm:mt-6">
               By signing in, you agree to our{" "}
               <a href="#" className="text-purple-600 hover:underline">Terms of Service</a>
               {" "}and{" "}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../../services/dataService";
 import { useToast } from "@/components/ui/Toast";
@@ -75,8 +75,25 @@ const Register = () => {
     navigate("/dashboard");
   };
 
+  useEffect(() => {
+    const applyOverflow = () => {
+      const shouldLock = window.innerWidth >= 1024;
+      document.body.style.overflow = shouldLock ? "hidden" : "";
+      document.documentElement.style.overflow = shouldLock ? "hidden" : "";
+    };
+
+    applyOverflow();
+    window.addEventListener("resize", applyOverflow);
+
+    return () => {
+      window.removeEventListener("resize", applyOverflow);
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen lg:h-[100dvh] overflow-y-auto lg:overflow-hidden flex">
       {/* Left Side - Gradient Background with Info */}
       <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 p-8 xl:p-12 flex-col justify-between relative overflow-hidden">
         {/* Background Pattern */}
@@ -145,21 +162,21 @@ const Register = () => {
       </div>
 
       {/* Right Side - Register Form */}
-      <div className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-6 sm:p-8 bg-gray-50">
+      <div className="w-full lg:w-1/2 xl:w-[45%] flex items-start lg:items-center justify-center p-4 sm:p-6 lg:p-8 bg-gray-50 overflow-y-auto lg:overflow-hidden">
         <div className="w-full max-w-md">
           {/* Form Card */}
-          <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-10">
+          <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-8 lg:p-9 overflow-hidden">
             {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
-              <p className="text-gray-500">Join us and discover your perfect career path</p>
+            <div className="mb-5 sm:mb-6">
+              <h1 className="text-2xl sm:text-3xl lg:text-[2rem] font-bold text-gray-900 mb-2 leading-tight">Create Account</h1>
+              <p className="text-gray-500 text-sm lg:text-[0.95rem]">Join us and discover your perfect career path</p>
             </div>
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Username Field */}
               <div>
-                <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="username" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                   Username
                 </label>
                 <div className="relative">
@@ -171,7 +188,7 @@ const Register = () => {
                     id="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
                     placeholder="Choose a username"
                     required
                   />
@@ -180,7 +197,7 @@ const Register = () => {
 
               {/* Email Field */}
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                   Email Address
                 </label>
                 <div className="relative">
@@ -192,7 +209,7 @@ const Register = () => {
                     id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
                     placeholder="your.email@gordon.edu.ph"
                     required
                   />
@@ -201,7 +218,7 @@ const Register = () => {
 
               {/* Password Field */}
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="password" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -213,7 +230,7 @@ const Register = () => {
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                      className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
                     placeholder="Create a strong password"
                     required
                   />
@@ -229,7 +246,7 @@ const Register = () => {
 
               {/* Confirm Password Field */}
               <div>
-                <label htmlFor="confirm-password" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="confirm-password" className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                   Confirm Password
                 </label>
                 <div className="relative">
@@ -241,7 +258,7 @@ const Register = () => {
                     id="confirm-password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                      className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
                     placeholder="Confirm your password"
                     required
                   />
@@ -276,7 +293,7 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
@@ -296,7 +313,7 @@ const Register = () => {
             </form>
 
             {/* Divider */}
-            <div className="relative my-8">
+              <div className="relative my-5 sm:my-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200"></div>
               </div>

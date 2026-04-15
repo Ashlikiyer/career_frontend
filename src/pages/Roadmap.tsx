@@ -19,6 +19,7 @@ import {
 } from "../types/assessment";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/Toast";
+import RoadmapSidebar from "../components/RoadmapSidebar";
 import {
   ChevronDown,
   ChevronUp,
@@ -169,6 +170,19 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   const [roadmapData, setRoadmapData] = useState<RoadmapResponse | null>(null);
   const [updatingStep, setUpdatingStep] = useState<number | null>(null);
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set()); // Track expanded accordion steps
+  const [selectedStepId, setSelectedStepId] = useState<number | null>(null); // Track selected step for sidebar
+
+  const focusStep = useCallback((stepId: number) => {
+    setSelectedStepId(stepId);
+    setExpandedSteps(new Set([stepId]));
+
+    window.setTimeout(() => {
+      const stepContainer = document.getElementById(`step-${stepId}`);
+      if (stepContainer) {
+        stepContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 80);
+  }, []);
 
   // Toggle accordion expansion
   const toggleStepExpansion = (stepId: number) => {
@@ -181,6 +195,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
       }
       return next;
     });
+    setSelectedStepId(stepId); // Update sidebar when step is expanded
   };
 
   // Feedback modal state
@@ -221,7 +236,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   const [liveElapsedSeconds, setLiveElapsedSeconds] = useState<number>(0); // Live counter for display
   const [pausedElapsedSeconds, setPausedElapsedSeconds] = useState<number>(0); // Preserved time when paused
   const [isPaused, setIsPaused] = useState(false); // Pause state
-  const liveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const liveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Format minutes to human-readable string
   const formatTime = (minutes: number): string => {
@@ -777,6 +792,11 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
         // Use the roadmap steps directly from the backend response
         if (response && response.roadmap && Array.isArray(response.roadmap)) {
           setRoadmap(response.roadmap);
+          setSelectedStepId((prev) => {
+            if (prev !== null) return prev;
+            const firstIncomplete = response.roadmap.find((step) => !step.is_done);
+            return firstIncomplete?.step_id ?? response.roadmap[0]?.step_id ?? null;
+          });
         } else {
           setRoadmap([]);
         }
@@ -870,128 +890,154 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
   }
 
   return (
-    <div className="roadmap-container">
-      <div className="flex-grow p-4 sm:p-8">
-        <div className="max-w-5xl mx-auto px-1 sm:px-0">
-          <div className="roadmap-header">
-            {/* Modern Header with Icon and Progress Card */}
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
-              {/* Left: Icon and Title */}
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
-                  <BookOpen className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
-                </div>
-                <div className="min-w-0">
-                  <h1 className="text-lg sm:text-2xl font-bold text-gray-900 leading-tight truncate">
-                    {roadmapData?.career_name || careerName} Learning Path
-                  </h1>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium bg-indigo-50 text-indigo-700">
-                      <Target className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                      {roadmapData?.total_steps || roadmap.length} steps
-                    </span>
+    <div className="roadmap-shell">
+      {/* Sidebar Navigation */}
+      {roadmapData && (
+        <RoadmapSidebar
+          steps={roadmapData.roadmap}
+          selectedStepId={selectedStepId}
+          careerName={roadmapData.career_name}
+          completedSteps={roadmapData.completed_steps}
+          totalSteps={roadmapData.total_steps}
+          onStepSelect={focusStep}
+        />
+      )}
+
+      {/* Main Content */}
+      <div className="roadmap-shell-main">
+        <div className="roadmap-container">
+          <div className="roadmap-main-content">
+            <div className="roadmap-main-inner">
+              <div className="roadmap-header">
+                <div className="roadmap-hero">
+                  <div className="roadmap-hero-main">
+                    <div className="roadmap-hero-icon">
+                      <BookOpen className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="roadmap-hero-copy">
+                      <p className="roadmap-hero-eyebrow">Personalized learning roadmap</p>
+                      <h1 className="roadmap-hero-title">
+                        {roadmapData?.career_name || careerName} Learning Path
+                      </h1>
+                      <p className="roadmap-hero-subtitle">
+                        Move through each step, pass assessments, and unlock the next milestone.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="roadmap-hero-progress-card">
+                    <div className="roadmap-hero-progress-header">
+                      <span>Overall Progress</span>
+                      <strong>
+                        {roadmapData?.total_steps
+                          ? Math.round((roadmapData.completed_steps / roadmapData.total_steps) * 100)
+                          : 0}%
+                      </strong>
+                    </div>
+                    <div className="roadmap-hero-progress-track">
+                      <div
+                        className="roadmap-hero-progress-fill"
+                        style={{
+                          width: `${roadmapData?.total_steps
+                            ? (roadmapData.completed_steps / roadmapData.total_steps) * 100
+                            : 0}%`,
+                        }}
+                      />
+                    </div>
+                    <p className="roadmap-hero-progress-meta">
+                      {roadmapData?.completed_steps || 0} of {roadmapData?.total_steps || roadmap.length} completed
+                    </p>
                   </div>
                 </div>
-              </div>
 
-              {/* Right: Progress Card */}
-              <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 sm:min-w-[200px] shadow-sm">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs sm:text-sm text-gray-500">Overall Progress</span>
-                  <span className="text-base sm:text-lg font-bold text-indigo-600">
-                    {roadmapData?.total_steps
-                      ? Math.round((roadmapData.completed_steps / roadmapData.total_steps) * 100)
-                      : 0}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-100 rounded-full h-2.5">
-                  <div
-                    className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2.5 rounded-full transition-all duration-500"
-                    style={{
-                      width: `${roadmapData?.total_steps
-                        ? (roadmapData.completed_steps / roadmapData.total_steps) * 100
-                        : 0}%`,
-                    }}
-                  />
-                </div>
-                <p className="text-xs text-gray-400 mt-1">
-                  {roadmapData?.completed_steps || 0} of {roadmapData?.total_steps || roadmap.length} completed
-                </p>
-              </div>
-            </div>
+                <div className="roadmap-stats-grid">
+                  <article className="roadmap-stat-card">
+                    <div className="roadmap-stat-icon roadmap-stat-icon-blue">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="roadmap-stat-label">Learning Time</p>
+                      <p className="roadmap-stat-value">
+                        {roadmapData?.total_time_formatted || formatTime(roadmapData?.total_time_minutes || 0)}
+                      </p>
+                    </div>
+                  </article>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
-              {/* Learning Time Card */}
-              <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs sm:text-sm text-gray-500">Learning Time</p>
-                  <p className="text-lg sm:text-xl font-bold text-gray-900 truncate">
-                    {roadmapData?.total_time_formatted || formatTime(roadmapData?.total_time_minutes || 0)}
-                  </p>
-                </div>
-              </div>
+                  <article className="roadmap-stat-card">
+                    <div className="roadmap-stat-icon roadmap-stat-icon-amber">
+                      <TrendingUp className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="roadmap-stat-label">Steps In Progress</p>
+                      <p className="roadmap-stat-value">{roadmapData?.steps_in_progress || 0}</p>
+                    </div>
+                  </article>
 
-              {/* Steps In Progress Card */}
-              <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" />
+                  <article className="roadmap-stat-card">
+                    <div className="roadmap-stat-icon roadmap-stat-icon-emerald">
+                      <CheckCircle className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="roadmap-stat-label">Completed Steps</p>
+                      <p className="roadmap-stat-value">{roadmapData?.completed_steps || 0}</p>
+                    </div>
+                  </article>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-xs sm:text-sm text-gray-500">Steps In Progress</p>
-                  <p className="text-lg sm:text-xl font-bold text-gray-900">
-                    {roadmapData?.steps_in_progress || 0}
-                  </p>
-                </div>
-              </div>
 
-              {/* Completed Card */}
-              <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs sm:text-sm text-gray-500">Completed</p>
-                  <p className="text-lg sm:text-xl font-bold text-gray-900">
-                    {roadmapData?.completed_steps || 0}
-                  </p>
-                </div>
-              </div>
-            </div>
+                <details className="difficulty-guide">
+                  <summary className="difficulty-guide-summary">
+                    <Zap className="w-4 h-4" />
+                    <span>Difficulty Levels Guide</span>
+                  </summary>
+                  <div className="difficulty-guide-grid">
+                    {(
+                      Object.entries(DIFFICULTY_INFO) as [
+                        DifficultyLevel,
+                        DifficultyInfo
+                      ][]
+                    ).map(([level, info]) => (
+                      <div key={level} className="difficulty-guide-item">
+                        <span
+                          className="difficulty-guide-badge"
+                          style={{
+                            backgroundColor: info.bgColor,
+                            color: info.color,
+                            borderColor: info.borderColor,
+                          }}
+                        >
+                          {info.icon} {info.label}
+                        </span>
+                        <span className="difficulty-guide-description">{info.description}</span>
+                      </div>
+                    ))}
+                  </div>
+                </details>
 
-            {/* Difficulty Level Legend - Collapsible */}
-            <details className="mb-4 sm:mb-6">
-              <summary className="cursor-pointer text-xs sm:text-sm text-gray-500 flex items-center gap-2 hover:text-gray-700">
-                <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span>View Difficulty Levels Guide</span>
-              </summary>
-              <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {(
-                  Object.entries(DIFFICULTY_INFO) as [
-                    DifficultyLevel,
-                    DifficultyInfo
-                  ][]
-                ).map(([level, info]) => (
-                  <div key={level} className="flex items-center gap-2 p-2 rounded-lg bg-gray-50">
-                    <span
-                      className="px-2 py-1 rounded-md text-xs font-medium"
-                      style={{
-                        backgroundColor: info.bgColor,
-                        color: info.color,
-                        borderColor: info.borderColor,
+                {roadmap.length > 0 && (
+                  <div className="roadmap-mobile-jump">
+                    <label htmlFor="roadmap-step-select">Jump to a roadmap step</label>
+                    <select
+                      id="roadmap-step-select"
+                      value={selectedStepId ?? ""}
+                      onChange={(event) => {
+                        const stepId = Number(event.target.value);
+                        if (!Number.isNaN(stepId) && stepId > 0) {
+                          focusStep(stepId);
+                        }
                       }}
                     >
-                      {info.icon} {info.label}
-                    </span>
-                    <span className="text-xs text-gray-500">{info.description}</span>
+                      <option value="" disabled>
+                        Select a step
+                      </option>
+                      {roadmap.map((step) => (
+                        <option key={step.step_id} value={step.step_id}>
+                          Step {step.step_number}: {step.title}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                ))}
+                )}
               </div>
-            </details>
-          </div>
           <div className="roadmap-timeline">
             {roadmap.length > 0 ? (
               roadmap.map((step, index) => {
@@ -1002,9 +1048,14 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                 const hasPassedAssessment =
                   stepInfo?.assessment_passed || false;
                 const canMarkAsDone = hasPassedAssessment || step.is_done;
+                  const showLearningAction = !step.is_done && activeStepId !== step.step_id;
+                  const showAssessmentAction =
+                    !!stepInfo &&
+                    !stepInfo.is_locked &&
+                    !(stepInfo.is_completed && stepInfo.assessment_passed);
 
                 return (
-                  <div key={step.step_id} className="roadmap-step">
+                  <div id={`step-${step.step_id}`} key={step.step_id} className="roadmap-step">
                     <div className="step-layout">
                       <div className="step-number-column">
                         <button
@@ -1029,7 +1080,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                           ) : step.is_done ? (
                             "✓"
                           ) : !canMarkAsDone ? (
-                            "🔒"
+                              <Lock className="w-4 h-4" aria-hidden="true" />
                           ) : (
                             step.step_number
                           )}
@@ -1038,16 +1089,9 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                           <div className="step-connector"></div>
                         )}
                       </div>
-                      <div
-                        className={`step-card ${
-                          step.is_done ? "completed" : ""
-                        } bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden`}
-                      >
+                        <div className={`step-card ${step.is_done ? "completed" : ""}`}>
                         {/* Clickable Header Row */}
-                        <div
-                          className="step-card-header cursor-pointer hover:bg-gray-50 transition-colors p-3 sm:p-4"
-                          onClick={() => toggleStepExpansion(step.step_id)}
-                        >
+                          <div className="step-card-header" onClick={() => toggleStepExpansion(step.step_id)}>
                           <div className="flex items-start justify-between gap-2 sm:gap-4">
                             <div className="flex-1 min-w-0">
                               {/* Title Row with Status */}
@@ -1131,32 +1175,36 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                         
                         {/* Expandable Content */}
                         {expandedSteps.has(step.step_id) && (
-                          <div className="border-t border-gray-100 p-3 sm:p-4 bg-gray-50/50">
+                            <div className="step-card-body">
 
                             {/* Time Tracking Controls */}
-                            {!step.is_done && !step.started_at && (
-                              <div className="mb-4">
-                                <button
-                                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors w-full sm:w-auto text-sm sm:text-base"
-                                  onClick={() => handleStartStep(step)}
-                                >
-                                  <PlayCircle className="w-4 h-4" />
-                                  Start Learning
-                                </button>
-                              </div>
-                            )}
+                              {(showLearningAction || showAssessmentAction) && (
+                                <div className="step-primary-actions">
+                                  {showLearningAction && (
+                                    <button
+                                      className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 text-white rounded-lg transition-colors w-full sm:w-auto text-sm sm:text-base ${
+                                        step.started_at
+                                          ? "bg-blue-600 hover:bg-blue-700"
+                                          : "bg-indigo-600 hover:bg-indigo-700"
+                                      }`}
+                                      onClick={() => handleStartStep(step)}
+                                    >
+                                      <PlayCircle className="w-4 h-4" />
+                                      {step.started_at ? "Continue Learning" : "Start Learning"}
+                                    </button>
+                                  )}
 
-                            {!step.is_done && step.started_at && activeStepId !== step.step_id && (
-                              <div className="mb-4">
-                                <button
-                                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full sm:w-auto text-sm sm:text-base"
-                                  onClick={() => handleStartStep(step)}
-                                >
-                                  <PlayCircle className="w-4 h-4" />
-                                  Continue Learning
-                                </button>
-                              </div>
-                            )}
+                                  {showAssessmentAction && (
+                                    <button
+                                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors w-full sm:w-auto text-sm sm:text-base"
+                                      onClick={() => handleTakeAssessment(step.step_number)}
+                                    >
+                                      <Target className="w-4 h-4" />
+                                      Take Assessment
+                                    </button>
+                                  )}
+                                </div>
+                              )}
 
                             {activeStepId === step.step_id && !step.is_done && (
                               <div className="mb-4 p-2.5 sm:p-3 bg-emerald-50 rounded-lg border border-emerald-200">
@@ -1188,14 +1236,12 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                             )}
 
                             {/* Assessment Section */}
-                            {assessmentProgress && (() => {
-                              const stepAssessmentInfo = assessmentProgress.steps.find(
-                                (s) => s.step_number === step.step_number
-                              );
-
-                              return (
-                                <div className="mb-4 p-2.5 sm:p-3 rounded-lg border bg-white">
-                                  {stepAssessmentInfo?.is_locked ? (
+                              {assessmentProgress &&
+                                stepInfo &&
+                                (stepInfo.is_locked ||
+                                  (stepInfo.is_completed && stepInfo.assessment_passed)) && (
+                                  <div className="mb-4 p-2.5 sm:p-3 rounded-lg border bg-white">
+                                    {stepInfo.is_locked ? (
                                     <div className="flex items-center gap-2 sm:gap-3 text-gray-500">
                                       <Lock className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                                       <div className="min-w-0">
@@ -1203,14 +1249,14 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                                         <p className="text-xs sm:text-sm">Complete Step {step.step_number - 1} first</p>
                                       </div>
                                     </div>
-                                  ) : stepAssessmentInfo?.is_completed && stepAssessmentInfo?.assessment_passed ? (
+                                    ) : stepInfo.is_completed && stepInfo.assessment_passed ? (
                                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
                                       <div className="flex items-center gap-2 sm:gap-3 text-emerald-600">
                                         <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                                         <div className="min-w-0">
                                           <p className="font-medium text-sm sm:text-base">Assessment Passed</p>
                                           <p className="text-xs sm:text-sm text-gray-500">
-                                            Completed {stepAssessmentInfo.completed_at ? new Date(stepAssessmentInfo.completed_at).toLocaleDateString() : ""}
+                                              Completed {stepInfo.completed_at ? new Date(stepInfo.completed_at).toLocaleDateString() : ""}
                                           </p>
                                         </div>
                                       </div>
@@ -1221,18 +1267,9 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                                         Retake
                                       </button>
                                     </div>
-                                  ) : (
-                                    <button
-                                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors w-full sm:w-auto text-sm sm:text-base"
-                                      onClick={() => handleTakeAssessment(step.step_number)}
-                                    >
-                                      <Target className="w-4 h-4" />
-                                      Take Assessment
-                                    </button>
-                                  )}
+                                    ) : null}
                                 </div>
-                              );
-                            })()}
+                                )}
 
                         {/* Week-by-Week Breakdown (New Detailed Structure) */}
                         {step.weeks && step.weeks.length > 0 ? (
@@ -1595,7 +1632,7 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
                             ) : step.is_done ? (
                               "Mark as Incomplete"
                             ) : !canMarkAsDone ? (
-                              "🔒 Mark as Done (Pass Assessment First)"
+                                "Mark as Done (Pass Assessment First)"
                             ) : (
                               "✓ Mark as Done"
                             )}
@@ -2078,6 +2115,8 @@ const RoadmapPage: React.FC<RoadmapPageProps> = ({
           </div>
         </div>
       )}
+      </div>
+      </div>
     </div>
   );
 };
