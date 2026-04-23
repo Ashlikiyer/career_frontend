@@ -8,7 +8,8 @@ import {
   AssessmentHistory,
 } from "../types/assessment";
 
-const API_BASE_URL = "https://career.careerapp.xyz/api/roadmap-assessment";
+const API_BASE_URL = "https://career.careerapp.xyz/api/roadmap-assessment"; // For local dev
+// const API_BASE_URL = "https://career.careerapp.xyz/api/roadmap-assessment"; // For production
 
 // Get auth token
 const getAuthToken = (): string => {
