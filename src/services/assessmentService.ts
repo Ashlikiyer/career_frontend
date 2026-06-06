@@ -8,8 +8,8 @@ import {
   AssessmentHistory,
 } from "../types/assessment";
 
-const API_BASE_URL = "https://career.careerapp.xyz/api/roadmap-assessment"; // For local dev
-// const API_BASE_URL = "https://career.careerapp.xyz/api/roadmap-assessment"; // For production
+// Use environment variable for API URL, fallback to localhost for development
+const API_BASE_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/roadmap-assessment`;
 
 // Get auth token
 const getAuthToken = (): string => {

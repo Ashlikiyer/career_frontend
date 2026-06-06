@@ -7,9 +7,9 @@
 import axios from "axios";
 import { Cookies } from "react-cookie";
 
-// API Configuration
- const API_URL = "https://career.careerapp.xyz";
- 
+// API Configuration - Uses environment variable
+const API_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || "http://localhost:5000";
+
 const api = axios.create({
   baseURL: API_URL,
   withCredentials: true,

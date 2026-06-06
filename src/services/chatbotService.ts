@@ -74,9 +74,8 @@ class ChatbotService {
   private retryDelay: number = 1000;
 
   constructor() {
-    // API Configuration - Change this URL when deploying to production
-    const API_URL = "https://career.careerapp.xyz"; // For production (remove trailing slash)
-    // const API_URL = "http://localhost:5000"; // Uncomment for local development
+    // Use environment variable for API URL, fallback to localhost for development
+    const API_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
     this.apiBaseUrl = API_URL;
   }
 
