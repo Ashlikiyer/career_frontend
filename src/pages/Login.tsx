@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../../services/dataService";
 import { useToast } from "@/components/ui/Toast";
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Compass, Zap, TrendingUp, CheckCircle2 } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Compass, Zap, TrendingUp } from "lucide-react";
 import EmailVerificationModal from "@/components/EmailVerificationModal";
 
 const Login = () => {
